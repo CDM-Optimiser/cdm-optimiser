@@ -3,19 +3,18 @@ import type {Patient} from '../../utils/types/patient.ts';
 
 interface PatientCardProps {
   patient: Patient;
-  index?: number;
+  index: number;
   onCalledChange?: (index: number, value: boolean) => void;
   onAcceptedChange?: (index: number, value: boolean) => void;
 }
 
 export function PatientCardComponent({
   patient,
-  index = 0,
+  index,
   onCalledChange,
   onAcceptedChange,
 }: PatientCardProps) {
   const handleCalledToggle = (event: ChangeEvent<HTMLInputElement>) => {
-    console.log(index, event.target.checked);
     onCalledChange?.(index, event.target.checked);
   };
 

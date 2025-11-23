@@ -2,19 +2,14 @@ import {useState} from 'react';
 import {PatientCardComponent} from '../features/patient-card/patient-card.component.tsx';
 import {useListPatients} from '../utils/hooks/useListPatients.tsx';
 
-export function PatientsCardPageComponent({params}: {params?: {gms?: string}}) {
+export function PatientsCardPageComponent() {
   const {patients} = useListPatients();
 
-  const initialIndex = params?.gms
-    ? patients.findIndex((p) => p['gms number'] === params.gms)
-    : 0;
-
-  const [currentIndex, setCurrentIndex] = useState(
-    initialIndex >= 0 ? initialIndex : 0
-  );
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const handlePrev = () =>
     setCurrentIndex((prev) => (prev > 0 ? prev - 1 : prev));
+
   const handleNext = () =>
     setCurrentIndex((prev) => (prev < patients.length - 1 ? prev + 1 : prev));
 
@@ -48,7 +43,7 @@ export function PatientsCardPageComponent({params}: {params?: {gms?: string}}) {
         </div>
       </div>
       <section className="rounded-xl bg-white p-4">
-        <PatientCardComponent patient={currentPatient} />
+        <PatientCardComponent patient={currentPatient} index={currentIndex} />
       </section>
     </section>
   );
