@@ -1,0 +1,152 @@
+import {useId, type ChangeEvent, type MouseEvent} from 'react';
+import type {Patient} from '../../utils/types/patient.ts';
+import {getVisiblePages} from '../../utils/getVisiblePagesButtons.ts';
+
+interface PaginationProps {
+  data: Patient[];
+  currentPage: number;
+  totalPages: number;
+  resultsPerPage: number;
+  onPageChange?: (page: number) => void;
+  onResultsPerPageChange?: (results: number) => void;
+}
+
+export function PaginationComponent({
+  data,
+  currentPage,
+  totalPages,
+  resultsPerPage,
+  onPageChange = () => {},
+  onResultsPerPageChange = () => {},
+}: PaginationProps) {
+  const selectResultsPerPageID = useId();
+  const pagesToRender = getVisiblePages(currentPage, totalPages);
+
+  const handlePrevClick = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+
+    if (currentPage > 1) {
+      onPageChange(currentPage - 1);
+    }
+  };
+
+  const handleNextClick = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+
+    if (currentPage < totalPages) {
+      onPageChange(currentPage + 1);
+    }
+  };
+
+  const handleChangePage = (event: MouseEvent<HTMLButtonElement>) => {
+    const page = Number(event.currentTarget.dataset.pageNumber);
+
+    if (!isNaN(page) && page !== currentPage) {
+      onPageChange(page);
+    }
+  };
+
+  const handleChangeResultsPerPage = (
+    event: ChangeEvent<HTMLSelectElement>
+  ) => {
+    const results = Number(event?.currentTarget.value);
+    onResultsPerPageChange(results);
+  };
+
+  return (
+    <div className="pagination flex w-full flex-wrap items-center justify-center gap-4 rounded-full bg-white px-8 py-4 shadow-md md:flex-nowrap md:justify-between">
+      <div className="isolate inline-flex">
+        <button
+          type="button"
+          data-page-number={currentPage - 1}
+          className="prev-page-button relative inline-flex items-center rounded-s-md bg-sky-400 px-3 py-2 font-bold text-white ring-1 ring-gray-200 transition duration-200 ease-in-out hover:bg-sky-700"
+          onClick={handlePrevClick}
+        >
+          <span className="sr-only">Previous patient</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M15 6l-6 6l6 6" />
+          </svg>
+        </button>
+        {pagesToRender.map((page, index) => {
+          if (page === '…') {
+            return (
+              <span
+                key={`ellipsis-${index}`}
+                className="relative inline-flex w-12 items-center justify-center bg-sky-200 px-3 py-2 font-bold text-white"
+              >
+                …
+              </span>
+            );
+          }
+
+          const buttonsClassName = `${
+            currentPage === page ? 'bg-sky-700' : 'bg-sky-400'
+          }`.trim();
+
+          return (
+            <button
+              key={page}
+              type="button"
+              data-page-number={page}
+              className={`relative inline-flex w-12 items-center justify-center ${buttonsClassName} px-3 py-2 font-bold text-white ring-1 ring-gray-200 transition duration-200 ease-in-out hover:bg-sky-700`}
+              onClick={handleChangePage}
+            >
+              {page}
+            </button>
+          );
+        })}
+        <button
+          type="button"
+          className="next-page-button relative inline-flex items-center rounded-e-md bg-sky-400 px-3 py-2 font-bold text-white ring-1 ring-gray-200 transition duration-200 ease-in-out hover:bg-sky-700"
+          data-page-number={currentPage + 1}
+          onClick={handleNextClick}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M9 6l6 6l-6 6" />
+          </svg>
+          <span className="sr-only">Next patient</span>
+        </button>
+      </div>
+      <div className="flex items-center justify-center gap-2">
+        <label htmlFor={selectResultsPerPageID}>Patients per page:</label>
+        <select
+          id={selectResultsPerPageID}
+          name={selectResultsPerPageID}
+          value={resultsPerPage}
+          className="rounded-md px-2 py-1 ring ring-gray-400"
+          onChange={handleChangeResultsPerPage}
+        >
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="15">15</option>
+        </select>
+      </div>
+      <span>
+        Showing page {currentPage} of {totalPages} | Total: {data.length}{' '}
+        patients
+      </span>
+    </div>
+  );
+}

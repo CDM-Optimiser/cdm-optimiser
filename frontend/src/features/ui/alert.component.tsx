@@ -1,0 +1,108 @@
+import type {JSX} from 'react';
+
+type AlertTypes = 'error' | 'info' | 'success' | 'warning';
+
+interface AlertProps {
+  type?: AlertTypes;
+  title: string;
+  text: string;
+}
+
+export function AlertComponent({type = 'info', title, text}: AlertProps) {
+  const bgColorClass: Record<AlertTypes, string> = {
+    error: 'bg-red-50',
+    info: 'bg-blue-50',
+    success: 'bg-green-50',
+    warning: 'bg-yellow-50',
+  };
+
+  const borderClass: Record<AlertTypes, string> = {
+    error: 'border-red-400',
+    info: 'border-blue-400',
+    success: 'border-green-400',
+    warning: 'border-yellow-400',
+  };
+
+  const svgClass: Record<AlertTypes, string> = {
+    error: 'text-red-400',
+    info: 'text-blue-400',
+    success: 'text-green-400',
+    warning: 'text-yellow-400',
+  };
+
+  const textClass: Record<AlertTypes, string> = {
+    error: 'text-red-800',
+    info: 'text-blue-800',
+    success: 'text-green-800',
+    warning: 'text-yellow-700',
+  };
+
+  const icons: Record<AlertTypes, JSX.Element> = {
+    error: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        className={`${svgClass[type]}`}
+      >
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path d="M12 2c5.523 0 10 4.477 10 10a10 10 0 0 1 -19.995 .324l-.005 -.324l.004 -.28c.148 -5.393 4.566 -9.72 9.996 -9.72zm.01 13l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007zm-.01 -8a1 1 0 0 0 -.993 .883l-.007 .117v4l.007 .117a1 1 0 0 0 1.986 0l.007 -.117v-4l-.007 -.117a1 1 0 0 0 -.993 -.883z" />
+      </svg>
+    ),
+    info: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        className={`${svgClass[type]}`}
+      >
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path d="M12 2c5.523 0 10 4.477 10 10a10 10 0 0 1 -19.995 .324l-.005 -.324l.004 -.28c.148 -5.393 4.566 -9.72 9.996 -9.72zm0 9h-1l-.117 .007a1 1 0 0 0 0 1.986l.117 .007v3l.007 .117a1 1 0 0 0 .876 .876l.117 .007h1l.117 -.007a1 1 0 0 0 .876 -.876l.007 -.117l-.007 -.117a1 1 0 0 0 -.764 -.857l-.112 -.02l-.117 -.006v-3l-.007 -.117a1 1 0 0 0 -.876 -.876l-.117 -.007zm.01 -3l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007z" />
+      </svg>
+    ),
+    success: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        className={`${svgClass[type]}`}
+      >
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
+      </svg>
+    ),
+    warning: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        className={`${svgClass[type]}`}
+      >
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path d="M12 1.67c.955 0 1.845 .467 2.39 1.247l.105 .16l8.114 13.548a2.914 2.914 0 0 1 -2.307 4.363l-.195 .008h-16.225a2.914 2.914 0 0 1 -2.582 -4.2l.099 -.185l8.11 -13.538a2.914 2.914 0 0 1 2.491 -1.403zm.01 13.33l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007zm-.01 -7a1 1 0 0 0 -.993 .883l-.007 .117v4l.007 .117a1 1 0 0 0 1.986 0l.007 -.117v-4l-.007 -.117a1 1 0 0 0 -.993 -.883z" />
+      </svg>
+    ),
+  };
+
+  return (
+    <div
+      className={`${bgColorClass[type]} border-l-4 ${borderClass[type]} rounded-md p-4`}
+    >
+      <div className="flex">
+        <div className="shrink-0">{icons[type]}</div>
+        <div className="ml-3">
+          <h3 className={`${textClass[type]} font-medium`}>{title}</h3>
+          <p className={`${textClass[type]} mt-2`}>{text}</p>
+        </div>
+      </div>
+    </div>
+  );
+}

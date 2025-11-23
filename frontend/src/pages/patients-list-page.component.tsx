@@ -1,0 +1,81 @@
+import {useId} from 'react';
+import {AlertComponent} from '../features/ui/alert.component.tsx';
+import {LegendComponent} from '../features/patients-list/legend.component.tsx';
+import {PaginationComponent} from '../features/patients-list/pagination.component.tsx';
+import {PatientsListComponent} from '../features/patients-list/patients-list.component.tsx';
+import {SearchPatientComponent} from '../features/patients-list/search-patient.component.tsx';
+import {useInputChange} from '../utils/hooks/useInputChange.tsx';
+import {useListPatients} from '../utils/hooks/useListPatients.tsx';
+import {usePageChange} from '../utils/hooks/usePageChange.tsx';
+import {useResultsPerPage} from '../utils/hooks/useResultsPerPage.tsx';
+import {filterPatients} from '../utils/filterPatients.ts';
+
+export function PatientsListPageComponent() {
+  const inputSearchID = useId();
+  const {patients} = useListPatients();
+  const {searchText, handleInputChange} = useInputChange();
+  const {currentPage, handlePageChange} = usePageChange();
+  const {resultsPerPage, handleResultsPerPage} = useResultsPerPage();
+  const {totalPages, pageResults} = filterPatients(
+    resultsPerPage,
+    searchText,
+    patients,
+    currentPage
+  );
+
+  const handleTextChange = (text: string) => {
+    handleInputChange(text);
+    handlePageChange(1);
+  };
+
+  return (
+    <main className="mx-auto my-0 flex w-full max-w-7xl flex-col justify-center p-6">
+      <SearchPatientComponent
+        inputSearchID={inputSearchID}
+        placeholder="Type to find a patient by its name, D.O.B or GMS number"
+        onTextChange={handleTextChange}
+      />
+      <section>
+        <div className="py-2">
+          <article>
+            {pageResults.length === 0 ? (
+              <AlertComponent
+                type="warning"
+                title="No patient/s found"
+                text="There are no patient/s that matches your criteria."
+              />
+            ) : (
+              <div className="flex flex-col gap-6">
+                <PaginationComponent
+                  data={patients}
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  resultsPerPage={resultsPerPage}
+                  onPageChange={handlePageChange}
+                  onResultsPerPageChange={handleResultsPerPage}
+                />
+                <LegendComponent
+                  acceptedPatientsText="Accepted patients"
+                  refusedPatientsText="Refused patients"
+                  pendingPatientsText="Pending patients"
+                />
+                <PatientsListComponent
+                  allPatients={patients}
+                  patients={pageResults}
+                />
+                <PaginationComponent
+                  data={patients}
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  resultsPerPage={resultsPerPage}
+                  onPageChange={handlePageChange}
+                  onResultsPerPageChange={handleResultsPerPage}
+                />
+              </div>
+            )}
+          </article>
+        </div>
+      </section>
+    </main>
+  );
+}
