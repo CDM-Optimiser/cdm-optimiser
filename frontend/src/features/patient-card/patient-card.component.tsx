@@ -15,6 +15,7 @@ export function PatientCardComponent({
   onAcceptedChange,
 }: PatientCardProps) {
   const handleCalledToggle = (event: ChangeEvent<HTMLInputElement>) => {
+    console.log(index, event.target.checked);
     onCalledChange?.(index, event.target.checked);
   };
 

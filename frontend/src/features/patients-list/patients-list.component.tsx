@@ -13,8 +13,8 @@ export function PatientsListComponent({
   allPatients,
   patients,
 }: PatientsListProps) {
-  const [patientsState, setPatientsState] = useState<Patient[]>(patients);
   const [selectedPatient, setSelectedPatient] = useState<number | null>(null);
+  const [patientsState, setPatientsState] = useState<Patient[]>(allPatients);
 
   const handleRowClick = (gmsNumber: string) => {
     const index = allPatients.findIndex((p) => p['gms number'] === gmsNumber);
@@ -154,6 +154,7 @@ export function PatientsListComponent({
             </div>
             <PatientCardComponent
               patient={patientsState[selectedPatient]}
+              index={selectedPatient}
               onCalledChange={handleCalledChange}
               onAcceptedChange={handleAcceptedChange}
             />
