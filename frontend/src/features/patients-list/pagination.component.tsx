@@ -1,9 +1,7 @@
-import {useId, type ChangeEvent, type MouseEvent} from 'react';
-import type {Patient} from '../../utils/types/patient.ts';
-import {getVisiblePages} from '../../utils/getVisiblePagesButtons.ts';
+import { useId, type ChangeEvent, type MouseEvent } from 'react';
+import { getVisiblePages } from '../../utils/getVisiblePagesButtons.ts';
 
 interface PaginationProps {
-  data: Patient[];
   currentPage: number;
   totalPages: number;
   resultsPerPage: number;
@@ -12,12 +10,11 @@ interface PaginationProps {
 }
 
 export function PaginationComponent({
-  data,
   currentPage,
   totalPages,
   resultsPerPage,
-  onPageChange = () => {},
-  onResultsPerPageChange = () => {},
+  onPageChange = () => { },
+  onResultsPerPageChange = () => { },
 }: PaginationProps) {
   const selectResultsPerPageID = useId();
   const pagesToRender = getVisiblePages(currentPage, totalPages);
@@ -59,7 +56,7 @@ export function PaginationComponent({
         <button
           type="button"
           data-page-number={currentPage - 1}
-          className="prev-page-button relative inline-flex items-center rounded-s-md bg-sky-400 px-3 py-2 font-bold text-white ring-1 ring-gray-200 transition duration-200 ease-in-out hover:bg-sky-700"
+          className="prev-page-button relative inline-flex items-center rounded-s-md bg-white px-3 py-2 font-bold text-gray-900 ring-1 ring-gray-200 transition duration-200 ease-in-out hover:bg-sky-200"
           onClick={handlePrevClick}
         >
           <span className="sr-only">Previous patient</span>
@@ -83,23 +80,22 @@ export function PaginationComponent({
             return (
               <span
                 key={`ellipsis-${index}`}
-                className="relative inline-flex w-12 items-center justify-center bg-sky-200 px-3 py-2 font-bold text-white"
+                className="relative inline-flex w-12 items-center justify-center bg-white px-3 py-2 font-bold text-gray-900 ring-1 ring-gray-200"
               >
                 …
               </span>
             );
           }
 
-          const buttonsClassName = `${
-            currentPage === page ? 'bg-sky-700' : 'bg-sky-400'
-          }`.trim();
+          const buttonsClassName = `${currentPage === page ? 'bg-sky-200' : 'bg-white'
+            }`.trim();
 
           return (
             <button
               key={page}
               type="button"
               data-page-number={page}
-              className={`relative inline-flex w-12 items-center justify-center ${buttonsClassName} px-3 py-2 font-bold text-white ring-1 ring-gray-200 transition duration-200 ease-in-out hover:bg-sky-700`}
+              className={`relative inline-flex w-12 items-center justify-center ${buttonsClassName} px-3 py-2 font-bold text-gray-900 ring-1 ring-gray-200 transition duration-200 ease-in-out hover:bg-sky-200`}
               onClick={handleChangePage}
             >
               {page}
@@ -108,7 +104,7 @@ export function PaginationComponent({
         })}
         <button
           type="button"
-          className="next-page-button relative inline-flex items-center rounded-e-md bg-sky-400 px-3 py-2 font-bold text-white ring-1 ring-gray-200 transition duration-200 ease-in-out hover:bg-sky-700"
+          className="next-page-button relative inline-flex items-center rounded-e-md bg-white px-3 py-2 font-bold text-gray-900 ring-1 ring-gray-200 transition duration-200 ease-in-out hover:bg-sky-200"
           data-page-number={currentPage + 1}
           onClick={handleNextClick}
         >
@@ -144,8 +140,7 @@ export function PaginationComponent({
         </select>
       </div>
       <span>
-        Showing page {currentPage} of {totalPages} | Total: {data.length}{' '}
-        patients
+        Showing page {currentPage} of {totalPages}
       </span>
     </div>
   );

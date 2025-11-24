@@ -38,6 +38,16 @@ export function PatientsListPageComponent() {
     handlePageChange(1);
   };
 
+  const acceptedCount = patients.filter(
+    (p) => p.called === '1' && p.accepted === '1'
+  ).length;
+
+  const refusedCount = patients.filter(
+    (p) => p.called === '1' && p.accepted === '0'
+  ).length;
+
+  const pendingCount = patients.filter((p) => p.called === '0').length;
+
   return (
     <main className="mx-auto my-0 flex w-full max-w-7xl flex-col justify-center p-6">
       <SearchPatientComponent
@@ -56,45 +66,50 @@ export function PatientsListPageComponent() {
               />
             ) : (
               <div className="flex flex-col gap-6">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div className="flex flex-wrap items-center gap-4 rounded-md bg-white p-4 shadow-md">
+                    <span>Filters:</span>
+                    <div className="flex gap-2">
+                      <button
+                        className={`rounded px-4 py-2 ${acceptedFilter === 'all' ? 'bg-sky-500 text-white' : 'bg-gray-200'}`}
+                        onClick={() => handleFilterChange('all')}
+                      >
+                        All
+                      </button>
+                      <button
+                        className={`rounded px-4 py-2 ${acceptedFilter === 'accepted' ? 'bg-green-500 text-white' : 'bg-gray-200'}`}
+                        onClick={() => handleFilterChange('accepted')}
+                      >
+                        Accepted
+                      </button>
+                      <button
+                        className={`rounded px-4 py-2 ${acceptedFilter === 'refused' ? 'bg-red-500 text-white' : 'bg-gray-200'}`}
+                        onClick={() => handleFilterChange('refused')}
+                      >
+                        Refused
+                      </button>
+                    </div>
+                  </div>
+                  <LegendComponent
+                    totalPatients={patients.length}
+                    acceptedPatientsText={`Accepted patients (${acceptedCount})`}
+                    refusedPatientsText={`Refused patients (${refusedCount})`}
+                    pendingPatientsText={`Pending patients (${pendingCount})`}
+                  />
+                </div>
+
                 <PaginationComponent
-                  data={patients}
                   currentPage={currentPage}
                   totalPages={totalPages}
                   resultsPerPage={resultsPerPage}
                   onPageChange={handlePageChange}
                   onResultsPerPageChange={handleResultsPerPage}
                 />
-                <div className="mb-4 flex gap-2">
-                  <button
-                    className={`rounded px-4 py-2 ${acceptedFilter === 'all' ? 'bg-sky-500 text-white' : 'bg-gray-200'}`}
-                    onClick={() => handleFilterChange('all')}
-                  >
-                    All
-                  </button>
-                  <button
-                    className={`rounded px-4 py-2 ${acceptedFilter === 'accepted' ? 'bg-green-500 text-white' : 'bg-gray-200'}`}
-                    onClick={() => handleFilterChange('accepted')}
-                  >
-                    Accepted
-                  </button>
-                  <button
-                    className={`rounded px-4 py-2 ${acceptedFilter === 'refused' ? 'bg-red-500 text-white' : 'bg-gray-200'}`}
-                    onClick={() => handleFilterChange('refused')}
-                  >
-                    Refused
-                  </button>
-                </div>
-                <LegendComponent
-                  acceptedPatientsText="Accepted patients"
-                  refusedPatientsText="Refused patients"
-                  pendingPatientsText="Pending patients"
-                />
                 <PatientsListComponent
                   allPatients={patients}
                   patients={pageResults}
                 />
                 <PaginationComponent
-                  data={patients}
                   currentPage={currentPage}
                   totalPages={totalPages}
                   resultsPerPage={resultsPerPage}
