@@ -12,7 +12,7 @@ export function FiltersComponent({
   };
 
   return (
-    <div className="flex flex-col flex-wrap gap-4 rounded-xl bg-white p-4 shadow-md">
+    <div className="flex w-full flex-col flex-wrap gap-4 rounded-xl bg-white p-4 shadow-md xl:w-auto">
       <span>Filters:</span>
       <div className="flex gap-2">
         <button

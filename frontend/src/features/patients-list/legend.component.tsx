@@ -12,7 +12,7 @@ export function LegendComponent({
   pendingPatientsText,
 }: LegendComponentProps) {
   return (
-    <div className="legend flex flex-col flex-wrap gap-4 rounded-xl bg-white p-4 shadow-md">
+    <div className="legend flex w-full flex-col flex-wrap gap-4 rounded-xl bg-white p-4 shadow-md xl:w-auto">
       <div className="flex gap-2">
         Total patients: <span className="font-medium">{totalPatients}</span>
       </div>

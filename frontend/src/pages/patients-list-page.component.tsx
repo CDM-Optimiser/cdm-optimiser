@@ -67,30 +67,7 @@ export function PatientsListPageComponent() {
               />
             ) : (
               <div className="flex flex-col gap-6">
-                <div className="flex flex-wrap items-center justify-between gap-4">
-                  {/* <div className="flex flex-wrap items-center gap-4 rounded-xl bg-white p-4 shadow-md">
-                    <span>Filters:</span>
-                    <div className="flex gap-2">
-                      <button
-                        className={`rounded px-4 py-2 ${acceptedFilter === 'all' ? 'bg-sky-500 text-white' : 'bg-gray-200'}`}
-                        onClick={() => handleFilterChange('all')}
-                      >
-                        All
-                      </button>
-                      <button
-                        className={`rounded px-4 py-2 ${acceptedFilter === 'accepted' ? 'bg-green-500 text-white' : 'bg-gray-200'}`}
-                        onClick={() => handleFilterChange('accepted')}
-                      >
-                        Accepted
-                      </button>
-                      <button
-                        className={`rounded px-4 py-2 ${acceptedFilter === 'refused' ? 'bg-red-500 text-white' : 'bg-gray-200'}`}
-                        onClick={() => handleFilterChange('refused')}
-                      >
-                        Refused
-                      </button>
-                    </div>
-                  </div> */}
+                <div className="flex flex-wrap items-center justify-center gap-4 xl:justify-between">
                   <FiltersComponent
                     filterSelected={acceptedFilter}
                     onFilterChange={handleFilterChange}
