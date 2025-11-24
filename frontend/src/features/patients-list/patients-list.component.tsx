@@ -2,7 +2,10 @@ import {useState} from 'react';
 import {ModalComponent} from '../ui/modal.component.tsx';
 import {PatientCardComponent} from '../patient-card/patient-card.component.tsx';
 import type {Patient} from '../../utils/types/patient.ts';
-import {booleanColumns} from '../../utils/booleanColumns.ts';
+import {
+  booleanColumns,
+  hiddenColumns,
+} from '../../utils/patientsTableColumns.ts';
 
 interface PatientsListProps {
   allPatients: Patient[];
@@ -46,126 +49,147 @@ export function PatientsListComponent({
   };
 
   return (
-    <div className="overflow-hidden overflow-x-auto rounded-xl shadow-md">
+    <div className="overflow-hidden overflow-x-auto rounded-xl shadow-md dark:ring-1 dark:ring-gray-600">
       <table className="relative w-full min-w-100 table-auto md:table-fixed">
-        <thead className="bg-sky-200">
+        <thead className="bg-sky-200 dark:bg-white/5">
           <tr>
             {allPatients[0] &&
-              Object.keys(allPatients[0]).map((header) => {
-                const [firstLetter, ...word] = header;
+              Object.keys(allPatients[0])
+                .filter((header) => !hiddenColumns.includes(header))
+                .map((header) => {
+                  const [firstLetter, ...word] = header;
 
-                header = firstLetter.toUpperCase() + word.join('');
+                  header = firstLetter.toUpperCase() + word.join('');
 
-                return (
-                  <th
-                    key={header}
-                    scope="col"
-                    className="text-md px-3 py-3.5 text-left font-semibold"
-                  >
-                    {header}
-                  </th>
-                );
-              })}
+                  return (
+                    <th
+                      key={header}
+                      scope="col"
+                      className="text-md px-3 py-3.5 text-left font-semibold"
+                    >
+                      {header}
+                    </th>
+                  );
+                })}
           </tr>
         </thead>
-        <tbody className="bg-white">
+        <tbody className="bg-white dark:bg-white/5">
           {patients.map((patient) => {
             let rowBackground = '';
 
             if (patient.called === '1' && patient.accepted === '1') {
-              rowBackground = 'bg-green-100';
+              rowBackground =
+                'bg-green-100 dark:bg-emerald-300 dark:text-gray-900';
             } else if (patient.called === '1' && patient.accepted === '0') {
-              rowBackground = 'bg-red-100';
+              rowBackground = 'bg-red-100 dark:bg-rose-300 dark:text-gray-900';
             }
 
             return (
               <tr
                 key={patient['gms number']}
-                className={`transition duration-200 ease-in-out not-last:border-b not-last:border-gray-200 hover:cursor-pointer hover:bg-sky-100 ${rowBackground}`}
+                className={`transition duration-200 ease-in-out not-last:border-b not-last:border-gray-200 hover:cursor-pointer hover:bg-sky-100 dark:hover:bg-sky-500 ${rowBackground}`}
                 onClick={() => handleRowClick(patient['gms number'])}
               >
-                {Object.keys(patient).map((header) => {
-                  const value = patient[header as keyof Patient];
+                {Object.keys(patient)
+                  .filter((header) => !hiddenColumns.includes(header))
+                  .map((header) => {
+                    const value = patient[header as keyof Patient];
 
-                  if (booleanColumns.includes(header)) {
+                    if (booleanColumns.includes(header)) {
+                      return (
+                        <td key={header} className="px-3 py-3.5 text-left">
+                          {value === '1' ? (
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                              className="text-green-400"
+                            >
+                              <path
+                                stroke="none"
+                                d="M0 0h24v24H0z"
+                                fill="none"
+                              />
+                              <path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
+                            </svg>
+                          ) : (
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="text-gray-400"
+                            >
+                              <path
+                                stroke="none"
+                                d="M0 0h24v24H0z"
+                                fill="none"
+                              />
+                              <path d="M5 12h2" />
+                              <path d="M17 12h2" />
+                              <path d="M11 12h2" />
+                            </svg>
+                          )}
+                        </td>
+                      );
+                    }
+
+                    if (header === 'called' || header === 'accepted') {
+                      return (
+                        <td key={header} className="px-3 py-3.5 text-left">
+                          {value === '1' ? (
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                              className="text-green-400"
+                            >
+                              <path
+                                stroke="none"
+                                d="M0 0h24v24H0z"
+                                fill="none"
+                              />
+                              <path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
+                            </svg>
+                          ) : (
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                              className="text-red-400"
+                            >
+                              <path
+                                stroke="none"
+                                d="M0 0h24v24H0z"
+                                fill="none"
+                              />
+                              <path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" />
+                            </svg>
+                          )}
+                        </td>
+                      );
+                    }
+
                     return (
-                      <td key={header} className="px-3 py-3.5 text-left">
-                        {value === '1' ? (
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                            className="text-red-400"
-                          >
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" />
-                          </svg>
-                        ) : (
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="text-gray-400"
-                          >
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <path d="M5 12h2" />
-                            <path d="M17 12h2" />
-                            <path d="M11 12h2" />
-                          </svg>
-                        )}
+                      <td
+                        key={header}
+                        className="dark px-3 py-3.5 text-left break-all"
+                      >
+                        {value}
                       </td>
                     );
-                  }
-
-                  if (header === 'called' || header === 'accepted') {
-                    return (
-                      <td key={header} className="px-3 py-3.5 text-left">
-                        {value === '1' ? (
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                            className="text-green-400"
-                          >
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
-                          </svg>
-                        ) : (
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                            className="text-red-400"
-                          >
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" />
-                          </svg>
-                        )}
-                      </td>
-                    );
-                  }
-
-                  return (
-                    <td
-                      key={header}
-                      className="px-3 py-3.5 text-left break-all"
-                    >
-                      {value}
-                    </td>
-                  );
-                })}
+                  })}
               </tr>
             );
           })}

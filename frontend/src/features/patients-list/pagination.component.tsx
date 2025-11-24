@@ -1,5 +1,5 @@
-import {useId, type ChangeEvent, type MouseEvent} from 'react';
-import {getVisiblePages} from '../../utils/getVisiblePagesButtons.ts';
+import { useId, type ChangeEvent, type MouseEvent } from 'react';
+import { getVisiblePages } from '../../utils/getVisiblePagesButtons.ts';
 
 interface PaginationProps {
   currentPage: number;
@@ -13,8 +13,8 @@ export function PaginationComponent({
   currentPage,
   totalPages,
   resultsPerPage,
-  onPageChange = () => {},
-  onResultsPerPageChange = () => {},
+  onPageChange = () => { },
+  onResultsPerPageChange = () => { },
 }: PaginationProps) {
   const selectResultsPerPageID = useId();
   const pagesToRender = getVisiblePages(currentPage, totalPages);
@@ -51,12 +51,12 @@ export function PaginationComponent({
   };
 
   return (
-    <div className="pagination flex w-full flex-wrap items-center justify-center gap-4 rounded-xl bg-white px-8 py-4 shadow-md md:flex-nowrap md:justify-between">
+    <div className="flex w-full flex-wrap items-center justify-center gap-4 rounded-xl bg-white px-8 py-4 shadow-md md:flex-nowrap md:justify-between dark:bg-white/5 dark:ring dark:ring-gray-600">
       <div className="isolate inline-flex">
         <button
           type="button"
           data-page-number={currentPage - 1}
-          className="prev-page-button relative inline-flex items-center rounded-s-md bg-white px-3 py-2 font-bold text-gray-900 ring-1 ring-gray-200 transition duration-200 ease-in-out hover:bg-sky-200 disabled:bg-gray-200 disabled:text-white"
+          className="relative inline-flex items-center rounded-s-md bg-white px-3 py-2 font-medium text-gray-900 ring-1 ring-gray-200 transition duration-200 ease-in-out hover:bg-sky-500 hover:ring-sky-200 hover:not-disabled:text-white disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400 dark:bg-white/5 dark:text-white"
           disabled={currentPage === 1}
           onClick={handlePrevClick}
         >
@@ -81,23 +81,25 @@ export function PaginationComponent({
             return (
               <span
                 key={`ellipsis-${index}`}
-                className="relative inline-flex w-12 items-center justify-center bg-white px-3 py-2 font-bold text-gray-900 ring-1 ring-gray-200"
+                className="relative inline-flex w-12 items-center justify-center bg-white px-3 py-2 font-medium text-gray-900 ring-1 ring-gray-200 dark:bg-white/5 dark:text-white"
               >
                 …
               </span>
             );
           }
 
-          const buttonsClassName = `${
-            currentPage === page ? 'bg-sky-200' : 'bg-white'
-          }`.trim();
+          const buttonsClassName = `${currentPage === page
+              ? 'bg-sky-200 disabled:bg-sky-500 text-white'
+              : 'bg-white'
+            }`.trim();
 
           return (
             <button
               key={page}
               type="button"
               data-page-number={page}
-              className={`relative inline-flex w-12 items-center justify-center ${buttonsClassName} px-3 py-2 font-bold text-gray-900 ring-1 ring-gray-200 transition duration-200 ease-in-out hover:bg-sky-200`}
+              className={`relative inline-flex w-12 items-center justify-center ${buttonsClassName} px-3 py-2 font-medium text-gray-900 ring-1 ring-gray-200 transition duration-200 ease-in-out hover:not-disabled:bg-sky-500 hover:not-disabled:text-white disabled:cursor-not-allowed dark:bg-white/5 dark:text-white dark:hover:not-disabled:bg-sky-500 dark:hover:not-disabled:ring-sky-200`}
+              disabled={currentPage === page}
               onClick={handleChangePage}
             >
               {page}
@@ -107,7 +109,7 @@ export function PaginationComponent({
         <button
           type="button"
           data-page-number={currentPage + 1}
-          className="next-page-button relative inline-flex items-center rounded-e-md bg-white px-3 py-2 font-bold text-gray-900 ring-1 ring-gray-200 transition duration-200 ease-in-out hover:bg-sky-200 disabled:bg-gray-200 disabled:text-white"
+          className="relative inline-flex items-center rounded-e-md bg-white px-3 py-2 font-medium text-gray-900 ring-1 ring-gray-200 transition duration-200 ease-in-out hover:bg-sky-500 hover:ring-sky-200 hover:not-disabled:text-white disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400 dark:bg-white/5 dark:text-white"
           disabled={currentPage === totalPages}
           onClick={handleNextClick}
         >
@@ -134,7 +136,7 @@ export function PaginationComponent({
           id={selectResultsPerPageID}
           name={selectResultsPerPageID}
           value={resultsPerPage}
-          className="rounded-md px-2 py-1 ring ring-gray-400"
+          className="rounded-md bg-white px-2 py-1 ring ring-gray-400 dark:bg-white/5"
           onChange={handleChangeResultsPerPage}
         >
           <option value="5">5</option>
