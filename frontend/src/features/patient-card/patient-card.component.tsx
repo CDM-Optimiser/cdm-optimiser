@@ -235,7 +235,7 @@ export function PatientCardComponent({
                   title="toggle"
                   checked={patient.called ?? false}
                   onChange={handleCalledToggle}
-                  className="absolute inset-0 appearance-none"
+                  className="absolute inset-0 cursor-pointer appearance-none"
                 />
               </div>
             </div>
@@ -292,7 +292,7 @@ export function PatientCardComponent({
                     title="toggle"
                     checked={patient.accepted ?? false}
                     onChange={handleAcceptedToggle}
-                    className="absolute inset-0 appearance-none"
+                    className="absolute inset-0 cursor-pointer appearance-none"
                   />
                 </div>
               </div>
