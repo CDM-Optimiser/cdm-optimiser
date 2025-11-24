@@ -29,14 +29,14 @@ export function PatientsCardPageComponent() {
           <button
             onClick={handlePrev}
             disabled={currentIndex === 0}
-            className="rounded-full bg-sky-500 px-4 py-2 text-white transition hover:not-disabled:bg-sky-700 disabled:bg-gray-200"
+            className="rounded-xl bg-sky-500 px-4 py-2 text-white transition hover:not-disabled:bg-sky-700 disabled:bg-gray-200"
           >
             Previous patient
           </button>
           <button
             onClick={handleNext}
             disabled={currentIndex === patients.length - 1}
-            className="rounded-full bg-sky-500 px-4 py-2 text-white transition hover:not-disabled:bg-sky-700 disabled:bg-gray-200"
+            className="rounded-xl bg-sky-500 px-4 py-2 text-white transition hover:not-disabled:bg-sky-700 disabled:bg-gray-200"
           >
             Next patient
           </button>

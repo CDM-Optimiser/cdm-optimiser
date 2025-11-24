@@ -60,14 +60,14 @@ export function PatientsListPageComponent() {
           <article>
             {pageResults.length === 0 ? (
               <AlertComponent
-                type="warning"
+                type="info"
                 title="No patient/s found"
                 text="There are no patient/s that matches your criteria."
               />
             ) : (
               <div className="flex flex-col gap-6">
                 <div className="flex flex-wrap items-center justify-between gap-4">
-                  <div className="flex flex-wrap items-center gap-4 rounded-md bg-white p-4 shadow-md">
+                  <div className="flex flex-wrap items-center gap-4 rounded-xl bg-white p-4 shadow-md">
                     <span>Filters:</span>
                     <div className="flex gap-2">
                       <button

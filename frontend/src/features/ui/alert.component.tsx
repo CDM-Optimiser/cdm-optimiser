@@ -11,28 +11,28 @@ interface AlertProps {
 export function AlertComponent({type = 'info', title, text}: AlertProps) {
   const bgColorClass: Record<AlertTypes, string> = {
     error: 'bg-red-50',
-    info: 'bg-blue-50',
+    info: 'bg-sky-50',
     success: 'bg-green-50',
     warning: 'bg-yellow-50',
   };
 
   const borderClass: Record<AlertTypes, string> = {
     error: 'border-red-400',
-    info: 'border-blue-400',
+    info: 'border-sky-400',
     success: 'border-green-400',
     warning: 'border-yellow-400',
   };
 
   const svgClass: Record<AlertTypes, string> = {
     error: 'text-red-400',
-    info: 'text-blue-400',
+    info: 'text-sky-400',
     success: 'text-green-400',
     warning: 'text-yellow-400',
   };
 
   const textClass: Record<AlertTypes, string> = {
     error: 'text-red-800',
-    info: 'text-blue-800',
+    info: 'text-sky-800',
     success: 'text-green-800',
     warning: 'text-yellow-700',
   };
@@ -94,7 +94,7 @@ export function AlertComponent({type = 'info', title, text}: AlertProps) {
 
   return (
     <div
-      className={`${bgColorClass[type]} border-l-4 ${borderClass[type]} rounded-md p-4`}
+      className={`${bgColorClass[type]} border-l-4 ${borderClass[type]} rounded-xl p-4`}
     >
       <div className="flex">
         <div className="shrink-0">{icons[type]}</div>

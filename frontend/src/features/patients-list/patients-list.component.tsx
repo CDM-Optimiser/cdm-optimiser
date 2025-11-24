@@ -1,8 +1,8 @@
-import {useState} from 'react';
-import {ModalComponent} from '../ui/modal.component.tsx';
-import {PatientCardComponent} from '../patient-card/patient-card.component.tsx';
-import type {Patient} from '../../utils/types/patient.ts';
-import {booleanColumns} from '../../utils/booleanColumns.ts';
+import { useState } from 'react';
+import { ModalComponent } from '../ui/modal.component.tsx';
+import { PatientCardComponent } from '../patient-card/patient-card.component.tsx';
+import type { Patient } from '../../utils/types/patient.ts';
+import { booleanColumns } from '../../utils/booleanColumns.ts';
 
 interface PatientsListProps {
   allPatients: Patient[];
@@ -33,14 +33,14 @@ export function PatientsListComponent({
 
   const handleCalledChange = (index: number, value: boolean) => {
     setPatientsState((prev) =>
-      prev.map((p, i) => (i === index ? {...p, called: value ? '1' : '0'} : p))
+      prev.map((p, i) => (i === index ? { ...p, called: value ? '1' : '0' } : p))
     );
   };
 
   const handleAcceptedChange = (index: number, value: boolean) => {
     setPatientsState((prev) =>
       prev.map((p, i) =>
-        i === index ? {...p, accepted: value ? '1' : '0'} : p
+        i === index ? { ...p, accepted: value ? '1' : '0' } : p
       )
     );
   };
@@ -184,7 +184,7 @@ export function PatientsListComponent({
             <div className="flex justify-center gap-4 py-4">
               <button
                 type="button"
-                className="rounded-full bg-sky-500 px-4 py-2 text-white transition duration-200 ease-in-out hover:not-disabled:-translate-y-1 hover:not-disabled:scale-110 hover:not-disabled:bg-sky-700 disabled:bg-gray-200"
+                className="rounded-xl bg-sky-500 px-4 py-2 text-white transition duration-200 ease-in-out hover:not-disabled:-translate-y-1 hover:not-disabled:scale-110 hover:not-disabled:bg-sky-700 disabled:bg-gray-200"
                 disabled={selectedPatient === 0}
                 onClick={handlePrev}
               >
@@ -192,7 +192,7 @@ export function PatientsListComponent({
               </button>
               <button
                 type="button"
-                className="rounded-full bg-sky-500 px-4 py-2 text-white transition duration-200 ease-in-out hover:not-disabled:-translate-y-1 hover:not-disabled:scale-110 hover:not-disabled:bg-sky-700 disabled:bg-gray-200"
+                className="rounded-xl bg-sky-500 px-4 py-2 text-white transition duration-200 ease-in-out hover:not-disabled:-translate-y-1 hover:not-disabled:scale-110 hover:not-disabled:bg-sky-700 disabled:bg-gray-200"
                 disabled={selectedPatient === allPatients.length - 1}
                 onClick={handleNext}
               >

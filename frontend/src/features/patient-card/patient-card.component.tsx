@@ -187,8 +187,8 @@ export function PatientCardComponent({
               <span className="text-md ms-3 font-medium select-none">
                 Called?
               </span>
-              <div className="group relative inline-flex h-6 w-12 rounded-full bg-red-400 p-0.5 outline-offset-2 transition duration-200 ease-in-out has-checked:bg-green-500">
-                <span className="relative inline-flex h-5 w-5 rounded-full bg-white p-2 ring-1 ring-red-400 transition duration-200 ease-in-out group-has-[input:checked]:translate-x-6 group-has-[input:checked]:ring-sky-500">
+              <div className="group relative inline-flex h-6 w-12 rounded-xl bg-red-400 p-0.5 outline-offset-2 transition duration-200 ease-in-out has-checked:bg-green-500">
+                <span className="relative inline-flex h-5 w-5 rounded-xl bg-white p-2 ring-1 ring-red-400 transition duration-200 ease-in-out group-has-[input:checked]:translate-x-6 group-has-[input:checked]:ring-sky-500">
                   <span
                     aria-hidden="true"
                     className="absolute inset-0 flex h-full w-full items-center justify-center opacity-100 transition-opacity duration-200 ease-in-out group-has-[input:checked]:opacity-0"
@@ -244,8 +244,8 @@ export function PatientCardComponent({
                 <span className="text-md ms-3 font-medium select-none">
                   Accepted?
                 </span>
-                <div className="group relative inline-flex h-6 w-12 rounded-full bg-red-400 p-0.5 outline-offset-2 transition duration-200 ease-in-out has-checked:bg-green-500">
-                  <span className="relative inline-flex h-5 w-5 rounded-full bg-white p-2 ring-1 ring-red-400 transition duration-200 ease-in-out group-has-[input:checked]:translate-x-6 group-has-[input:checked]:ring-sky-500">
+                <div className="group relative inline-flex h-6 w-12 rounded-xl bg-red-400 p-0.5 outline-offset-2 transition duration-200 ease-in-out has-checked:bg-green-500">
+                  <span className="relative inline-flex h-5 w-5 rounded-xl bg-white p-2 ring-1 ring-red-400 transition duration-200 ease-in-out group-has-[input:checked]:translate-x-6 group-has-[input:checked]:ring-sky-500">
                     <span
                       aria-hidden="true"
                       className="absolute inset-0 flex h-full w-full items-center justify-center opacity-100 transition-opacity duration-200 ease-in-out group-has-[input:checked]:opacity-0"
