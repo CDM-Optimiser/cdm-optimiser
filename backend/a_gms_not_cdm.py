@@ -21,6 +21,6 @@ def gms_not_cdm_generator():
     gms_not_cdm.to_csv("gms_not_cdm.csv",index=False)
     
     
-    
-gms_not_cdm_generator()
+if __name__=="__main__":    
+    gms_not_cdm_generator()
     

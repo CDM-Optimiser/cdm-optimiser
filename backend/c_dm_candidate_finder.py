@@ -22,6 +22,7 @@ def dm_candidate_detector():
     gms.to_csv("gms_not_cdm.csv",index=False)
     
     
-dm_candidate_detector()
+if __name__=="__main__":    
+    dm_candidate_detector()
     
     

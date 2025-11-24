@@ -19,7 +19,8 @@ def asthma_candidate_detector():
     
     gms.to_csv("gms_not_cdm.csv",index=False)
     
-    
-asthma_candidate_detector()
+
+if __name__=="__main__":      
+    asthma_candidate_detector()
     
     

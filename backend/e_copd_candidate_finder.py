@@ -48,6 +48,6 @@ def copd_candidate_detector():
     
     
     
-    
-copd_candidate_detector()
+if __name__=="__main__":    
+    copd_candidate_detector()
     

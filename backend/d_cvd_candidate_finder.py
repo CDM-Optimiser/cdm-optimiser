@@ -17,6 +17,6 @@ def cvd_candidate_detector():
     
     gms.to_csv("gms_not_cdm.csv",index=False)
     
-    
-cvd_candidate_detector()
+if __name__=="__main__":    
+    cvd_candidate_detector()
     

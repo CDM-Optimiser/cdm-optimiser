@@ -12,4 +12,5 @@ def cdm_condition_counter():
     
     gms.to_csv("gms_not_cdm.csv",index=False)
     
-cdm_condition_counter()
+if __name__=="__main__":    
+    cdm_condition_counter()
