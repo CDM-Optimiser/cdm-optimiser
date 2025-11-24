@@ -40,14 +40,16 @@ export function PatientsListPageComponent() {
   };
 
   const acceptedCount = patients.filter(
-    (p) => p.called === '1' && p.accepted === '1'
+    (patient) => patient.accepted === '1'
   ).length;
 
   const refusedCount = patients.filter(
-    (p) => p.called === '1' && p.accepted === '0'
+    (patient) => patient.refused === '1'
   ).length;
 
-  const pendingCount = patients.filter((p) => p.called === '0').length;
+  const pendingCount = patients.filter(
+    (patient) => patient.accepted === '0' && patient.refused === '0'
+  ).length;
 
   return (
     <main className="mx-auto my-0 flex w-full max-w-7xl flex-col justify-center p-6">

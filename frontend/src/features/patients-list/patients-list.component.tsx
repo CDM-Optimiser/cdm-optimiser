@@ -34,16 +34,18 @@ export function PatientsListComponent({
     );
   };
 
-  const handleCalledChange = (index: number, value: boolean) => {
+  const handleAcceptedChange = (index: number, value: boolean) => {
     setPatientsState((prev) =>
-      prev.map((p, i) => (i === index ? {...p, called: value ? '1' : '0'} : p))
+      prev.map((patient, i) =>
+        i === index ? {...patient, accepted: value ? '1' : '0'} : patient
+      )
     );
   };
 
-  const handleAcceptedChange = (index: number, value: boolean) => {
+  const handleRefuseChange = (index: number, value: boolean) => {
     setPatientsState((prev) =>
-      prev.map((p, i) =>
-        i === index ? {...p, accepted: value ? '1' : '0'} : p
+      prev.map((patient, i) =>
+        i === index ? {...patient, refused: value ? '1' : '0'} : patient
       )
     );
   };
@@ -77,10 +79,10 @@ export function PatientsListComponent({
           {patients.map((patient) => {
             let rowBackground = '';
 
-            if (patient.called === '1' && patient.accepted === '1') {
+            if (patient.accepted === '1' && patient.refused === '0') {
               rowBackground =
                 'bg-green-100 dark:bg-emerald-300 dark:text-gray-900';
-            } else if (patient.called === '1' && patient.accepted === '0') {
+            } else if (patient.refused === '1' && patient.accepted === '0') {
               rowBackground = 'bg-red-100 dark:bg-rose-300 dark:text-gray-900';
             }
 
@@ -226,8 +228,8 @@ export function PatientsListComponent({
             <PatientCardComponent
               patient={patientsState[selectedPatient]}
               index={selectedPatient}
-              onCalledChange={handleCalledChange}
               onAcceptedChange={handleAcceptedChange}
+              onRefusedChange={handleRefuseChange}
             />
           </div>
         )}

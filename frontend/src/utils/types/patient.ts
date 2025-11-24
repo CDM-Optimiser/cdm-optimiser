@@ -9,6 +9,6 @@ export interface Patient {
   cvd: string;
   copd: string;
   'cdm condition counter': string;
-  called?: string;
   accepted?: string;
+  refused?: string;
 }

@@ -4,22 +4,22 @@ import type {Patient} from '../../utils/types/patient.ts';
 interface PatientCardProps {
   patient: Patient;
   index: number;
-  onCalledChange?: (index: number, value: boolean) => void;
   onAcceptedChange?: (index: number, value: boolean) => void;
+  onRefusedChange?: (index: number, value: boolean) => void;
 }
 
 export function PatientCardComponent({
   patient,
   index,
-  onCalledChange,
   onAcceptedChange,
+  onRefusedChange,
 }: PatientCardProps) {
-  const handleCalledToggle = (event: ChangeEvent<HTMLInputElement>) => {
-    onCalledChange?.(index, event.target.checked);
-  };
-
   const handleAcceptedToggle = (event: ChangeEvent<HTMLInputElement>) => {
     onAcceptedChange?.(index, event.target.checked);
+  };
+
+  const handleRefusedToggle = (event: ChangeEvent<HTMLInputElement>) => {
+    onRefusedChange?.(index, event.target.checked);
   };
 
   return (
@@ -185,7 +185,7 @@ export function PatientCardComponent({
           <div className="patient-actions patient-actions flex items-center gap-2 border-t border-gray-200 pt-4">
             <div className="flex items-center gap-2">
               <span className="text-md ms-3 font-medium select-none">
-                Called?
+                Accepted
               </span>
               <div className="group relative inline-flex h-6 w-12 rounded-xl bg-red-400 p-0.5 outline-offset-2 transition duration-200 ease-in-out has-checked:bg-green-500">
                 <span className="relative inline-flex h-5 w-5 rounded-xl bg-white p-2 ring-1 ring-red-400 transition duration-200 ease-in-out group-has-[input:checked]:translate-x-6 group-has-[input:checked]:ring-sky-500">
@@ -233,70 +233,68 @@ export function PatientCardComponent({
                   type="checkbox"
                   name="patient-called"
                   title="toggle"
-                  checked={patient.called === '1'}
-                  onChange={handleCalledToggle}
+                  checked={patient.accepted === '1'}
+                  onChange={handleAcceptedToggle}
                   className="absolute inset-0 cursor-pointer appearance-none"
                 />
               </div>
             </div>
-            {patient.called === '1' && (
-              <div className="flex items-center gap-2">
-                <span className="text-md ms-3 font-medium select-none">
-                  Accepted?
-                </span>
-                <div className="group relative inline-flex h-6 w-12 rounded-xl bg-red-400 p-0.5 outline-offset-2 transition duration-200 ease-in-out has-checked:bg-green-500">
-                  <span className="relative inline-flex h-5 w-5 rounded-xl bg-white p-2 ring-1 ring-red-400 transition duration-200 ease-in-out group-has-[input:checked]:translate-x-6 group-has-[input:checked]:ring-sky-500">
-                    <span
-                      aria-hidden="true"
-                      className="absolute inset-0 flex h-full w-full items-center justify-center opacity-100 transition-opacity duration-200 ease-in-out group-has-[input:checked]:opacity-0"
+            <div className="flex items-center gap-2">
+              <span className="text-md ms-3 font-medium select-none">
+                Refused
+              </span>
+              <div className="group relative inline-flex h-6 w-12 rounded-xl bg-red-400 p-0.5 outline-offset-2 transition duration-200 ease-in-out has-checked:bg-green-500">
+                <span className="relative inline-flex h-5 w-5 rounded-xl bg-white p-2 ring-1 ring-red-400 transition duration-200 ease-in-out group-has-[input:checked]:translate-x-6 group-has-[input:checked]:ring-sky-500">
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-0 flex h-full w-full items-center justify-center opacity-100 transition-opacity duration-200 ease-in-out group-has-[input:checked]:opacity-0"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M18 6l-12 12" />
-                        <path d="M6 6l12 12" />
-                      </svg>
-                    </span>
-                    <span
-                      aria-hidden="true"
-                      className="absolute inset-0 flex h-full w-full appearance-none items-center justify-center opacity-0 transition-opacity duration-100 ease-in-out group-has-[input:checked]:opacity-100"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M5 12l5 5l10 -10" />
-                      </svg>
-                    </span>
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M18 6l-12 12" />
+                      <path d="M6 6l12 12" />
+                    </svg>
                   </span>
-                  <input
-                    type="checkbox"
-                    name="patient-called"
-                    title="toggle"
-                    checked={patient.accepted === '1'}
-                    onChange={handleAcceptedToggle}
-                    className="absolute inset-0 cursor-pointer appearance-none"
-                  />
-                </div>
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-0 flex h-full w-full appearance-none items-center justify-center opacity-0 transition-opacity duration-100 ease-in-out group-has-[input:checked]:opacity-100"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M5 12l5 5l10 -10" />
+                    </svg>
+                  </span>
+                </span>
+                <input
+                  type="checkbox"
+                  name="patient-called"
+                  title="toggle"
+                  checked={patient.refused === '1'}
+                  onChange={handleRefusedToggle}
+                  className="absolute inset-0 cursor-pointer appearance-none"
+                />
               </div>
-            )}
+            </div>
           </div>
         </article>
       </div>

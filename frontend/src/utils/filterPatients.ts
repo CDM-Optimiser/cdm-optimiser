@@ -21,11 +21,11 @@ export function filterPatients(
 
   if (acceptedFilter === 'accepted') {
     filteredPatients = filteredPatients.filter(
-      (p) => p.called === '1' && p.accepted === '1'
+      (patient) => patient.accepted === '1' && patient.refused === '0'
     );
   } else if (acceptedFilter === 'refused') {
     filteredPatients = filteredPatients.filter(
-      (p) => p.called === '1' && p.accepted === '0'
+      (patient) => patient.refused === '1' && patient.accepted === '0'
     );
   }
 
