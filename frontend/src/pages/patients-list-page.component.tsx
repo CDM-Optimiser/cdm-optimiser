@@ -1,4 +1,4 @@
-import {useId} from 'react';
+import {useId, useState} from 'react';
 import {AlertComponent} from '../features/ui/alert.component.tsx';
 import {LegendComponent} from '../features/patients-list/legend.component.tsx';
 import {PaginationComponent} from '../features/patients-list/pagination.component.tsx';
@@ -12,6 +12,10 @@ import {filterPatients} from '../utils/filterPatients.ts';
 
 export function PatientsListPageComponent() {
   const inputSearchID = useId();
+  const [acceptedFilter, setAcceptedFilter] = useState<
+    'all' | 'accepted' | 'refused'
+  >('all');
+
   const {patients} = useListPatients();
   const {searchText, handleInputChange} = useInputChange();
   const {currentPage, handlePageChange} = usePageChange();
@@ -20,8 +24,14 @@ export function PatientsListPageComponent() {
     resultsPerPage,
     searchText,
     patients,
-    currentPage
+    currentPage,
+    acceptedFilter
   );
+
+  const handleFilterChange = (filter: 'all' | 'accepted' | 'refused') => {
+    setAcceptedFilter(filter);
+    handlePageChange(1);
+  };
 
   const handleTextChange = (text: string) => {
     handleInputChange(text);
@@ -54,6 +64,26 @@ export function PatientsListPageComponent() {
                   onPageChange={handlePageChange}
                   onResultsPerPageChange={handleResultsPerPage}
                 />
+                <div className="mb-4 flex gap-2">
+                  <button
+                    className={`rounded px-4 py-2 ${acceptedFilter === 'all' ? 'bg-sky-500 text-white' : 'bg-gray-200'}`}
+                    onClick={() => handleFilterChange('all')}
+                  >
+                    All
+                  </button>
+                  <button
+                    className={`rounded px-4 py-2 ${acceptedFilter === 'accepted' ? 'bg-green-500 text-white' : 'bg-gray-200'}`}
+                    onClick={() => handleFilterChange('accepted')}
+                  >
+                    Accepted
+                  </button>
+                  <button
+                    className={`rounded px-4 py-2 ${acceptedFilter === 'refused' ? 'bg-red-500 text-white' : 'bg-gray-200'}`}
+                    onClick={() => handleFilterChange('refused')}
+                  >
+                    Refused
+                  </button>
+                </div>
                 <LegendComponent
                   acceptedPatientsText="Accepted patients"
                   refusedPatientsText="Refused patients"

@@ -18,6 +18,7 @@ export function useListPatients() {
           headers.forEach((header, i) => {
             obj[header] = values[i];
           });
+
           return obj as Patient;
         });
 

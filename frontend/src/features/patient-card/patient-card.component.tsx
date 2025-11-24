@@ -233,13 +233,13 @@ export function PatientCardComponent({
                   type="checkbox"
                   name="patient-called"
                   title="toggle"
-                  checked={patient.called ?? false}
+                  checked={patient.called === '1'}
                   onChange={handleCalledToggle}
                   className="absolute inset-0 cursor-pointer appearance-none"
                 />
               </div>
             </div>
-            {patient.called && (
+            {patient.called === '1' && (
               <div className="flex items-center gap-2">
                 <span className="text-md ms-3 font-medium select-none">
                   Accepted?
@@ -290,7 +290,7 @@ export function PatientCardComponent({
                     type="checkbox"
                     name="patient-called"
                     title="toggle"
-                    checked={patient.accepted ?? false}
+                    checked={patient.accepted === '1'}
                     onChange={handleAcceptedToggle}
                     className="absolute inset-0 cursor-pointer appearance-none"
                   />

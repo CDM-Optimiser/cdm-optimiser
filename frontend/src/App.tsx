@@ -9,7 +9,7 @@ function App() {
     <>
       <HeaderComponent title="CDM Optimiser" />
       <Route path="/" Component={PatientsListPageComponent} />
-      <Route path="/patients-cards" Component={PatientsCardPageComponent} />
+      {/* <Route path="/patients-cards" Component={PatientsCardPageComponent} /> */}
       <FooterComponent brand="CDM Optimiser" />
     </>
   );

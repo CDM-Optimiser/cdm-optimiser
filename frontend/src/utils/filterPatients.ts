@@ -4,24 +4,34 @@ export function filterPatients(
   resultsPerPage: number,
   searchText: string,
   patients: Patient[],
-  currentPage: number
+  currentPage: number,
+  acceptedFilter: 'all' | 'accepted' | 'refused' = 'all'
 ) {
-  const patientsFoundByText =
-    searchText === ''
-      ? patients
-      : patients.filter((patient) => {
-          return (
-            patient.name.toLowerCase().includes(searchText.toLowerCase()) ||
-            patient.dob.includes(searchText) ||
-            patient['gms number']
-              .toLowerCase()
-              .includes(searchText.toLowerCase())
-          );
-        });
+  let filteredPatients = patients;
 
-  const totalPages = Math.ceil(patientsFoundByText.length / resultsPerPage);
+  if (searchText) {
+    filteredPatients = filteredPatients.filter((patient) => {
+      return (
+        patient.name.toLowerCase().includes(searchText.toLowerCase()) ||
+        patient.dob.includes(searchText) ||
+        patient['gms number'].toLowerCase().includes(searchText.toLowerCase())
+      );
+    });
+  }
 
-  const pageResults = patientsFoundByText.slice(
+  if (acceptedFilter === 'accepted') {
+    filteredPatients = filteredPatients.filter(
+      (p) => p.called === '1' && p.accepted === '1'
+    );
+  } else if (acceptedFilter === 'refused') {
+    filteredPatients = filteredPatients.filter(
+      (p) => p.called === '1' && p.accepted === '0'
+    );
+  }
+
+  const totalPages = Math.ceil(filteredPatients.length / resultsPerPage);
+
+  const pageResults = filteredPatients.slice(
     (currentPage - 1) * resultsPerPage,
     currentPage * resultsPerPage
   );
