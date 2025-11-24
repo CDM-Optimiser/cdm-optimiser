@@ -56,7 +56,8 @@ export function PaginationComponent({
         <button
           type="button"
           data-page-number={currentPage - 1}
-          className="prev-page-button relative inline-flex items-center rounded-s-md bg-white px-3 py-2 font-bold text-gray-900 ring-1 ring-gray-200 transition duration-200 ease-in-out hover:bg-sky-200"
+          className="prev-page-button relative inline-flex items-center rounded-s-md bg-white px-3 py-2 font-bold text-gray-900 ring-1 ring-gray-200 transition duration-200 ease-in-out hover:bg-sky-200 disabled:bg-gray-200 disabled:text-white"
+          disabled={currentPage === 1}
           onClick={handlePrevClick}
         >
           <span className="sr-only">Previous patient</span>
@@ -105,8 +106,9 @@ export function PaginationComponent({
         })}
         <button
           type="button"
-          className="next-page-button relative inline-flex items-center rounded-e-md bg-white px-3 py-2 font-bold text-gray-900 ring-1 ring-gray-200 transition duration-200 ease-in-out hover:bg-sky-200"
           data-page-number={currentPage + 1}
+          className="next-page-button relative inline-flex items-center rounded-e-md bg-white px-3 py-2 font-bold text-gray-900 ring-1 ring-gray-200 transition duration-200 ease-in-out hover:bg-sky-200 disabled:bg-gray-200 disabled:text-white"
+          disabled={currentPage === totalPages}
           onClick={handleNextClick}
         >
           <svg

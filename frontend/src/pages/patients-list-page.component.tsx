@@ -9,6 +9,7 @@ import {useListPatients} from '../utils/hooks/useListPatients.tsx';
 import {usePageChange} from '../utils/hooks/usePageChange.tsx';
 import {useResultsPerPage} from '../utils/hooks/useResultsPerPage.tsx';
 import {filterPatients} from '../utils/filterPatients.ts';
+import {FiltersComponent} from '../features/patients-list/filters.component.tsx';
 
 export function PatientsListPageComponent() {
   const inputSearchID = useId();
@@ -67,7 +68,7 @@ export function PatientsListPageComponent() {
             ) : (
               <div className="flex flex-col gap-6">
                 <div className="flex flex-wrap items-center justify-between gap-4">
-                  <div className="flex flex-wrap items-center gap-4 rounded-xl bg-white p-4 shadow-md">
+                  {/* <div className="flex flex-wrap items-center gap-4 rounded-xl bg-white p-4 shadow-md">
                     <span>Filters:</span>
                     <div className="flex gap-2">
                       <button
@@ -89,7 +90,11 @@ export function PatientsListPageComponent() {
                         Refused
                       </button>
                     </div>
-                  </div>
+                  </div> */}
+                  <FiltersComponent
+                    filterSelected={acceptedFilter}
+                    onFilterChange={handleFilterChange}
+                  />
                   <LegendComponent
                     totalPatients={patients.length}
                     acceptedPatientsText={`Accepted patients (${acceptedCount})`}

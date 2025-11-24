@@ -12,11 +12,11 @@ export function LegendComponent({
   pendingPatientsText,
 }: LegendComponentProps) {
   return (
-    <div className="legend flex flex-col flex-wrap rounded-xl bg-white p-4 shadow-md">
-      <div className="flex flex-wrap items-center gap-6">
-        <div className="flex gap-2">
-          Total patients: <span className="font-medium">{totalPatients}</span>
-        </div>
+    <div className="legend flex flex-col flex-wrap gap-4 rounded-xl bg-white p-4 shadow-md">
+      <div className="flex gap-2">
+        Total patients: <span className="font-medium">{totalPatients}</span>
+      </div>
+      <div className="flex flex-wrap items-center gap-6 py-2">
         <div className="flex flex-wrap items-center gap-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
