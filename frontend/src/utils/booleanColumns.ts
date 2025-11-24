@@ -1,1 +1,1 @@
-export const booleanColumns = ['asthma', 'dm', 'cvd', 'copd'];
+export const booleanColumns = ['asthma', 'dm', 'cvd', 'copd', 'called', 'accepted'];

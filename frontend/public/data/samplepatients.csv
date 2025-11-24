@@ -1,5 +1,5 @@
-name,dob,gms number,address,phone,asthma,dm,cvd,copd,cdm condition counter
-Mrs. Susanna Croal,1929-11-12,GMS178827,14 Morgan Street V71 3119 Roy Ville,788-397-3220x47678,1,0,1,0,2
+name,dob,gms number,address,phone,asthma,dm,cvd,copd,cdm condition counter,called,accepted
+Mrs. Susanna Croal,1929-11-12,GMS178827,14 Morgan Street V71 3119 Roy Ville,788-397-3220x47678,1,0,1,0,2,0,0
 Dr. Brian Jennings,1933-09-17,GMS897598,05 McLeigh Street X23F0E1 Declan Ville,442-198-5001x0850,0,0,1,1,2
 Dr. Steven Cullinane,1994-02-25,GMS208354,79 Carville Street Y48Y7TY Johanna Ville,+1-813-920-1059x8671,0,0,0,0,0
 Mr. Jordan MacConachy,1966-07-11,GMS456947,83 Clinten Street E05 09PV Timothy Ville,(842)196-9208x0666,1,0,0,0,1
