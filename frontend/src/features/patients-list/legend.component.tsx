@@ -16,7 +16,7 @@ export function LegendComponent({
       <div className="flex justify-center gap-2">
         Total patients: <span className="font-medium">{totalPatients}</span>
       </div>
-      <div className="flex flex-wrap items-center gap-6 py-2">
+      <div className="flex flex-wrap items-center justify-center gap-6 py-2">
         <div className="flex flex-wrap items-center gap-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
