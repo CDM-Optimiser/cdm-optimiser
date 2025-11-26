@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from backend.database.database import SessionLocal, Patient
@@ -23,8 +23,28 @@ def get_db():
 
 
 @app.get("/api/patients")
-def get_patients(db: Session = Depends(get_db)):
-    return db.query(Patient).all()
+def get_patients(
+    db: Session = Depends(get_db),
+    limit: int = Query(10, ge=1),
+    offset: int = Query(0, ge=0),
+):
+    total = db.query(Patient).count()
+    patients = db.query(Patient).offset(offset).limit(limit).all()
+
+    return {
+        "data": [
+            {
+                key: value
+                for key, value in patient.__dict__.items()
+                if key != "_sa_instance_state"
+            }
+            for patient in patients
+        ],
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+        "results": len(patients),
+    }
 
 
 @app.put("/api/patient/{patient_id}")
