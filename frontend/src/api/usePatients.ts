@@ -6,7 +6,12 @@ function getErrorMessage(error: unknown) {
   return String(error);
 }
 
-export function usePatients(limit: number, offset: number, searchText: string) {
+export function usePatients(
+  limit: number,
+  offset: number,
+  searchText: string,
+  currentPage: number
+) {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [totalPatients, setTotalPatients] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -17,10 +22,15 @@ export function usePatients(limit: number, offset: number, searchText: string) {
       try {
         setLoading(true);
 
-        const url =
-          searchText.length > 0
-            ? `http://localhost:8000/api/patients?limit=999999&offset=0`
-            : `http://localhost:8000/api/patients?limit=${limit}&offset=${offset}`;
+        const params = new URLSearchParams();
+
+        if (searchText) params.append('search', searchText);
+        params.append('limit', limit.toString());
+        params.append('offset', offset.toString());
+
+        const queryParams = params.toString();
+
+        const url = `http://localhost:8000/api/patients?${queryParams}`;
 
         const response = await fetch(url);
 
@@ -58,7 +68,7 @@ export function usePatients(limit: number, offset: number, searchText: string) {
     }
 
     loadPatients();
-  }, [limit, offset, searchText]);
+  }, [limit, offset, searchText, currentPage]);
 
   return {
     patients,
