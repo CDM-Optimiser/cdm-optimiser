@@ -1,4 +1,4 @@
-import type { ChangeEvent } from 'react';
+import type {ChangeEvent} from 'react';
 
 interface SearchPatientProps {
   inputSearchID: string;
@@ -9,7 +9,7 @@ interface SearchPatientProps {
 export function SearchPatientComponent({
   inputSearchID,
   placeholder,
-  onTextChange = () => { },
+  onTextChange = () => {},
 }: SearchPatientProps) {
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const inputText = event.target.value;

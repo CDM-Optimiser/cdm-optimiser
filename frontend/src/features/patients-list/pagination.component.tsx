@@ -1,5 +1,5 @@
-import { useId, type ChangeEvent, type MouseEvent } from 'react';
-import { getVisiblePages } from '../../utils/getVisiblePagesButtons.ts';
+import {useId, type ChangeEvent, type MouseEvent} from 'react';
+import {getVisiblePages} from '../../utils/getVisiblePagesButtons.ts';
 
 interface PaginationProps {
   currentPage: number;
@@ -13,8 +13,8 @@ export function PaginationComponent({
   currentPage,
   totalPages,
   resultsPerPage,
-  onPageChange = () => { },
-  onResultsPerPageChange = () => { },
+  onPageChange = () => {},
+  onResultsPerPageChange = () => {},
 }: PaginationProps) {
   const selectResultsPerPageID = useId();
   const pagesToRender = getVisiblePages(currentPage, totalPages);
@@ -91,10 +91,11 @@ export function PaginationComponent({
             );
           }
 
-          const buttonsClassName = `${currentPage === page
-            ? 'bg-sky-200 disabled:bg-sky-500 text-white'
-            : 'bg-white'
-            }`.trim();
+          const buttonsClassName = `${
+            currentPage === page
+              ? 'bg-sky-200 disabled:bg-sky-500 text-white'
+              : 'bg-white'
+          }`.trim();
 
           return (
             <button

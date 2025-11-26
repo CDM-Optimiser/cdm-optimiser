@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import { PatientCardComponent } from '../patient-card/patient-card.component.tsx';
-import { ModalComponent } from '../ui/modal.component.tsx';
-import { SVGComponent } from '../ui/svg.component.tsx';
-import type { Patient } from '../../utils/types/patient.ts';
+import {useState} from 'react';
+import {PatientCardComponent} from '../patient-card/patient-card.component.tsx';
+import {ModalComponent} from '../ui/modal.component.tsx';
+import {SVGComponent} from '../ui/svg.component.tsx';
+import type {Patient} from '../../utils/types/patient.ts';
 import {
   booleanColumns,
   headerLabels,
   excludedColumns,
 } from '../../utils/patientsTableColumns.ts';
-import { useSelectedPatient } from '../../utils/hooks/useSelectedPatient.tsx';
+import {useSelectedPatient} from '../../utils/hooks/useSelectedPatient.tsx';
 
 interface PatientsListProps {
   allPatients: Patient[];
@@ -21,7 +21,7 @@ export function PatientsListComponent({
 }: PatientsListProps) {
   const [patientsState, setPatientsState] = useState<Patient[]>(allPatients);
 
-  const { selectedPatient, setSelectedPatient, handleRowClick } =
+  const {selectedPatient, setSelectedPatient, handleRowClick} =
     useSelectedPatient(allPatients);
 
   const handlePrev = () => {
@@ -37,7 +37,7 @@ export function PatientsListComponent({
   const handleAcceptedChange = (index: number, value: boolean) => {
     setPatientsState((prev) =>
       prev.map((patient, i) =>
-        i === index ? { ...patient, accepted: value ? true : false } : patient
+        i === index ? {...patient, accepted: value ? true : false} : patient
       )
     );
   };
@@ -45,7 +45,7 @@ export function PatientsListComponent({
   const handleRefuseChange = (index: number, value: boolean) => {
     setPatientsState((prev) =>
       prev.map((patient, i) =>
-        i === index ? { ...patient, refused: value ? true : false } : patient
+        i === index ? {...patient, refused: value ? true : false} : patient
       )
     );
   };
@@ -138,58 +138,6 @@ export function PatientsListComponent({
               </tr>
             );
           })}
-          {/* {patients.map((patient) => {
-            let rowBackground = '';
-            if (patient.accepted === '1' && patient.refused === '0') {
-              rowBackground = 'bg-green-100 dark:bg-emerald-300 dark:text-gray-900';
-            } else if (patient.refused === '1' && patient.accepted === '0') {
-              rowBackground = 'bg-red-100 dark:bg-rose-300 dark:text-gray-900';
-            }
-
-            return (
-              <tr
-                key={patient.gms}
-                className={`transition duration-200 ease-in-out not-last:border-b not-last:border-gray-200 hover:cursor-pointer hover:bg-sky-100 dark:hover:bg-sky-500 ${rowBackground}`}
-                onClick={() => handleRowClick(patient.gms)}
-              >
-                {Object.keys(headerLabels)
-                  .filter((key) => !hiddenColumns.includes(key))
-                  .map((key) => {
-                    const value = patient[key as keyof Patient];
-
-                    if (booleanColumns.includes(key)) {
-                      return (
-                        <td key={key} className="px-3 py-3.5 text-left">
-                          {value === '1' ? (
-                            <span className="text-green-500 font-bold">✓</span>
-                          ) : (
-                            <span className="text-gray-400">—</span>
-                          )}
-                        </td>
-                      );
-                    }
-
-                    if (key === 'accepted' || key === 'called') {
-                      return (
-                        <td key={key} className="px-3 py-3.5 text-left">
-                          {value === '1' ? (
-                            <span className="text-green-400 font-bold">✓</span>
-                          ) : (
-                            <span className="text-red-400 font-bold">✗</span>
-                          )}
-                        </td>
-                      );
-                    }
-
-                    return (
-                      <td key={key} className="px-3 py-3.5 text-left break-all">
-                        {value}
-                      </td>
-                    );
-                  })}
-              </tr>
-            );
-          })} */}
         </tbody>
       </table>
 
