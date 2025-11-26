@@ -1,9 +1,9 @@
 import {useState} from 'react';
 import {PatientCardComponent} from '../features/patient-card/patient-card.component.tsx';
-import {useListPatients} from '../utils/hooks/useListPatients.tsx';
+import {usePatients} from '../api/patients.ts';
 
 export function PatientsCardPageComponent() {
-  const {patients} = useListPatients();
+  const {patients} = usePatients();
 
   const [currentIndex, setCurrentIndex] = useState(0);
 

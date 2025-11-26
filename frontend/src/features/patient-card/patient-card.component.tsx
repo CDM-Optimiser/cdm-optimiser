@@ -1,5 +1,6 @@
 import {type ChangeEvent} from 'react';
 import type {Patient} from '../../utils/types/patient.ts';
+import {SVGComponent} from '../ui/svg.component.tsx';
 
 interface PatientCardProps {
   patient: Patient;
@@ -27,17 +28,21 @@ export function PatientCardComponent({
       <div>
         <article className="patient-sheet">
           <header className="border-b border-gray-200">
-            <div className="flex items-center gap-4 pb-4">
+            <div className="flex flex-wrap items-baseline justify-between gap-4 pb-4">
               <h1 className="text-2xl">Patient Information</h1>
+              <div className="flex items-center gap-2">
+                <span className="font-bold">Potential income:</span>
+                <span>€ {patient.potential_income}</span>
+              </div>
             </div>
           </header>
           <section className="grid grid-cols-2 gap-6 p-4">
-            <div className="col-span-2 flex flex-col gap-2">
+            <div className="flex flex-col gap-2">
               <strong>Name</strong>
               <span>{patient.name}</span>
             </div>
             <div className="flex flex-col gap-2">
-              <strong>GMS number</strong> <span>{patient['gms number']}</span>
+              <strong>GMS number</strong> <span>{patient.gms}</span>
             </div>
             <div className="flex flex-col gap-2">
               <strong>D.O.B.</strong>
@@ -48,137 +53,69 @@ export function PatientCardComponent({
               <span>{patient.address}</span>
             </div>
             <div className="flex flex-col gap-2">
-              <strong>Phone</strong>
-              <span>{patient.phone}</span>
+              <strong>Home Phone</strong>
+              <span>{patient.home_phone}</span>
+            </div>
+            <div className="flex flex-col gap-2">
+              <strong>Mobile Phone</strong>
+              <span>{patient.mobile_phone}</span>
             </div>
             <div className="col-span-2 mt-4 flex items-center justify-center gap-4">
               <strong>Asthma:</strong>
-              {patient.asthma === '1' ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="text-red-400"
-                >
+              {patient.asthma ? (
+                <SVGComponent className="text-green-400">
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                  <path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" />
-                </svg>
+                  <path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
+                </SVGComponent>
               ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-gray-400"
-                >
+                <SVGComponent className="text-gray-40">
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                   <path d="M5 12h2" />
                   <path d="M17 12h2" />
                   <path d="M11 12h2" />
-                </svg>
+                </SVGComponent>
               )}
               <strong>DM:</strong>
-              {patient.dm === '1' ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="text-red-400"
-                >
+              {patient.dm ? (
+                <SVGComponent className="text-green-400">
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                  <path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" />
-                </svg>
+                  <path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
+                </SVGComponent>
               ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-gray-400"
-                >
+                <SVGComponent className="text-gray-40">
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                   <path d="M5 12h2" />
                   <path d="M17 12h2" />
                   <path d="M11 12h2" />
-                </svg>
+                </SVGComponent>
               )}
               <strong>CVD:</strong>
-              {patient.cvd === '1' ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="text-red-400"
-                >
+              {patient.cvd ? (
+                <SVGComponent className="text-green-400">
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                  <path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" />
-                </svg>
+                  <path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
+                </SVGComponent>
               ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-gray-400"
-                >
+                <SVGComponent className="text-gray-40">
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                   <path d="M5 12h2" />
                   <path d="M17 12h2" />
                   <path d="M11 12h2" />
-                </svg>
+                </SVGComponent>
               )}
               <strong>COPD:</strong>
-              {patient.copd === '1' ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="text-red-400"
-                >
+              {patient.copd ? (
+                <SVGComponent className="text-green-400">
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                  <path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" />
-                </svg>
+                  <path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
+                </SVGComponent>
               ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-gray-400"
-                >
+                <SVGComponent className="text-gray-40">
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                   <path d="M5 12h2" />
                   <path d="M17 12h2" />
                   <path d="M11 12h2" />
-                </svg>
+                </SVGComponent>
               )}
             </div>
           </section>
@@ -233,7 +170,7 @@ export function PatientCardComponent({
                   type="checkbox"
                   name="patient-called"
                   title="toggle"
-                  checked={patient.accepted === '1'}
+                  checked={patient.accepted}
                   onChange={handleAcceptedToggle}
                   className="absolute inset-0 cursor-pointer appearance-none"
                 />
@@ -289,7 +226,7 @@ export function PatientCardComponent({
                   type="checkbox"
                   name="patient-called"
                   title="toggle"
-                  checked={patient.refused === '1'}
+                  checked={patient.refused}
                   onChange={handleRefusedToggle}
                   className="absolute inset-0 cursor-pointer appearance-none"
                 />

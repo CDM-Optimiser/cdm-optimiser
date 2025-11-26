@@ -1,5 +1,5 @@
-import {useId, type ChangeEvent, type MouseEvent} from 'react';
-import {getVisiblePages} from '../../utils/getVisiblePagesButtons.ts';
+import { useId, type ChangeEvent, type MouseEvent } from 'react';
+import { getVisiblePages } from '../../utils/getVisiblePagesButtons.ts';
 
 interface PaginationProps {
   currentPage: number;
@@ -13,8 +13,8 @@ export function PaginationComponent({
   currentPage,
   totalPages,
   resultsPerPage,
-  onPageChange = () => {},
-  onResultsPerPageChange = () => {},
+  onPageChange = () => { },
+  onResultsPerPageChange = () => { },
 }: PaginationProps) {
   const selectResultsPerPageID = useId();
   const pagesToRender = getVisiblePages(currentPage, totalPages);
@@ -52,6 +52,9 @@ export function PaginationComponent({
 
   return (
     <div className="flex w-full flex-wrap items-center justify-center gap-4 rounded-xl bg-white px-8 py-4 shadow-md md:flex-nowrap md:justify-between dark:bg-white/5 dark:ring dark:ring-gray-600">
+      <span>
+        Showing page {currentPage} of {totalPages}
+      </span>
       <div className="isolate inline-flex">
         <button
           type="button"
@@ -88,11 +91,10 @@ export function PaginationComponent({
             );
           }
 
-          const buttonsClassName = `${
-            currentPage === page
-              ? 'bg-sky-200 disabled:bg-sky-500 text-white'
-              : 'bg-white'
-          }`.trim();
+          const buttonsClassName = `${currentPage === page
+            ? 'bg-sky-200 disabled:bg-sky-500 text-white'
+            : 'bg-white'
+            }`.trim();
 
           return (
             <button
@@ -145,9 +147,6 @@ export function PaginationComponent({
           <option value="15">15</option>
         </select>
       </div>
-      <span>
-        Showing page {currentPage} of {totalPages}
-      </span>
     </div>
   );
 }

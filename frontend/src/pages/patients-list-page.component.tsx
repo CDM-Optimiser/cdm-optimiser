@@ -1,15 +1,15 @@
 import {useId, useState} from 'react';
 import {AlertComponent} from '../features/ui/alert.component.tsx';
+import {FiltersComponent} from '../features/patients-list/filters.component.tsx';
 import {LegendComponent} from '../features/patients-list/legend.component.tsx';
 import {PaginationComponent} from '../features/patients-list/pagination.component.tsx';
 import {PatientsListComponent} from '../features/patients-list/patients-list.component.tsx';
 import {SearchPatientComponent} from '../features/patients-list/search-patient.component.tsx';
 import {useInputChange} from '../utils/hooks/useInputChange.tsx';
-import {useListPatients} from '../utils/hooks/useListPatients.tsx';
 import {usePageChange} from '../utils/hooks/usePageChange.tsx';
 import {useResultsPerPage} from '../utils/hooks/useResultsPerPage.tsx';
 import {filterPatients} from '../utils/filterPatients.ts';
-import {FiltersComponent} from '../features/patients-list/filters.component.tsx';
+import {usePatients} from '../api/patients.ts';
 
 export function PatientsListPageComponent() {
   const inputSearchID = useId();
@@ -17,7 +17,7 @@ export function PatientsListPageComponent() {
     'all' | 'accepted' | 'refused'
   >('all');
 
-  const {patients} = useListPatients();
+  const {patients} = usePatients();
   const {searchText, handleInputChange} = useInputChange();
   const {currentPage, handlePageChange} = usePageChange();
   const {resultsPerPage, handleResultsPerPage} = useResultsPerPage();
@@ -39,16 +39,10 @@ export function PatientsListPageComponent() {
     handlePageChange(1);
   };
 
-  const acceptedCount = patients.filter(
-    (patient) => patient.accepted === '1'
-  ).length;
-
-  const refusedCount = patients.filter(
-    (patient) => patient.refused === '1'
-  ).length;
-
+  const acceptedCount = patients.filter((patient) => patient.accepted).length;
+  const refusedCount = patients.filter((patient) => patient.refused).length;
   const pendingCount = patients.filter(
-    (patient) => patient.accepted === '0' && patient.refused === '0'
+    (patient) => !patient.accepted && !patient.refused
   ).length;
 
   return (

@@ -1,14 +1,22 @@
 export interface Patient {
   name: string;
   dob: string;
-  'gms number': string;
+  gender: string;
   address: string;
-  phone: string;
-  asthma: string;
-  dm: string;
-  cvd: string;
-  copd: string;
-  'cdm condition counter': string;
-  accepted?: string;
-  refused?: string;
+  home_phone: string;
+  mobile_phone: string;
+  email: string;
+  gms: string;
+  regdate: string;
+  type: string;
+  hcp: string;
+  expdate: string;
+  asthma: boolean;
+  dm: boolean;
+  cvd: boolean;
+  copd: boolean;
+  cdm_condition_count: number;
+  potential_income: number;
+  accepted?: boolean;
+  refused?: boolean;
 }

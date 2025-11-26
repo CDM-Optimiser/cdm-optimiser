@@ -1,11 +1,14 @@
-import {useState} from 'react';
-import {ModalComponent} from '../ui/modal.component.tsx';
-import {PatientCardComponent} from '../patient-card/patient-card.component.tsx';
-import type {Patient} from '../../utils/types/patient.ts';
+import { useState } from 'react';
+import { PatientCardComponent } from '../patient-card/patient-card.component.tsx';
+import { ModalComponent } from '../ui/modal.component.tsx';
+import { SVGComponent } from '../ui/svg.component.tsx';
+import type { Patient } from '../../utils/types/patient.ts';
 import {
   booleanColumns,
-  hiddenColumns,
+  headerLabels,
+  excludedColumns,
 } from '../../utils/patientsTableColumns.ts';
+import { useSelectedPatient } from '../../utils/hooks/useSelectedPatient.tsx';
 
 interface PatientsListProps {
   allPatients: Patient[];
@@ -17,12 +20,9 @@ export function PatientsListComponent({
   patients,
 }: PatientsListProps) {
   const [patientsState, setPatientsState] = useState<Patient[]>(allPatients);
-  const [selectedPatient, setSelectedPatient] = useState<number | null>(null);
 
-  const handleRowClick = (gmsNumber: string) => {
-    const index = allPatients.findIndex((p) => p['gms number'] === gmsNumber);
-    setSelectedPatient(index >= 0 ? index : null);
-  };
+  const { selectedPatient, setSelectedPatient, handleRowClick } =
+    useSelectedPatient(allPatients);
 
   const handlePrev = () => {
     setSelectedPatient((prev) => (prev && prev > 0 ? prev - 1 : prev));
@@ -37,7 +37,7 @@ export function PatientsListComponent({
   const handleAcceptedChange = (index: number, value: boolean) => {
     setPatientsState((prev) =>
       prev.map((patient, i) =>
-        i === index ? {...patient, accepted: value ? '1' : '0'} : patient
+        i === index ? { ...patient, accepted: value ? true : false } : patient
       )
     );
   };
@@ -45,90 +45,70 @@ export function PatientsListComponent({
   const handleRefuseChange = (index: number, value: boolean) => {
     setPatientsState((prev) =>
       prev.map((patient, i) =>
-        i === index ? {...patient, refused: value ? '1' : '0'} : patient
+        i === index ? { ...patient, refused: value ? true : false } : patient
       )
     );
   };
 
   return (
     <div className="overflow-hidden overflow-x-auto rounded-xl shadow-md dark:ring-1 dark:ring-gray-600">
-      <table className="relative w-full min-w-100 table-auto md:table-fixed">
+      <table className="relative w-full min-w-100 table-auto">
         <thead className="bg-sky-200 dark:bg-white/5">
           <tr>
-            {allPatients[0] &&
-              Object.keys(allPatients[0])
-                .filter((header) => !hiddenColumns.includes(header))
-                .map((header) => {
-                  const [firstLetter, ...word] = header;
-
-                  header = firstLetter.toUpperCase() + word.join('');
-
-                  return (
-                    <th
-                      key={header}
-                      scope="col"
-                      className="text-md px-3 py-3.5 text-left font-semibold"
-                    >
-                      {header}
-                    </th>
-                  );
-                })}
+            {Object.entries(headerLabels)
+              .filter(([key]) => !excludedColumns.includes(key))
+              .map(([key, label]) => (
+                <th
+                  key={key}
+                  className="border border-gray-300 px-4 py-2 text-left"
+                >
+                  {label}
+                </th>
+              ))}
           </tr>
         </thead>
         <tbody className="bg-white dark:bg-white/5">
           {patients.map((patient) => {
             let rowBackground = '';
 
-            if (patient.accepted === '1' && patient.refused === '0') {
+            if (patient.accepted && !patient.refused) {
               rowBackground =
                 'bg-green-100 dark:bg-emerald-300 dark:text-gray-900';
-            } else if (patient.refused === '1' && patient.accepted === '0') {
+            } else if (patient.refused && !patient.accepted) {
               rowBackground = 'bg-red-100 dark:bg-rose-300 dark:text-gray-900';
             }
 
             return (
               <tr
-                key={patient['gms number']}
+                key={patient.gms}
                 className={`transition duration-200 ease-in-out not-last:border-b not-last:border-gray-200 hover:cursor-pointer hover:bg-sky-100 dark:hover:bg-sky-500 ${rowBackground}`}
-                onClick={() => handleRowClick(patient['gms number'])}
+                onClick={() => handleRowClick(patient.gms)}
               >
-                {Object.keys(patient)
-                  .filter((header) => !hiddenColumns.includes(header))
-                  .map((header) => {
-                    const value = patient[header as keyof Patient];
+                {Object.keys(headerLabels)
+                  .filter((key) => !excludedColumns.includes(key))
+                  .map((key) => {
+                    const typedKey = key as keyof Patient;
 
-                    if (booleanColumns.includes(header)) {
+                    let displayValue: boolean | string | number =
+                      patient[typedKey] ?? '';
+
+                    if (booleanColumns.includes(key)) {
                       return (
-                        <td key={header} className="px-3 py-3.5 text-left">
-                          {value === '1' ? (
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              fill="currentColor"
-                              className="text-green-400"
-                            >
+                        <td
+                          key={key}
+                          className="border border-gray-300 px-4 py-2 text-center"
+                        >
+                          {displayValue ? (
+                            <SVGComponent className="text-green-400">
                               <path
                                 stroke="none"
                                 d="M0 0h24v24H0z"
                                 fill="none"
                               />
                               <path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
-                            </svg>
+                            </SVGComponent>
                           ) : (
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="text-gray-400"
-                            >
+                            <SVGComponent className="text-gray-40">
                               <path
                                 stroke="none"
                                 d="M0 0h24v24H0z"
@@ -137,64 +117,79 @@ export function PatientsListComponent({
                               <path d="M5 12h2" />
                               <path d="M17 12h2" />
                               <path d="M11 12h2" />
-                            </svg>
+                            </SVGComponent>
                           )}
                         </td>
                       );
                     }
-
-                    if (header === 'called' || header === 'accepted') {
-                      return (
-                        <td key={header} className="px-3 py-3.5 text-left">
-                          {value === '1' ? (
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              fill="currentColor"
-                              className="text-green-400"
-                            >
-                              <path
-                                stroke="none"
-                                d="M0 0h24v24H0z"
-                                fill="none"
-                              />
-                              <path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
-                            </svg>
-                          ) : (
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              fill="currentColor"
-                              className="text-red-400"
-                            >
-                              <path
-                                stroke="none"
-                                d="M0 0h24v24H0z"
-                                fill="none"
-                              />
-                              <path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" />
-                            </svg>
-                          )}
-                        </td>
-                      );
+                    if (key === 'potential_income') {
+                      displayValue = `€ ${patient[typedKey]}`;
                     }
 
                     return (
                       <td
-                        key={header}
-                        className="dark px-3 py-3.5 text-left break-all"
+                        key={key}
+                        className="border border-gray-300 px-4 py-2"
                       >
-                        {value}
+                        {displayValue}
                       </td>
                     );
                   })}
               </tr>
             );
           })}
+          {/* {patients.map((patient) => {
+            let rowBackground = '';
+            if (patient.accepted === '1' && patient.refused === '0') {
+              rowBackground = 'bg-green-100 dark:bg-emerald-300 dark:text-gray-900';
+            } else if (patient.refused === '1' && patient.accepted === '0') {
+              rowBackground = 'bg-red-100 dark:bg-rose-300 dark:text-gray-900';
+            }
+
+            return (
+              <tr
+                key={patient.gms}
+                className={`transition duration-200 ease-in-out not-last:border-b not-last:border-gray-200 hover:cursor-pointer hover:bg-sky-100 dark:hover:bg-sky-500 ${rowBackground}`}
+                onClick={() => handleRowClick(patient.gms)}
+              >
+                {Object.keys(headerLabels)
+                  .filter((key) => !hiddenColumns.includes(key))
+                  .map((key) => {
+                    const value = patient[key as keyof Patient];
+
+                    if (booleanColumns.includes(key)) {
+                      return (
+                        <td key={key} className="px-3 py-3.5 text-left">
+                          {value === '1' ? (
+                            <span className="text-green-500 font-bold">✓</span>
+                          ) : (
+                            <span className="text-gray-400">—</span>
+                          )}
+                        </td>
+                      );
+                    }
+
+                    if (key === 'accepted' || key === 'called') {
+                      return (
+                        <td key={key} className="px-3 py-3.5 text-left">
+                          {value === '1' ? (
+                            <span className="text-green-400 font-bold">✓</span>
+                          ) : (
+                            <span className="text-red-400 font-bold">✗</span>
+                          )}
+                        </td>
+                      );
+                    }
+
+                    return (
+                      <td key={key} className="px-3 py-3.5 text-left break-all">
+                        {value}
+                      </td>
+                    );
+                  })}
+              </tr>
+            );
+          })} */}
         </tbody>
       </table>
 

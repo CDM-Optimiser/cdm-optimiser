@@ -1,18 +1,21 @@
 import webview
-from backend.app import create_api
-import os
+import threading
+import uvicorn
+from backend.app import app
 
-FRONTEND_DIST = os.path.join(os.getcwd(), "frontend", "dist", "index.html")
+
+def start_api():
+    uvicorn.run(app, host="127.0.0.1", port=8000)
+
 
 if __name__ == "__main__":
-    api = create_api()
+    threading.Thread(target=start_api, daemon=True).start()
 
-    window = webview.create_window(
-        title="CDM Optimiser",
-        url=FRONTEND_DIST,
-        js_api=api,
-        width=1200,
-        height=800
+    webview.create_window(
+        "CDM Optimiser",
+        url="frontend/dist/index.html",
+        width=1400,
+        height=900,
     )
 
     webview.start()

@@ -13,7 +13,7 @@ export function LegendComponent({
 }: LegendComponentProps) {
   return (
     <div className="flex w-full flex-col flex-wrap gap-4 rounded-xl bg-white p-4 shadow-md xl:w-auto dark:bg-white/5 dark:ring dark:ring-gray-600">
-      <div className="flex gap-2">
+      <div className="flex gap-2 justify-center">
         Total patients: <span className="font-medium">{totalPatients}</span>
       </div>
       <div className="flex flex-wrap items-center gap-6 py-2">

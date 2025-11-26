@@ -94,7 +94,7 @@ export function AlertComponent({type = 'info', title, text}: AlertProps) {
 
   return (
     <div
-      className={`${bgColorClass[type]} border-l-4 ${borderClass[type]} rounded-xl p-4`}
+      className={`${bgColorClass[type]} border-l-4 ${borderClass[type]} rounded-xl p-4 shadow-md`}
     >
       <div className="flex">
         <div className="shrink-0">{icons[type]}</div>

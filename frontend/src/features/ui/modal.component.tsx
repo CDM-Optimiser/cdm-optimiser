@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type {ReactNode} from 'react';
 
 interface ModalProps {
   isOpen: boolean;
@@ -6,7 +6,7 @@ interface ModalProps {
   children: ReactNode;
 }
 
-export function ModalComponent({ isOpen, onClose, children }: ModalProps) {
+export function ModalComponent({isOpen, onClose, children}: ModalProps) {
   if (!isOpen) return null;
 
   return (

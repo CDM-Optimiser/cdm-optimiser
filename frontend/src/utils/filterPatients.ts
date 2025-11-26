@@ -14,18 +14,18 @@ export function filterPatients(
       return (
         patient.name.toLowerCase().includes(searchText.toLowerCase()) ||
         patient.dob.includes(searchText) ||
-        patient['gms number'].toLowerCase().includes(searchText.toLowerCase())
+        patient.gms.toLowerCase().includes(searchText.toLowerCase())
       );
     });
   }
 
   if (acceptedFilter === 'accepted') {
     filteredPatients = filteredPatients.filter(
-      (patient) => patient.accepted === '1' && patient.refused === '0'
+      (patient) => patient.accepted && !patient.refused
     );
   } else if (acceptedFilter === 'refused') {
     filteredPatients = filteredPatients.filter(
-      (patient) => patient.refused === '1' && patient.accepted === '0'
+      (patient) => patient.refused && !patient.accepted
     );
   }
 
