@@ -35,7 +35,8 @@ export function PatientsListPageComponent() {
     currentPage
   );
 
-  const {filteredPatients} = filterPatients(patients, acceptedFilter);
+  const {filteredPatients, acceptedCount, refusedCount, pendingCount} =
+    filterPatients(patients, acceptedFilter);
 
   const totalPages = Math.ceil(totalPatients / resultsPerPage);
 
@@ -53,12 +54,6 @@ export function PatientsListPageComponent() {
   const handleTextChange = (text: string) => {
     handleInputChange(text);
   };
-
-  const acceptedCount = patients.filter((patient) => patient.accepted).length;
-  const refusedCount = patients.filter((patient) => patient.refused).length;
-  const pendingCount = patients.filter(
-    (patient) => !patient.accepted && !patient.refused
-  ).length;
 
   return (
     <main className="mx-auto my-0 flex w-full max-w-7xl flex-col justify-center gap-6 p-6">

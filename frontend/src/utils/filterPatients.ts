@@ -1,22 +1,32 @@
 import type {Patient} from './types/patient.ts';
 
+export type PatientFilter = 'all' | 'accepted' | 'refused' | 'pending';
+
 export function filterPatients(
   patients: Patient[],
-  acceptedFilter: 'all' | 'accepted' | 'refused' | 'pending' = 'all'
+  acceptedFilter: PatientFilter = 'all'
 ) {
-  let filteredPatients = patients;
+  const filteredPatients = patients.filter((patient) => {
+    switch (acceptedFilter) {
+      case 'accepted':
+        return patient.accepted && !patient.refused;
+      case 'refused':
+        return patient.refused && !patient.accepted;
+      case 'pending':
+        return !patient.accepted && !patient.refused;
+      default:
+        return true;
+    }
+  });
 
-  if (acceptedFilter === 'accepted') {
-    filteredPatients = filteredPatients.filter(
-      (patient) => patient.accepted && !patient.refused
-    );
-  } else if (acceptedFilter === 'refused') {
-    filteredPatients = filteredPatients.filter(
-      (patient) => patient.refused && !patient.accepted
-    );
-  }
+  const acceptedCount = patients.filter((p) => p.accepted).length;
+  const refusedCount = patients.filter((p) => p.refused).length;
+  const pendingCount = patients.filter((p) => !p.accepted && !p.refused).length;
 
   return {
     filteredPatients,
+    acceptedCount,
+    refusedCount,
+    pendingCount,
   };
 }
