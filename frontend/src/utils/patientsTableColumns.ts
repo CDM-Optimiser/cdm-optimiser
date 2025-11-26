@@ -1,5 +1,17 @@
 export const booleanColumns = ['asthma', 'dm', 'cvd', 'copd'];
-export const excludedColumns = ['accepted', 'refused'];
+export const excludedColumns = [
+  'gender',
+  'email',
+  'gms',
+  'regadte',
+  'type',
+  'hcp',
+  'expdate',
+  'cdm_condition_count',
+  'potential_income',
+  'accepted',
+  'refused',
+];
 
 export const headerLabels: Record<string, string> = {
   name: 'Name',
