@@ -1,10 +1,8 @@
 import type {Patient} from './types/patient.ts';
 
 export function filterPatients(
-  resultsPerPage: number,
   searchText: string,
   patients: Patient[],
-  currentPage: number,
   acceptedFilter: 'all' | 'accepted' | 'refused' = 'all'
 ) {
   let filteredPatients = patients;
@@ -29,15 +27,7 @@ export function filterPatients(
     );
   }
 
-  const totalPages = Math.ceil(filteredPatients.length / resultsPerPage);
-
-  const pageResults = filteredPatients.slice(
-    (currentPage - 1) * resultsPerPage,
-    currentPage * resultsPerPage
-  );
-
   return {
-    totalPages,
-    pageResults,
+    filteredPatients,
   };
 }
