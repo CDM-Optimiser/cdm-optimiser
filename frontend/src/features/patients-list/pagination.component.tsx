@@ -1,5 +1,6 @@
 import {useId, type ChangeEvent, type MouseEvent} from 'react';
 import {getVisiblePages} from '../../utils/getVisiblePagesButtons.ts';
+import {PatientsPerPageComponent} from './patients-per-page.component.tsx';
 
 interface PaginationProps {
   currentPage: number;
@@ -135,18 +136,11 @@ export function PaginationComponent({
         </button>
       </div>
       <div className="flex items-center justify-center gap-2">
-        <label htmlFor={selectResultsPerPageID}>Patients per page:</label>
-        <select
-          id={selectResultsPerPageID}
-          name={selectResultsPerPageID}
-          value={resultsPerPage}
-          className="rounded-md bg-white px-2 py-1 ring ring-gray-400 dark:bg-white/5"
+        <PatientsPerPageComponent
+          selectIDAndName={selectResultsPerPageID}
+          resultsPerPage={resultsPerPage}
           onChange={handleChangeResultsPerPage}
-        >
-          <option value="5">5</option>
-          <option value="10">10</option>
-          <option value="15">15</option>
-        </select>
+        />
       </div>
     </div>
   );
