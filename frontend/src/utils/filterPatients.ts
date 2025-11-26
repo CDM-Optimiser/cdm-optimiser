@@ -1,8 +1,8 @@
-import type {Patient} from './types/patient.ts';
+import type { Patient } from './types/patient.ts';
 
 export function filterPatients(
   patients: Patient[],
-  acceptedFilter: 'all' | 'accepted' | 'refused' = 'all'
+  acceptedFilter: 'all' | 'accepted' | 'refused' | 'pending' = 'all'
 ) {
   let filteredPatients = patients;
 
