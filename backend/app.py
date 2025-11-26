@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 from backend.database.database import SessionLocal, Patient
 
@@ -27,9 +28,22 @@ def get_patients(
     db: Session = Depends(get_db),
     limit: int = Query(10, ge=1),
     offset: int = Query(0, ge=0),
+    search: str = Query("", alias="search"),
 ):
-    total = db.query(Patient).count()
-    patients = db.query(Patient).offset(offset).limit(limit).all()
+    query = db.query(Patient)
+
+    if search:
+        search_pattern = f"%{search.lower()}%"
+        query = query.filter(
+            or_(
+                func.lower(Patient.name).like(search_pattern),
+                Patient.dob.like(search_pattern),
+                func.lower(Patient.gms).like(search_pattern),
+            )
+        )
+
+    total = query.count()
+    patients = query.offset(offset).limit(limit).all()
 
     return {
         "data": [
