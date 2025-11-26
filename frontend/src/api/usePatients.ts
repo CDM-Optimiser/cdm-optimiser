@@ -6,23 +6,31 @@ function getErrorMessage(error: unknown) {
   return String(error);
 }
 
-export function usePatients() {
+export function usePatients(limit: number, offset: number, searchText: string) {
   const [patients, setPatients] = useState<Patient[]>([]);
+  const [totalPatients, setTotalPatients] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadPatients() {
       try {
-        const res = await fetch('http://localhost:8000/api/patients');
+        setLoading(true);
 
-        if (!res.ok) {
-          throw new Error(`Error: ${res.status}`);
+        const url =
+          searchText.length > 0
+            ? `http://localhost:8000/api/patients?limit=999999&offset=0`
+            : `http://localhost:8000/api/patients?limit=${limit}&offset=${offset}`;
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
         }
 
-        const data = await res.json();
+        const patientsData = await response.json();
 
-        const parsedPatients = data.map((patient: Patient) => ({
+        const parsedPatients = patientsData.data.map((patient: Patient) => ({
           ...patient,
           asthma: Boolean(patient.asthma),
           dm: Boolean(patient.dm),
@@ -39,6 +47,7 @@ export function usePatients() {
         }));
 
         setPatients(parsedPatients);
+        setTotalPatients(patientsData.total);
       } catch (error) {
         const message = getErrorMessage(error);
 
@@ -49,10 +58,11 @@ export function usePatients() {
     }
 
     loadPatients();
-  }, []);
+  }, [limit, offset, searchText]);
 
   return {
     patients,
+    totalPatients,
     loading,
     error,
     setPatients,
