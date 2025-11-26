@@ -3,7 +3,7 @@ export const excludedColumns = [
   'gender',
   'email',
   'gms',
-  'regadte',
+  'regdate',
   'type',
   'hcp',
   'expdate',
