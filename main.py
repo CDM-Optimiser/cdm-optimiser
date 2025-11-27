@@ -130,9 +130,22 @@ def init_db():
     Base.metadata.create_all(bind=engine)
 
 
-def _open_browser(host, port):
-    time.sleep(1)
-    webbrowser.open(f"http://{host}:{port}")
+def _browser_host_for_open(host: str) -> str:
+    if host in ("0.0.0.0", "::"):
+        return "127.0.0.1"
+    return host
+
+
+def _open_browser_later(host: str, port: int, delay: float = 0.8):
+    def _open():
+        time.sleep(delay)
+        url = f"http://{_browser_host_for_open(host)}:{port}/"
+        try:
+            webbrowser.open(url)
+        except Exception:
+            print("Couldn't auto-open browser; open:", url)
+
+    threading.Thread(target=_open, daemon=True).start()
 
 
 def main():
@@ -166,6 +179,11 @@ def main():
     )
     parser.add_argument(
         "--reload", action="store_true", help="Run uvicorn with reload (dev only)"
+    )
+    parser.add_argument(
+        "--no-browser-open",
+        action="store_true",
+        help="Don't attempt to open the browser automatically",
     )
     args = parser.parse_args()
 
@@ -201,9 +219,8 @@ def main():
         if not mounted:
             logger.info("Frontend not mounted; continue serving APIs only")
 
-    threading.Thread(
-        target=_open_browser, args=(args.host, args.port), daemon=True
-    ).start()
+    if not args.no_browser_open:
+        _open_browser_later(args.host, args.port)
 
     import uvicorn
 
