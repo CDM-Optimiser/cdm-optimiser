@@ -1,54 +1,27 @@
-import {useState} from 'react';
-import {PatientCardComponent} from '../patient-card/patient-card.component.tsx';
-import {ModalComponent} from '../ui/modal.component.tsx';
-import {SVGComponent} from '../ui/svg.component.tsx';
-import type {Patient} from '../../utils/types/patient.ts';
+import { type Dispatch, type SetStateAction } from 'react';
+import { PatientCardComponent } from '../patient-card/patient-card.component.tsx';
+import { ModalComponent } from '../ui/modal.component.tsx';
+import { SVGComponent } from '../ui/svg.component.tsx';
+import type { Patient } from '../../utils/types/patient.ts';
 import {
   booleanColumns,
   headerLabels,
   excludedColumns,
 } from '../../utils/patientsTableColumns.ts';
-import {useSelectedPatient} from '../../utils/hooks/useSelectedPatient.tsx';
+import { useSelectedPatient } from '../../utils/hooks/useSelectedPatient.tsx';
 
 interface PatientsListProps {
-  allPatients: Patient[];
   patients: Patient[];
+  onUpdatePatients: Dispatch<SetStateAction<Patient[]>>;
+  loadPatients: () => Promise<void>;
 }
 
 export function PatientsListComponent({
-  allPatients,
   patients,
+  loadPatients,
 }: PatientsListProps) {
-  const [patientsState, setPatientsState] = useState<Patient[]>(allPatients);
-
-  const {selectedPatient, setSelectedPatient, handleRowClick} =
-    useSelectedPatient(allPatients);
-
-  const handlePrev = () => {
-    setSelectedPatient((prev) => (prev && prev > 0 ? prev - 1 : prev));
-  };
-
-  const handleNext = () => {
-    setSelectedPatient((prev) =>
-      prev !== null && prev < allPatients.length - 1 ? prev + 1 : prev
-    );
-  };
-
-  const handleAcceptedChange = (index: number, value: boolean) => {
-    setPatientsState((prev) =>
-      prev.map((patient, i) =>
-        i === index ? {...patient, accepted: value ? true : false} : patient
-      )
-    );
-  };
-
-  const handleRefuseChange = (index: number, value: boolean) => {
-    setPatientsState((prev) =>
-      prev.map((patient, i) =>
-        i === index ? {...patient, refused: value ? true : false} : patient
-      )
-    );
-  };
+  const { selectedPatient, setSelectedPatient, handleRowClick } =
+    useSelectedPatient(patients);
 
   return (
     <div className="overflow-hidden overflow-x-auto rounded-xl shadow-md dark:ring-1 dark:ring-gray-600">
@@ -99,13 +72,18 @@ export function PatientsListComponent({
                           className="border border-gray-300 px-4 py-2 text-center"
                         >
                           {displayValue ? (
-                            <SVGComponent className="text-green-400">
+                            <SVGComponent className="text-green-500">
                               <path
                                 stroke="none"
                                 d="M0 0h24v24H0z"
                                 fill="none"
                               />
-                              <path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
+                              <path
+                                stroke="none"
+                                d="M0 0h24v24H0z"
+                                fill="none"
+                              />
+                              <path d="M18.333 2c1.96 0 3.56 1.537 3.662 3.472l.005 .195v12.666c0 1.96 -1.537 3.56 -3.472 3.662l-.195 .005h-12.666a3.667 3.667 0 0 1 -3.662 -3.472l-.005 -.195v-12.666c0 -1.96 1.537 -3.56 3.472 -3.662l.195 -.005h12.666zm-2.626 7.293a1 1 0 0 0 -1.414 0l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.32 1.497l2 2l.094 .083a1 1 0 0 0 1.32 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
                             </SVGComponent>
                           ) : (
                             <SVGComponent className="text-gray-40">
@@ -146,35 +124,12 @@ export function PatientsListComponent({
         onClose={() => setSelectedPatient(null)}
       >
         {selectedPatient !== null && (
-          <div>
-            <div className="mb-2 text-center font-medium text-gray-700">
-              Patient {selectedPatient + 1} of {allPatients.length}
-            </div>
-            <div className="flex justify-center gap-4 py-4">
-              <button
-                type="button"
-                className="rounded-xl bg-sky-500 px-4 py-2 text-white transition duration-200 ease-in-out hover:not-disabled:-translate-y-1 hover:not-disabled:scale-110 hover:not-disabled:bg-sky-700 disabled:bg-gray-200"
-                disabled={selectedPatient === 0}
-                onClick={handlePrev}
-              >
-                Previous patient
-              </button>
-              <button
-                type="button"
-                className="rounded-xl bg-sky-500 px-4 py-2 text-white transition duration-200 ease-in-out hover:not-disabled:-translate-y-1 hover:not-disabled:scale-110 hover:not-disabled:bg-sky-700 disabled:bg-gray-200"
-                disabled={selectedPatient === allPatients.length - 1}
-                onClick={handleNext}
-              >
-                Next patient
-              </button>
-            </div>
+          <>
             <PatientCardComponent
-              patient={patientsState[selectedPatient]}
-              index={selectedPatient}
-              onAcceptedChange={handleAcceptedChange}
-              onRefusedChange={handleRefuseChange}
+              patient={patients[selectedPatient]}
+              loadPatients={loadPatients}
             />
-          </div>
+          </>
         )}
       </ModalComponent>
     </div>

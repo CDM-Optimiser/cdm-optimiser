@@ -29,6 +29,7 @@ def get_patients(
     limit: int = Query(10, ge=1),
     offset: int = Query(0, ge=0),
     search: str = Query("", alias="search"),
+    status: str = Query("all", regex="^(all|accepted|refused|pending)$"),
 ):
     query = db.query(Patient)
 
@@ -42,10 +43,40 @@ def get_patients(
             )
         )
 
+    if status == "accepted":
+        query = query.filter(Patient.accepted == True, Patient.refused != True)
+    elif status == "refused":
+        query = query.filter(Patient.refused == True, Patient.accepted != True)
+    elif status == "pending":
+        query = query.filter(
+            or_(Patient.accepted == None, Patient.accepted == False),
+            or_(Patient.refused == None, Patient.refused == False),
+        )
+
     total = query.count()
     patients = query.offset(offset).limit(limit).all()
 
+    accepted_count = db.query(Patient).filter(Patient.accepted == True).count()
+    refused_count = db.query(Patient).filter(Patient.refused == True).count()
+    pending_count = (
+        db.query(Patient)
+        .filter(
+            or_(Patient.accepted == None, Patient.accepted == False),
+            or_(Patient.refused == None, Patient.refused == False),
+        )
+        .count()
+    )
+
     return {
+        "total": total,
+        "counts": {
+            "accepted": accepted_count,
+            "refused": refused_count,
+            "pending": pending_count,
+        },
+        "limit": limit,
+        "offset": offset,
+        "results": len(patients),
         "data": [
             {
                 key: value
@@ -54,19 +85,15 @@ def get_patients(
             }
             for patient in patients
         ],
-        "total": total,
-        "limit": limit,
-        "offset": offset,
-        "results": len(patients),
     }
 
 
-@app.put("/api/patient/{patient_id}")
-def update_patient(patient_id: int, data: dict, db: Session = Depends(get_db)):
-    patient = db.query(Patient).filter(Patient.id == patient_id).first()
+@app.put("/api/patient/{gms}")
+def update_patient(gms: str, data: dict, db: Session = Depends(get_db)):
+    patient = db.query(Patient).filter(Patient.gms == gms).first()
 
     if not patient:
-        raise HTTPException(404, "Patient not found")
+        raise HTTPException(status_code=404, detail="Patient not found")
 
     for key, value in data.items():
         if hasattr(patient, key):
@@ -74,4 +101,9 @@ def update_patient(patient_id: int, data: dict, db: Session = Depends(get_db)):
 
     db.commit()
     db.refresh(patient)
-    return patient
+
+    return {
+        key: value
+        for key, value in patient.__dict__.items()
+        if key != "_sa_instance_state"
+    }

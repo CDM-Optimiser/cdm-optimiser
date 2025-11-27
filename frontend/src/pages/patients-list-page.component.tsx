@@ -1,25 +1,30 @@
-import {useEffect, useId, useState} from 'react';
-import {AlertComponent} from '../features/ui/alert.component.tsx';
-import {FiltersComponent} from '../features/patients-list/filters.component.tsx';
-import {LegendComponent} from '../features/patients-list/legend.component.tsx';
-import {PaginationComponent} from '../features/patients-list/pagination.component.tsx';
-import {PatientsListComponent} from '../features/patients-list/patients-list.component.tsx';
-import {SearchPatientComponent} from '../features/patients-list/search-patient.component.tsx';
-import {useDebounce} from '../utils/hooks/useDebounce.tsx';
-import {useInputChange} from '../utils/hooks/useInputChange.tsx';
-import {useResultsPerPage} from '../utils/hooks/useResultsPerPage.tsx';
-import {filterPatients} from '../utils/filterPatients.ts';
-import {usePatients} from '../api/usePatients.ts';
+import { useEffect, useId, useState } from 'react';
+import { AlertComponent } from '../features/ui/alert.component.tsx';
+import { FiltersComponent } from '../features/patients-list/filters.component.tsx';
+import { LegendComponent } from '../features/patients-list/legend.component.tsx';
+import { PaginationComponent } from '../features/patients-list/pagination.component.tsx';
+import { PatientsListComponent } from '../features/patients-list/patients-list.component.tsx';
+import { SearchPatientComponent } from '../features/patients-list/search-patient.component.tsx';
+import { useDebounce } from '../utils/hooks/useDebounce.tsx';
+import { useInputChange } from '../utils/hooks/useInputChange.tsx';
+import { useResultsPerPage } from '../utils/hooks/useResultsPerPage.tsx';
+import { filterPatients } from '../utils/filterPatients.ts';
+import { usePatients } from '../api/usePatients.ts';
 
 export function PatientsListPageComponent() {
   const inputSearchID = useId();
   const [acceptedFilter, setAcceptedFilter] = useState<
     'all' | 'accepted' | 'refused' | 'pending'
   >('all');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const page = Number(params.get('page'));
 
-  const {resultsPerPage, handleResultsPerPage} = useResultsPerPage();
-  const {searchText, handleInputChange} = useInputChange();
+    return Number.isNaN(page) ? page : 1;
+  });
+
+  const { resultsPerPage, handleResultsPerPage } = useResultsPerPage();
+  const { searchText, handleInputChange } = useInputChange();
   const debouncedSearchText = useDebounce(searchText, 400);
 
   useEffect(() => {
@@ -28,21 +33,26 @@ export function PatientsListPageComponent() {
 
   const offset = (currentPage - 1) * resultsPerPage;
 
-  const {patients, totalPatients, loading, error} = usePatients(
-    resultsPerPage,
-    offset,
-    debouncedSearchText,
-    currentPage
-  );
+  const {
+    patients,
+    totalPatients,
+    loading,
+    acceptedPatients,
+    refusedPatients,
+    pendingPatients,
+    error,
+    setPatients,
+    loadPatients,
+  } = usePatients(resultsPerPage, offset, debouncedSearchText, acceptedFilter);
 
-  const {filteredPatients, acceptedCount, refusedCount, pendingCount} =
-    filterPatients(patients, acceptedFilter);
+  const { filteredPatients } = filterPatients(patients, acceptedFilter);
 
   const totalPages = Math.ceil(totalPatients / resultsPerPage);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    window.scrollTo({top: 0, behavior: 'smooth'});
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleFilterChange = (
@@ -74,9 +84,9 @@ export function PatientsListPageComponent() {
                 />
                 <LegendComponent
                   totalPatients={totalPatients}
-                  acceptedPatientsText={`Accepted patients (${acceptedCount})`}
-                  refusedPatientsText={`Refused patients (${refusedCount})`}
-                  pendingPatientsText={`Pending patients (${pendingCount})`}
+                  acceptedPatientsText={`Accepted (${acceptedPatients})`}
+                  refusedPatientsText={`Refused (${refusedPatients})`}
+                  pendingPatientsText={`Pending (${pendingPatients})`}
                 />
               </div>
               <PaginationComponent
@@ -108,8 +118,9 @@ export function PatientsListPageComponent() {
               )}
               {!loading && !error && filteredPatients.length > 0 && (
                 <PatientsListComponent
-                  allPatients={patients}
                   patients={filteredPatients}
+                  onUpdatePatients={setPatients}
+                  loadPatients={loadPatients}
                 />
               )}
               <PaginationComponent

@@ -1,14 +1,14 @@
 import {useState} from 'react';
 
 export function useResultsPerPage() {
-  const [resultsPerPage, setResultsPerPage] = useState(10);
+  const [patientsPerPage, setPatientsPerPage] = useState(10);
 
   const handleResultsPerPage = (results: number) => {
-    setResultsPerPage(results);
+    setPatientsPerPage(results);
   };
 
   return {
-    resultsPerPage,
+    resultsPerPage: patientsPerPage,
     handleResultsPerPage,
   };
 }

@@ -56,7 +56,7 @@ export function FiltersComponent({
         <button
           type="button"
           className={`rounded-md border-b-4 border-sky-500 border-b-sky-600 bg-sky-500 px-4 py-2 text-white transition duration-200 ease-in-out hover:text-white hover:not-disabled:border-sky-800 hover:not-disabled:bg-sky-600 active:not-disabled:border-b-0 disabled:cursor-not-allowed dark:border-b-sky-700 dark:bg-sky-500 dark:hover:not-disabled:border-sky-900 dark:hover:not-disabled:bg-sky-800 ${
-            filterSelected !== 'accepted' && filterSelected !== 'refused'
+            filterSelected === 'pending'
               ? `border-sky-900 bg-sky-700 text-white dark:border-b-sky-900 dark:bg-sky-700`
               : ''
           } `}

@@ -19,14 +19,5 @@ export function filterPatients(
     }
   });
 
-  const acceptedCount = patients.filter((p) => p.accepted).length;
-  const refusedCount = patients.filter((p) => p.refused).length;
-  const pendingCount = patients.filter((p) => !p.accepted && !p.refused).length;
-
-  return {
-    filteredPatients,
-    acceptedCount,
-    refusedCount,
-    pendingCount,
-  };
+  return {filteredPatients};
 }

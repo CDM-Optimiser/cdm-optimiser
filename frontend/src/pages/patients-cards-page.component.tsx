@@ -1,9 +1,15 @@
-import {useState} from 'react';
-import {PatientCardComponent} from '../features/patient-card/patient-card.component.tsx';
-import {usePatients} from '../api/patients.ts';
+import { useMemo, useState } from 'react';
+import { usePatientsContext } from '../utils/hooks/patientsContext.tsx';
+import { PatientCardComponent } from '../features/patient-card/patient-card.component.tsx';
+import { AlertComponent } from '../features/ui/alert.component.tsx';
 
 export function PatientsCardPageComponent() {
-  const {patients} = usePatients();
+  const { patients, loadPatients } = usePatientsContext();
+
+  const pendingPatients = useMemo(
+    () => patients.filter((patient) => patient.accepted !== true && patient.refused !== true),
+    [patients]
+  );
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -11,19 +17,19 @@ export function PatientsCardPageComponent() {
     setCurrentIndex((prev) => (prev > 0 ? prev - 1 : prev));
 
   const handleNext = () =>
-    setCurrentIndex((prev) => (prev < patients.length - 1 ? prev + 1 : prev));
+    setCurrentIndex((prev) => (prev < pendingPatients.length - 1 ? prev + 1 : prev));
 
-  if (!patients || patients.length === 0) {
-    return <div className="py-20 text-center">No patients available</div>;
+  if (!pendingPatients || pendingPatients.length === 0) {
+    return <AlertComponent type='info' title='No pending patients' text='There are no pending patients to show.' />;
   }
 
-  const currentPatient = patients[currentIndex];
+  const currentPatient = pendingPatients[currentIndex];
 
   return (
     <section className="mx-auto max-w-7xl p-6">
       <div className="mb-4 flex items-center justify-between rounded-xl bg-white p-4 dark:bg-white/5 dark:ring dark:ring-gray-600">
         <span className="font-medium text-gray-900 dark:text-gray-200">
-          Patient {currentIndex + 1} of {patients.length}
+          Pending patient: {currentIndex + 1} of {pendingPatients.length}
         </span>
         <div className="flex gap-2">
           <button
@@ -43,7 +49,7 @@ export function PatientsCardPageComponent() {
         </div>
       </div>
       <section className="rounded-xl bg-white p-4 dark:bg-white/5 dark:ring dark:ring-gray-600">
-        <PatientCardComponent patient={currentPatient} index={currentIndex} />
+        <PatientCardComponent patient={currentPatient} loadPatients={loadPatients} />
       </section>
     </section>
   );

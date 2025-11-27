@@ -1,80 +1,69 @@
-import {useEffect, useState} from 'react';
-import type {Patient} from '../utils/types/patient.ts';
+import { useEffect, useState, useCallback } from 'react';
+import type { Patient } from '../utils/types/patient.ts';
+import { getErrorMessage } from '../utils/getErrorMessage.ts';
 
-function getErrorMessage(error: unknown) {
-  if (error instanceof Error) return error.message;
-  return String(error);
-}
-
-export function usePatients(
-  limit: number,
-  offset: number,
-  searchText: string,
-  currentPage: number
-) {
+export function usePatients(limit: number, offset: number, searchText: string, status: 'all' | 'accepted' | 'refused' | 'pending') {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [totalPatients, setTotalPatients] = useState(0);
+  const [acceptedPatients, setAcceptedPatients] = useState(0);
+  const [refusedPatients, setRefusedPatients] = useState(0);
+  const [pendingPatients, setPendingPatients] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function loadPatients() {
-      try {
-        setLoading(true);
+  const loadPatients = useCallback(async () => {
+    try {
+      setLoading(true);
 
-        const params = new URLSearchParams();
+      const params = new URLSearchParams();
+      if (searchText) params.append('search', searchText);
+      params.append('limit', limit.toString());
+      params.append('offset', offset.toString());
+      params.append("status", status);
 
-        if (searchText) params.append('search', searchText);
-        params.append('limit', limit.toString());
-        params.append('offset', offset.toString());
+      const url = `http://localhost:8000/api/patients?${params.toString()}`;
+      const response = await fetch(url);
 
-        const queryParams = params.toString();
+      if (!response.ok) throw new Error(`Error: ${response.status}`);
 
-        const url = `http://localhost:8000/api/patients?${queryParams}`;
+      const patientsData = await response.json();
 
-        const response = await fetch(url);
+      const parsedPatients = patientsData.data.map((patient: Patient) => ({
+        ...patient,
+        asthma: Boolean(patient.asthma),
+        dm: Boolean(patient.dm),
+        cvd: Boolean(patient.cvd),
+        copd: Boolean(patient.copd),
+        accepted: patient.accepted != null ? Boolean(patient.accepted) : undefined,
+        refused: patient.refused != null ? Boolean(patient.refused) : undefined,
+      }));
 
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
-        }
-
-        const patientsData = await response.json();
-
-        const parsedPatients = patientsData.data.map((patient: Patient) => ({
-          ...patient,
-          asthma: Boolean(patient.asthma),
-          dm: Boolean(patient.dm),
-          cvd: Boolean(patient.cvd),
-          copd: Boolean(patient.copd),
-          accepted:
-            patient.accepted !== undefined
-              ? Boolean(patient.accepted)
-              : undefined,
-          refused:
-            patient.refused !== undefined
-              ? Boolean(patient.refused)
-              : undefined,
-        }));
-
-        setPatients(parsedPatients);
-        setTotalPatients(patientsData.total);
-      } catch (error) {
-        const message = getErrorMessage(error);
-
-        setError(message);
-      } finally {
-        setLoading(false);
-      }
+      setPatients(parsedPatients);
+      setTotalPatients(patientsData.total);
+      setAcceptedPatients(patientsData.counts.accepted);
+      setRefusedPatients(patientsData.counts.refused);
+      setPendingPatients(patientsData.counts.pending);
+      setError(null);
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setLoading(false);
     }
+  }, [limit, offset, searchText, status]);
 
+  useEffect(() => {
     loadPatients();
-  }, [limit, offset, searchText, currentPage]);
+  }, [loadPatients]);
 
   return {
     patients,
     totalPatients,
+    acceptedPatients,
+    refusedPatients,
+    pendingPatients,
     loading,
     error,
     setPatients,
+    loadPatients,
   };
 }
