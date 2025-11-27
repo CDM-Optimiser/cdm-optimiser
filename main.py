@@ -7,6 +7,9 @@ import logging
 import argparse
 from pathlib import Path
 from typing import Optional
+import threading
+import webbrowser
+import time
 
 load_dotenv()
 
@@ -127,6 +130,11 @@ def init_db():
     Base.metadata.create_all(bind=engine)
 
 
+def _open_browser(host, port):
+    time.sleep(1)
+    webbrowser.open(f"http://{host}:{port}")
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Run the Optimiser server with optional frontend build"
@@ -192,6 +200,10 @@ def main():
         mounted = mount_frontend(app)
         if not mounted:
             logger.info("Frontend not mounted; continue serving APIs only")
+
+    threading.Thread(
+        target=_open_browser, args=(args.host, args.port), daemon=True
+    ).start()
 
     import uvicorn
 
