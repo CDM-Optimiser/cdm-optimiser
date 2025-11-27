@@ -102,6 +102,13 @@ export function PatientsListPageComponent() {
 
       {!loading && filteredPatients.length > 0 && (
         <>
+          <PaginationComponent
+            currentPage={currentPage}
+            totalPages={totalPages}
+            resultsPerPage={resultsPerPage}
+            onPageChange={handlePageChange}
+            onResultsPerPageChange={handleResultsPerPage}
+          />
           <PatientsListComponent
             patients={paginatedPatients}
             onUpdatePatients={setPatients}
