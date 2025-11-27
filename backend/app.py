@@ -10,7 +10,7 @@ from backend.database.database import SessionLocal, Patient
 load_dotenv()
 
 MAX_PATIENTS = int(os.getenv("MAX_PATIENTS", 1000))
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./patients.db")
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./app.db")
 
 app = FastAPI()
 
@@ -25,6 +25,7 @@ app.add_middleware(
 
 def get_db():
     db = SessionLocal()
+
     try:
         yield db
     finally:
@@ -62,10 +63,12 @@ def get_patients(
         )
 
     total = query.count()
+
     if limit is not None:
-        patients = query.offset(offset).limit(limit).all()
+        safe_limit = min(limit, MAX_PATIENTS)
+        patients = query.offset(offset).limit(safe_limit).all()
     else:
-        patients = query.all()
+        patients = query.limit(MAX_PATIENTS).all()
 
     accepted_count = db.query(Patient).filter(Patient.accepted == True).count()
     refused_count = db.query(Patient).filter(Patient.refused == True).count()
@@ -99,9 +102,9 @@ def get_patients(
     }
 
 
-@app.put("/api/patient/{gms}")
-def update_patient(gms: str, data: dict, db: Session = Depends(get_db)):
-    patient = db.query(Patient).filter(Patient.gms == gms).first()
+@app.put("/api/patient/{patient_id}")
+def update_patient(patient_id: int, data: dict, db: Session = Depends(get_db)):
+    patient = db.query(Patient).filter(Patient.id == patient_id).first()
 
     if not patient:
         raise HTTPException(status_code=404, detail="Patient not found")
