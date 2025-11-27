@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useId,
   useState,
   type ChangeEvent,
@@ -6,11 +7,11 @@ import {
   type MouseEvent,
   type SetStateAction,
 } from 'react';
-import type {Patient} from '../../utils/types/patient.ts';
-import {SVGComponent} from '../ui/svg.component.tsx';
-import {useUpdatePatient} from '../../api/useUpdatePatient.tsx';
-import {AlertComponent} from '../ui/alert.component.tsx';
-import {getErrorMessage} from '../../utils/getErrorMessage.ts';
+import type { Patient } from '../../utils/types/patient.ts';
+import { SVGComponent } from '../ui/svg.component.tsx';
+import { useUpdatePatient } from '../../api/useUpdatePatient.tsx';
+import { AlertComponent } from '../ui/alert.component.tsx';
+import { getErrorMessage } from '../../utils/getErrorMessage.ts';
 
 interface PatientCardProps {
   patient: Patient;
@@ -27,7 +28,7 @@ export function PatientCardComponent({
   const [localRefused, setLocalRefused] = useState(!!patient.refused);
   const [localError, setLocalError] = useState<string | null>(null);
 
-  const {updatePatient, updating, error} = useUpdatePatient();
+  const { updatePatient, updating, error } = useUpdatePatient();
 
   const handleAcceptedToggle = (event: ChangeEvent<HTMLInputElement>) => {
     const isChecked = event.target.checked;
@@ -63,6 +64,12 @@ export function PatientCardComponent({
       setLocalError(getErrorMessage(error));
     }
   };
+
+  useEffect(() => {
+    setLocalAccepted(!!patient.accepted);
+    setLocalRefused(!!patient.refused);
+    setLocalError(null);
+  }, [patient.gms, patient.accepted, patient.refused]);
 
   return (
     <section className="mx-auto max-w-7xl">
