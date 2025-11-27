@@ -15,12 +15,10 @@ import webview
 
 load_dotenv()
 
-# make sqlite path runtime-writable in a packaged exe
 db_url = os.getenv("DATABASE_URL", "sqlite:///backend/app.db")
 if db_url.startswith("sqlite:///"):
     db_file = Path(db_url.replace("sqlite:///", ""))
     if getattr(sys, "_MEIPASS", None):
-        # For single-file exe, put DB next to user data dir
         runtime_dir = Path(os.getenv("APPDATA") or Path.home()) / "cdm-optimiser"
         runtime_dir.mkdir(parents=True, exist_ok=True)
         os.environ["DATABASE_URL"] = f"sqlite:///{runtime_dir / db_file.name}"
@@ -157,22 +155,18 @@ def _open_browser_later(host: str, port: int, delay: float = 0.8):
 
 
 def run_server(host: str, port: int, reload: bool = False):
-    # runs in a background thread
     uvicorn.run(app, host=host, port=port, reload=reload)
 
 
 def run_with_webview(host: str, port: int):
-    # Start server in the background
     server_thread = threading.Thread(
         target=run_server, args=(host, port, False), daemon=True
     )
     server_thread.start()
 
-    # prefer a reachable address for the webview window
     addr_for_view = "127.0.0.1" if host in ("0.0.0.0", "::") else host
     url = f"http://{addr_for_view}:{port}/"
 
-    # Create a pywebview window and start the GUI loop in the main thread
     webview.create_window("CDM Optimiser", url)
     webview.start()
 
@@ -259,7 +253,6 @@ def main():
     host = args.host
     port = args.port
 
-    # if --no-gui: start server normally
     if args.no_gui:
         run_server(host, port, reload=args.reload)
     else:

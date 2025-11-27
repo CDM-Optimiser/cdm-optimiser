@@ -1,3 +1,4 @@
+from typing import Optional
 from dotenv import load_dotenv
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -5,9 +6,13 @@ from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 from backend.database.database import Base, engine, SessionLocal, Patient
 from backend.database import importer
-import os
 from pathlib import Path
-from typing import Optional
+import sys
+import os
+import logging
+
+logger = logging.getLogger(__name__)
+runtime_base = Path(getattr(sys, "_MEIPASS", Path(__file__).parent)).resolve()
 
 load_dotenv()
 
@@ -36,25 +41,22 @@ def get_db():
 
 @app.on_event("startup")
 def ensure_db_and_seed():
-    # Ensure schema exists
     Base.metadata.create_all(bind=engine)
 
-    # If using sqlite, ensure db file is in writable runtime path
-    db_url = os.getenv("DATABASE_URL", "sqlite:///backend/app.db")
-    if db_url.startswith("sqlite:///"):
-        db_path = Path(db_url.replace("sqlite:///", "")).resolve()
-        # If running packaged, copy sample DB or run importer if db missing/empty
-        if not db_path.exists():
-            # If a sample DB is in package, copy it
-            sample = Path("backend/app.sample.db")
-            if sample.exists():
-                db_path.parent.mkdir(parents=True, exist_ok=True)
-                sample.copy(db_path)
-            else:
-                # Import CSV to create DB
-                importer.import_csv_to_sqlite()
+    packaged_sample = runtime_base / "backend" / "app.sample.db"
+    if packaged_sample.exists():
+        logger.info("Found packaged sample DB; set runtime DB accordingly")
 
-    # If DB existed but is empty, seed data
+        return
+
+    csv_path = runtime_base / "backend" / "data" / "patients_300_final.csv"
+    if csv_path.exists():
+        importer.import_csv_to_sqlite()
+    else:
+        logger.info(
+            "No packaged sample DB or CSV; DB will be empty unless a runtime CSV or DB is provided"
+        )
+
     with SessionLocal() as session:
         if session.query(Patient).count() == 0:
             importer.import_csv_to_sqlite()
