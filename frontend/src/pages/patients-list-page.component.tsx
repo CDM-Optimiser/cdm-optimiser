@@ -9,10 +9,11 @@ import { useDebounce } from '../utils/hooks/useDebounce.tsx';
 import { useInputChange } from '../utils/hooks/useInputChange.tsx';
 import { useResultsPerPage } from '../utils/hooks/useResultsPerPage.tsx';
 import { filterPatients } from '../utils/filterPatients.ts';
-import { usePatients } from '../api/usePatients.ts';
+import { usePatientsContext } from '../utils/hooks/patientsContext.tsx';
 
 export function PatientsListPageComponent() {
   const inputSearchID = useId();
+  const { patients, totalPatients, acceptedPatients, refusedPatients, pendingPatients, loading, error, setPatients, loadPatients } = usePatientsContext()
   const [acceptedFilter, setAcceptedFilter] = useState<
     'all' | 'accepted' | 'refused' | 'pending'
   >('all');
@@ -31,18 +32,10 @@ export function PatientsListPageComponent() {
     setCurrentPage(1);
   }, [debouncedSearchText, acceptedFilter, resultsPerPage]);
 
-  const offset = (currentPage - 1) * resultsPerPage;
-
-  const {
-    patients,
-    totalPatients,
-    loading,
-    acceptedPatients,
-    refusedPatients,
-    pendingPatients,
-    error,
-    setPatients,
-  } = usePatients(resultsPerPage, offset, debouncedSearchText, acceptedFilter);
+  useEffect(() => {
+    const offset = (currentPage - 1) * resultsPerPage;
+    loadPatients(resultsPerPage, offset, debouncedSearchText, acceptedFilter);
+  }, [resultsPerPage, currentPage, debouncedSearchText, acceptedFilter]);
 
   const { filteredPatients } = filterPatients(patients, acceptedFilter);
 
