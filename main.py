@@ -10,14 +10,22 @@ from typing import Optional
 import threading
 import webbrowser
 import time
+import uvicorn
+import webview
 
 load_dotenv()
 
-base_dir = Path(getattr(sys, "_MEIPASS", Path(__file__).parent)).resolve()
-
+# make sqlite path runtime-writable in a packaged exe
 db_url = os.getenv("DATABASE_URL", "sqlite:///backend/app.db")
 if db_url.startswith("sqlite:///"):
-    os.environ["DATABASE_URL"] = f"sqlite:///{base_dir / 'app.db'}"
+    db_file = Path(db_url.replace("sqlite:///", ""))
+    if getattr(sys, "_MEIPASS", None):
+        # For single-file exe, put DB next to user data dir
+        runtime_dir = Path(os.getenv("APPDATA") or Path.home()) / "cdm-optimiser"
+        runtime_dir.mkdir(parents=True, exist_ok=True)
+        os.environ["DATABASE_URL"] = f"sqlite:///{runtime_dir / db_file.name}"
+
+base_dir = Path(getattr(sys, "_MEIPASS", Path(__file__).parent)).resolve()
 
 from backend.app import app
 from backend.database.database import Base, engine
@@ -148,6 +156,27 @@ def _open_browser_later(host: str, port: int, delay: float = 0.8):
     threading.Thread(target=_open, daemon=True).start()
 
 
+def run_server(host: str, port: int, reload: bool = False):
+    # runs in a background thread
+    uvicorn.run(app, host=host, port=port, reload=reload)
+
+
+def run_with_webview(host: str, port: int):
+    # Start server in the background
+    server_thread = threading.Thread(
+        target=run_server, args=(host, port, False), daemon=True
+    )
+    server_thread.start()
+
+    # prefer a reachable address for the webview window
+    addr_for_view = "127.0.0.1" if host in ("0.0.0.0", "::") else host
+    url = f"http://{addr_for_view}:{port}/"
+
+    # Create a pywebview window and start the GUI loop in the main thread
+    webview.create_window("CDM Optimiser", url)
+    webview.start()
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Run the Optimiser server with optional frontend build"
@@ -184,6 +213,11 @@ def main():
         "--no-browser-open",
         action="store_true",
         help="Don't attempt to open the browser automatically",
+    )
+    parser.add_argument(
+        "--no-gui",
+        action="store_true",
+        help="Run without GUI (webview), for debugging or server-only use",
     )
     args = parser.parse_args()
 
@@ -222,9 +256,14 @@ def main():
     if not args.no_browser_open:
         _open_browser_later(args.host, args.port)
 
-    import uvicorn
+    host = args.host
+    port = args.port
 
-    uvicorn.run(app, host=args.host, port=args.port, reload=args.reload)
+    # if --no-gui: start server normally
+    if args.no_gui:
+        run_server(host, port, reload=args.reload)
+    else:
+        run_with_webview(host, port)
 
 
 if __name__ == "__main__":
