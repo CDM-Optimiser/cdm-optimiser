@@ -13,15 +13,14 @@ import { useSelectedPatient } from '../../utils/hooks/useSelectedPatient.tsx';
 interface PatientsListProps {
   patients: Patient[];
   onUpdatePatients: Dispatch<SetStateAction<Patient[]>>;
-  loadPatients: () => Promise<void>;
 }
 
 export function PatientsListComponent({
   patients,
-  loadPatients,
+  onUpdatePatients,
 }: PatientsListProps) {
   const { selectedPatient, setSelectedPatient, handleRowClick } =
-    useSelectedPatient(patients);
+    useSelectedPatient();
 
   return (
     <div className="overflow-hidden overflow-x-auto rounded-xl shadow-md dark:ring-1 dark:ring-gray-600">
@@ -55,7 +54,7 @@ export function PatientsListComponent({
               <tr
                 key={patient.gms}
                 className={`transition duration-200 ease-in-out not-last:border-b not-last:border-gray-200 hover:cursor-pointer hover:bg-sky-100 dark:hover:bg-sky-500 ${rowBackground}`}
-                onClick={() => handleRowClick(patient.gms)}
+                onClick={() => handleRowClick(patient)}
               >
                 {Object.keys(headerLabels)
                   .filter((key) => !excludedColumns.includes(key))
@@ -123,13 +122,11 @@ export function PatientsListComponent({
         isOpen={selectedPatient !== null}
         onClose={() => setSelectedPatient(null)}
       >
-        {selectedPatient !== null && (
-          <>
-            <PatientCardComponent
-              patient={patients[selectedPatient]}
-              loadPatients={loadPatients}
-            />
-          </>
+        {selectedPatient && (
+          <PatientCardComponent
+            patient={selectedPatient}
+            onUpdatePatients={onUpdatePatients}
+          />
         )}
       </ModalComponent>
     </div>

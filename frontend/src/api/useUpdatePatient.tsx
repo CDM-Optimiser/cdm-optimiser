@@ -1,6 +1,6 @@
-import {useState} from 'react';
-import type {Patient} from '../utils/types/patient.ts';
-import {getErrorMessage} from '../utils/getErrorMessage.ts';
+import { useState } from 'react';
+import type { Patient } from '../utils/types/patient.ts';
+import { getErrorMessage } from '../utils/getErrorMessage.ts';
 
 export function useUpdatePatient() {
   const [updating, setUpdating] = useState(false);
@@ -14,13 +14,14 @@ export function useUpdatePatient() {
         `http://localhost:8000/api/patient/${patient.gms}`,
         {
           method: 'PUT',
-          headers: {'Content-Type': 'application/json'},
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             accepted: patient.accepted ?? null,
             refused: patient.refused ?? null,
           }),
         }
       );
+
       if (!response.ok) {
         throw new Error(`Failed to update patient: ${response.status}`);
       }
@@ -32,6 +33,7 @@ export function useUpdatePatient() {
       const message = getErrorMessage(error);
 
       setError(message);
+      throw new Error(message);
     } finally {
       setUpdating(false);
     }

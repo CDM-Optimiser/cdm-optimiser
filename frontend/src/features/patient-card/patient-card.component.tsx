@@ -1,4 +1,4 @@
-import { useId, useState, type ChangeEvent, type MouseEvent } from 'react';
+import { useId, useState, type ChangeEvent, type Dispatch, type MouseEvent, type SetStateAction } from 'react';
 import type { Patient } from '../../utils/types/patient.ts';
 import { SVGComponent } from '../ui/svg.component.tsx';
 import { useUpdatePatient } from '../../api/useUpdatePatient.tsx';
@@ -7,55 +7,53 @@ import { getErrorMessage } from '../../utils/getErrorMessage.ts';
 
 interface PatientCardProps {
   patient: Patient;
-  loadPatients: () => Promise<void>;
+  onUpdatePatients: Dispatch<SetStateAction<Patient[]>>;
 }
 
 export function PatientCardComponent({
   patient,
-  loadPatients,
+  onUpdatePatients
 }: PatientCardProps) {
   const acceptedInputID = useId();
   const refusedInputID = useId();
   const [localAccepted, setLocalAccepted] = useState(!!patient.accepted);
   const [localRefused, setLocalRefused] = useState(!!patient.refused);
-  const [localError, setLocalError] = useState<string | null>(null)
+  const [localError, setLocalError] = useState<string | null>(null);
 
   const { updatePatient, updating, error } = useUpdatePatient();
 
+  const handleAcceptedToggle = (event: ChangeEvent<HTMLInputElement>) => {
+    const isChecked = event.target.checked;
 
-  const handleAcceptedToggle = (e: ChangeEvent<HTMLInputElement>) => {
-    const isChecked = e.target.checked;
     setLocalAccepted(isChecked);
     setLocalRefused(false);
   };
 
-  const handleRefusedToggle = (e: ChangeEvent<HTMLInputElement>) => {
-    const isChecked = e.target.checked;
+  const handleRefusedToggle = (event: ChangeEvent<HTMLInputElement>) => {
+    const isChecked = event.target.checked;
+
     setLocalRefused(isChecked);
     setLocalAccepted(false);
   };
 
-  const handleUpdate = async (event?: MouseEvent<HTMLButtonElement>) => {
-    event?.preventDefault();
+  const handleUpdate = async (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
 
     try {
-      const start = Date.now();
-
-      await updatePatient({
+      const updated = await updatePatient({
         ...patient,
         accepted: localAccepted,
         refused: localRefused,
       });
 
-      await loadPatients();
-
-      const elapsed = Date.now() - start;
-
-      if (elapsed < 1000) {
-        await new Promise((resolve) => setTimeout(resolve, 2000 - elapsed));
+      if (updated) {
+        onUpdatePatients(prev =>
+          prev.map(p => (p.gms === updated.gms ? updated : p))
+        );
       }
     } catch (error) {
-      setLocalError(getErrorMessage(error))
+      setLocalError(getErrorMessage(error));
     }
   };
 
@@ -160,15 +158,28 @@ export function PatientCardComponent({
                     aria-hidden="true"
                     className="absolute inset-0 flex h-full w-full items-center justify-center opacity-100 transition-opacity duration-200 ease-in-out group-has-[input:checked]:opacity-0"
                   >
-                    <SVGComponent height='16' width='16' fill='none' strokeWidth='2'>
-                      <path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M5 12h2" /><path d="M17 12h2" /><path d="M11 12h2" />
+                    <SVGComponent
+                      height="16"
+                      width="16"
+                      fill="none"
+                      strokeWidth="2"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M5 12h2" />
+                      <path d="M17 12h2" />
+                      <path d="M11 12h2" />
                     </SVGComponent>
                   </span>
                   <span
                     aria-hidden="true"
                     className="absolute inset-0 flex h-full w-full appearance-none items-center justify-center opacity-0 transition-opacity duration-100 ease-in-out group-has-[input:checked]:opacity-100"
                   >
-                    <SVGComponent height='16' width='16' fill='none' strokeWidth='2'>
+                    <SVGComponent
+                      height="16"
+                      width="16"
+                      fill="none"
+                      strokeWidth="2"
+                    >
                       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                       <path d="M5 12l5 5l10 -10" />
                     </SVGComponent>
@@ -195,15 +206,28 @@ export function PatientCardComponent({
                     aria-hidden="true"
                     className="absolute inset-0 flex h-full w-full items-center justify-center opacity-100 transition-opacity duration-200 ease-in-out group-has-[input:checked]:opacity-0"
                   >
-                    <SVGComponent height='16' width='16' fill='none' strokeWidth='2'>
-                      <path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M5 12h2" /><path d="M17 12h2" /><path d="M11 12h2" />
+                    <SVGComponent
+                      height="16"
+                      width="16"
+                      fill="none"
+                      strokeWidth="2"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M5 12h2" />
+                      <path d="M17 12h2" />
+                      <path d="M11 12h2" />
                     </SVGComponent>
                   </span>
                   <span
                     aria-hidden="true"
                     className="absolute inset-0 flex h-full w-full appearance-none items-center justify-center opacity-0 transition-opacity duration-100 ease-in-out group-has-[input:checked]:opacity-100"
                   >
-                    <SVGComponent height='16' width='16' fill='none' strokeWidth='2'>
+                    <SVGComponent
+                      height="16"
+                      width="16"
+                      fill="none"
+                      strokeWidth="2"
+                    >
                       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                       <path d="M18 6l-12 12" />
                       <path d="M6 6l12 12" />

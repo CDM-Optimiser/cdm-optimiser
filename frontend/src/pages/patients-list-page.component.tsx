@@ -20,7 +20,7 @@ export function PatientsListPageComponent() {
     const params = new URLSearchParams(window.location.search);
     const page = Number(params.get('page'));
 
-    return Number.isNaN(page) ? page : 1;
+    return Number.isNaN(page) || page < 1 ? 1 : page;
   });
 
   const { resultsPerPage, handleResultsPerPage } = useResultsPerPage();
@@ -42,7 +42,6 @@ export function PatientsListPageComponent() {
     pendingPatients,
     error,
     setPatients,
-    loadPatients,
   } = usePatients(resultsPerPage, offset, debouncedSearchText, acceptedFilter);
 
   const { filteredPatients } = filterPatients(patients, acceptedFilter);
@@ -120,7 +119,6 @@ export function PatientsListPageComponent() {
                 <PatientsListComponent
                   patients={filteredPatients}
                   onUpdatePatients={setPatients}
-                  loadPatients={loadPatients}
                 />
               )}
               <PaginationComponent
