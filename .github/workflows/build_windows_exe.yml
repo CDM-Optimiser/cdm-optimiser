@@ -34,10 +34,13 @@ jobs:
           python -m pip install -r requirements.txt
           python -m pip install pyinstaller
 
-      - name: Run PyInstaller (Windows paths, use semicolon in --add-data)
+      - name: Run PyInstaller (Windows using bash shell)
+        shell: bash
         run: |
-          py -3 -m pyinstaller --clean --onefile \
+          python -m PyInstaller --clean --onefile \
             --add-data "frontend\\dist;frontend\\dist" \
+            --add-data ".env;." \
+            --hidden-import backend.database.encryption \
             main.py
 
       - name: Upload artifact
