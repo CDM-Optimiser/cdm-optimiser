@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
+from typing import Optional
 from backend.database.database import SessionLocal, Patient
 
 app = FastAPI()
@@ -26,7 +27,7 @@ def get_db():
 @app.get("/api/patients")
 def get_patients(
     db: Session = Depends(get_db),
-    limit: int = Query(10, ge=1),
+    limit: Optional[int] = Query(None, ge=1),
     offset: int = Query(0, ge=0),
     search: str = Query("", alias="search"),
     status: str = Query("all", regex="^(all|accepted|refused|pending)$"),
@@ -54,7 +55,10 @@ def get_patients(
         )
 
     total = query.count()
-    patients = query.offset(offset).limit(limit).all()
+    if limit is not None:
+        patients = query.offset(offset).limit(limit).all()
+    else:
+        patients = query.all()
 
     accepted_count = db.query(Patient).filter(Patient.accepted == True).count()
     refused_count = db.query(Patient).filter(Patient.refused == True).count()

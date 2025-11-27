@@ -1,6 +1,14 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { getErrorMessage } from '../../utils/getErrorMessage.ts';
-import type { Patient } from '../../utils/types/patient.ts';
+import {
+  useCallback,
+  useEffect,
+  useState,
+  createContext,
+  useContext,
+} from 'react';
+import {getErrorMessage} from '../../utils/getErrorMessage.ts';
+import type {Patient} from '../../utils/types/patient.ts';
+
+type Status = 'all' | 'accepted' | 'refused' | 'pending';
 
 type PatientsContextType = {
   patients: Patient[];
@@ -11,12 +19,19 @@ type PatientsContextType = {
   loading: boolean;
   error: string | null;
   setPatients: React.Dispatch<React.SetStateAction<Patient[]>>;
-  loadPatients: (limit?: number, offset?: number, search?: string, status?: 'all' | 'accepted' | 'refused' | 'pending') => void;
+  loadPatients: (
+    limit?: number,
+    offset?: number,
+    search?: string,
+    status?: Status
+  ) => Promise<void>;
 };
 
-const PatientsContext = createContext<PatientsContextType | undefined>(undefined);
+const PatientsContext = createContext<PatientsContextType | undefined>(
+  undefined
+);
 
-export const PatientsProvider = ({ children }: { children: React.ReactNode }) => {
+export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [totalPatients, setTotalPatients] = useState(0);
   const [acceptedPatients, setAcceptedPatients] = useState(0);
@@ -25,54 +40,85 @@ export const PatientsProvider = ({ children }: { children: React.ReactNode }) =>
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadPatients = async (
-    limit: number = 10,
-    offset: number = 0,
-    search: string = '',
-    status: 'all' | 'accepted' | 'refused' | 'pending' = 'all'
-  ) => {
-    try {
-      setLoading(true);
-      const params = new URLSearchParams();
-      params.append('limit', limit.toString());
-      params.append('offset', Math.max(0, offset).toString());
-      if (search) params.append('search', search);
-      params.append('status', status);
+  const loadPatients = useCallback(
+    async (
+      limit?: number,
+      offset?: number,
+      search = '',
+      status: Status = 'all'
+    ) => {
+      try {
+        setLoading(true);
+        const params = new URLSearchParams();
+        if (limit != null) params.append('limit', limit.toString());
+        if (offset != null) params.append('offset', offset.toString());
+        if (search) params.append('search', search);
+        params.append('status', status);
 
-      const response = await fetch(`http://localhost:8000/api/patients?${params.toString()}`);
-      if (!response.ok) throw new Error(`Error: ${response.status}`);
+        const res = await fetch(
+          `http://localhost:8000/api/patients?${params.toString()}`
+        );
+        if (!res.ok) throw new Error(`Error ${res.status}`);
+        const data = await res.json();
 
-      const data = await response.json();
-      const parsedPatients = data.data.map((patient: Patient) => ({
-        ...patient,
-        asthma: Boolean(patient.asthma),
-        dm: Boolean(patient.dm),
-        cvd: Boolean(patient.cvd),
-        copd: Boolean(patient.copd),
-        accepted: patient.accepted != null ? Boolean(patient.accepted) : undefined,
-        refused: patient.refused != null ? Boolean(patient.refused) : undefined,
-      }));
+        const parsedPatients = data.data.map((p: Patient) => ({
+          ...p,
+          asthma: Boolean(p.asthma),
+          dm: Boolean(p.dm),
+          cvd: Boolean(p.cvd),
+          copd: Boolean(p.copd),
+          accepted: p.accepted != null ? Boolean(p.accepted) : undefined,
+          refused: p.refused != null ? Boolean(p.refused) : undefined,
+        }));
 
-      setPatients(parsedPatients);
-      setTotalPatients(data.total);
-      setAcceptedPatients(data.counts.accepted);
-      setRefusedPatients(data.counts.refused);
-      setPendingPatients(data.counts.pending);
-      setError(null);
-    } catch (err) {
-      setError(getErrorMessage(err));
-    } finally {
-      setLoading(false);
-    }
-  };
+        setPatients(parsedPatients);
+        setTotalPatients(data.total);
+        setAcceptedPatients(data.counts.accepted);
+        setRefusedPatients(data.counts.refused);
+        setPendingPatients(data.counts.pending);
+        setError(null);
+      } catch (err) {
+        setError(getErrorMessage(err));
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     loadPatients();
-  }, []);
+  }, [loadPatients]);
+
+  useEffect(() => {
+    setTotalPatients(patients.length);
+    setAcceptedPatients(patients.filter((p) => p.accepted === true).length);
+    setRefusedPatients(patients.filter((p) => p.refused === true).length);
+    setPendingPatients(
+      patients.filter((p) => !(p.accepted === true) && !(p.refused === true))
+        .length
+    );
+  }, [
+    patients,
+    setTotalPatients,
+    setAcceptedPatients,
+    setRefusedPatients,
+    setPendingPatients,
+  ]);
 
   return (
     <PatientsContext.Provider
-      value={{ patients, totalPatients, acceptedPatients, refusedPatients, pendingPatients, loading, error, setPatients, loadPatients }}
+      value={{
+        patients,
+        totalPatients,
+        acceptedPatients,
+        refusedPatients,
+        pendingPatients,
+        loading,
+        error,
+        setPatients,
+        loadPatients,
+      }}
     >
       {children}
     </PatientsContext.Provider>
@@ -80,7 +126,8 @@ export const PatientsProvider = ({ children }: { children: React.ReactNode }) =>
 };
 
 export const usePatientsContext = () => {
-  const context = useContext(PatientsContext);
-  if (!context) throw new Error('usePatientsContext must be used within PatientsProvider');
-  return context;
+  const ctx = useContext(PatientsContext);
+  if (!ctx)
+    throw new Error('usePatientsContext must be used within PatientsProvider');
+  return ctx;
 };

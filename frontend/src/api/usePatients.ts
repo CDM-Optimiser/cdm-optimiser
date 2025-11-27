@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import type { Patient } from '../utils/types/patient.ts';
-import { getErrorMessage } from '../utils/getErrorMessage.ts';
+import {useEffect, useState} from 'react';
+import type {Patient} from '../utils/types/patient.ts';
+import {getErrorMessage} from '../utils/getErrorMessage.ts';
 
 export function usePatients(
   limit: number,
@@ -42,7 +42,8 @@ export function usePatients(
           copd: Boolean(patient.copd),
           accepted:
             patient.accepted != null ? Boolean(patient.accepted) : undefined,
-          refused: patient.refused != null ? Boolean(patient.refused) : undefined,
+          refused:
+            patient.refused != null ? Boolean(patient.refused) : undefined,
         }));
 
         setPatients(parsedPatients);
@@ -59,8 +60,7 @@ export function usePatients(
     }
 
     loadPatients();
-
-  }, [limit, offset, searchText, status])
+  }, [limit, offset, searchText, status]);
 
   return {
     patients,
@@ -70,6 +70,6 @@ export function usePatients(
     pendingPatients,
     loading,
     error,
-    setPatients
+    setPatients,
   };
 }

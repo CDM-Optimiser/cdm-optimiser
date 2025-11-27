@@ -1,16 +1,13 @@
-import { useMemo, useState } from 'react';
-import { usePatientsContext } from '../utils/hooks/patientsContext.tsx';
-import { PatientCardComponent } from '../features/patient-card/patient-card.component.tsx';
-import { AlertComponent } from '../features/ui/alert.component.tsx';
+import {useMemo, useState} from 'react';
+import {usePatientsContext} from '../utils/hooks/patientsContext.tsx';
+import {PatientCardComponent} from '../features/patient-card/patient-card.component.tsx';
+import {AlertComponent} from '../features/ui/alert.component.tsx';
 
-export function PatientsCardPageComponent() {
-  const { patients, setPatients } = usePatientsContext();
+export function PendingPatientsPageComponent() {
+  const {patients, setPatients} = usePatientsContext();
 
   const pendingPatients = useMemo(
-    () =>
-      patients.filter(
-        (patient) => patient.accepted !== true && patient.refused !== true
-      ),
+    () => patients.filter((patient) => !patient.accepted && !patient.refused),
     [patients]
   );
 
@@ -23,16 +20,6 @@ export function PatientsCardPageComponent() {
     setCurrentIndex((prev) =>
       prev < pendingPatients.length - 1 ? prev + 1 : prev
     );
-
-  if (!pendingPatients || pendingPatients.length === 0) {
-    return (
-      <AlertComponent
-        type="info"
-        title="No pending patients"
-        text="There are no pending patients to show."
-      />
-    );
-  }
 
   const currentPatient = pendingPatients[currentIndex];
 

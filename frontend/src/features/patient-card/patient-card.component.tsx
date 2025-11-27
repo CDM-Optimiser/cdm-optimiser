@@ -1,9 +1,16 @@
-import { useId, useState, type ChangeEvent, type Dispatch, type MouseEvent, type SetStateAction } from 'react';
-import type { Patient } from '../../utils/types/patient.ts';
-import { SVGComponent } from '../ui/svg.component.tsx';
-import { useUpdatePatient } from '../../api/useUpdatePatient.tsx';
-import { AlertComponent } from '../ui/alert.component.tsx';
-import { getErrorMessage } from '../../utils/getErrorMessage.ts';
+import {
+  useId,
+  useState,
+  type ChangeEvent,
+  type Dispatch,
+  type MouseEvent,
+  type SetStateAction,
+} from 'react';
+import type {Patient} from '../../utils/types/patient.ts';
+import {SVGComponent} from '../ui/svg.component.tsx';
+import {useUpdatePatient} from '../../api/useUpdatePatient.tsx';
+import {AlertComponent} from '../ui/alert.component.tsx';
+import {getErrorMessage} from '../../utils/getErrorMessage.ts';
 
 interface PatientCardProps {
   patient: Patient;
@@ -12,7 +19,7 @@ interface PatientCardProps {
 
 export function PatientCardComponent({
   patient,
-  onUpdatePatients
+  onUpdatePatients,
 }: PatientCardProps) {
   const acceptedInputID = useId();
   const refusedInputID = useId();
@@ -20,7 +27,7 @@ export function PatientCardComponent({
   const [localRefused, setLocalRefused] = useState(!!patient.refused);
   const [localError, setLocalError] = useState<string | null>(null);
 
-  const { updatePatient, updating, error } = useUpdatePatient();
+  const {updatePatient, updating, error} = useUpdatePatient();
 
   const handleAcceptedToggle = (event: ChangeEvent<HTMLInputElement>) => {
     const isChecked = event.target.checked;
@@ -48,15 +55,14 @@ export function PatientCardComponent({
       });
 
       if (updated) {
-        onUpdatePatients(prev =>
-          prev.map(p => (p.gms === updated.gms ? updated : p))
+        onUpdatePatients((prev) =>
+          prev.map((p) => (p.gms === updated.gms ? updated : p))
         );
       }
     } catch (error) {
       setLocalError(getErrorMessage(error));
     }
   };
-
 
   return (
     <section className="mx-auto max-w-7xl">

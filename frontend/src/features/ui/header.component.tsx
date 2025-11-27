@@ -15,11 +15,11 @@ export function HeaderComponent({title}: HeaderProps) {
           Patients list
         </a>
         <a
-          href="/patients-cards"
-          title="Patients cards"
+          href="/pending-patients"
+          title="Pending patients"
           className="text-xl text-sky-500 underline transition duration-200 ease-in-out hover:text-sky-700"
         >
-          Patients cards
+          Pending patients
         </a>
       </nav>
     </header>
