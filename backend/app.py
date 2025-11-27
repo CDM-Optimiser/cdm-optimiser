@@ -1,9 +1,16 @@
+from dotenv import load_dotenv
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
+import os
 from typing import Optional
 from backend.database.database import SessionLocal, Patient
+
+load_dotenv()
+
+MAX_PATIENTS = int(os.getenv("MAX_PATIENTS", 1000))
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./patients.db")
 
 app = FastAPI()
 
