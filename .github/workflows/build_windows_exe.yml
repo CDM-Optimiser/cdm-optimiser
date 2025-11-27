@@ -34,6 +34,19 @@ jobs:
           python -m pip install -r requirements.txt
           python -m pip install pyinstaller
 
+      - name: Create .env from secrets
+        shell: bash
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          KEY: ${{ secrets.KEY }}
+          MAX_PATIENTS: ${{ secrets.MAX_PATIENTS }}
+        run: |
+          cat > .env <<EOF
+          DATABASE_URL=${DATABASE_URL:-sqlite:///backend/app.db}
+          KEY=${KEY:-placeholderkey}
+          MAX_PATIENTS=${MAX_PATIENTS:-1000}
+          EOF
+
       - name: Run PyInstaller (Windows using bash shell)
         shell: bash
         run: |
