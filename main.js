@@ -11,6 +11,7 @@ const CHECK_URL = `http://127.0.0.1:${BACKEND_PORT}`;
 const isDev = process.env.NODE_ENV === 'development';
 
 let backendProcess = null;
+let progressInterval = null;
 let window = null;
 
 if (process.platform === "linux") {
@@ -24,7 +25,7 @@ function getPackagedBackendPath() {
 		path.join(resourcesDir, "backend-server.exe"),
 	];
 
-	return possible.find((p) => fs.existsSync(p)) || null;
+	return possible.find((package) => fs.existsSync(package)) || null;
 }
 
 function spawnBackend() {
@@ -57,16 +58,30 @@ function spawnBackend() {
 		console.log("Spawned python backend via uvicorn:", pythonCmd);
 	}
 
-	if (backendProcess) {
-		backendProcess.stdout.on("data", (chunk) => console.log("[backend stdout] " + chunk.toString()));
-		backendProcess.stderr.on("data", (chunk) => console.error("[backend stderr] " + chunk.toString()));
-		backendProcess.on("exit", (code, signal) => {
-			console.log(`Backend process exited (code=${code}, signal=${signal})`);
-		});
+	if (!backendProcess) return;
+
+	backendProcess.stdout.on("data", (chunk) => console.log("[backend stdout]", chunk.toString()));
+	backendProcess.stderr.on("data", (chunk) => console.error("[backend stderr]", chunk.toString()));
+
+	backendProcess.on("exit", (code, signal) => {
+		console.log(`Backend process exited (code=${code}, signal=${signal})`);
+	});
+}
+
+function killBackend() {
+	if (!backendProcess) return;
+	try {
+		if (process.platform === "win32") {
+			spawn("taskkill", ["/pid", backendProcess.pid, "/f", "/t"]);
+		} else {
+			backendProcess.kill("SIGTERM");
+		}
+	} catch (err) {
+		console.error("Failed to kill backend:", err);
 	}
 }
 
-async function waitForBackendReady(timeoutMs = 5000, intervalMs = 200) {
+async function waitForBackendReady(timeoutMs = 10000, intervalMs = 200) {
 	const start = Date.now();
 
 	while (Date.now() - start < timeoutMs) {
@@ -134,7 +149,7 @@ function createWindow() {
 app.whenReady().then(async () => {
 	spawnBackend();
 
-	const ready = await waitForBackendReady(5000, 250);
+	const ready = await waitForBackendReady(10000, 250);
 
 	if (!ready) {
 		dialog.showMessageBox({

@@ -34,12 +34,11 @@
       "buildResources": "build"
     },
     "extraResources": [
-      {
-        "from": "backend/dist-backend/",
-        "to": "backend",
-        "filter": ["**/*"]
-      }
-    ]
+    {
+      "from": "dist/backend-server.exe",
+      "to": "backend-server.exe"
+    }
+  ]
   },
   "dependencies": {
   }

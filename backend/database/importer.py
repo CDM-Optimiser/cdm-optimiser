@@ -14,15 +14,18 @@ def runtime_base() -> Path:
 
 def csv_runtime_path(filename: str = "patients_300_final.csv") -> Path:
     env_path = os.getenv("CDM_CSV_PATH")
+
     if env_path:
         return Path(env_path)
-    return runtime_base() / "backend" / "data" / filename
+    return runtime_base().parent / "data" / filename
 
 
 def import_csv_to_sqlite(csv_filename: str = "patients_300_final.csv"):
     csv_path = csv_runtime_path(csv_filename)
+
     if not csv_path.exists():
         logger.warning("CSV not found, skipping DB import: %s", csv_path)
+
         return
 
     logger.info("Importing CSV from: %s", csv_path)
@@ -31,7 +34,7 @@ def import_csv_to_sqlite(csv_filename: str = "patients_300_final.csv"):
     Base.metadata.create_all(bind=engine)
 
     session = SessionLocal()
-    
+
     for _, row in df.iterrows():
         patient = Patient(
             name=row.get("name"),
