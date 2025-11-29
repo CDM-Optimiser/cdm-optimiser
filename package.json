@@ -1,0 +1,46 @@
+{
+  "name": "cdm-optimiser",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "build:frontend": "cd frontend && npm run build",
+    "dev": "concurrently \"cd frontend && npm run dev\" \"electron .\"",
+    "dist": "electron-builder",
+    "start": "npm run build:frontend && electron .",
+    "start-backend-dev": "python -m uvicorn backend.app:app --host 127.0.0.1 --port 8000 --log-level info",
+    "pack": "electron-builder --dir",
+    "postinstall": "cd frontend && npm install",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jane Doe",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "electron": "^39.2.4",
+    "electron-builder": "^26.0.12",
+    "node-fetch": "^3.3.2"
+  },
+  "build": {
+    "appId": "com.cdm-optimiser.cdm-optimiser",
+    "files": [
+      "main.js",
+      "preload.js",
+      "../frontend/dist/**",
+      "../backend/**",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "build"
+    },
+    "extraResources": [
+      {
+        "from": "backend/dist-backend/",
+        "to": "backend",
+        "filter": ["**/*"]
+      }
+    ]
+  },
+  "dependencies": {
+  }
+}

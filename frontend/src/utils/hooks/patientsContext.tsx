@@ -5,8 +5,9 @@ import {
   createContext,
   useContext,
 } from 'react';
-import {getErrorMessage} from '../../utils/getErrorMessage.ts';
-import type {Patient} from '../../utils/types/patient.ts';
+import { BACKEND_URL } from '../../env.ts';
+import { getErrorMessage } from '../../utils/getErrorMessage.ts';
+import type { Patient } from '../../utils/types/patient.ts';
 
 type Status = 'all' | 'accepted' | 'refused' | 'pending';
 
@@ -31,7 +32,7 @@ const PatientsContext = createContext<PatientsContextType | undefined>(
   undefined
 );
 
-export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
+export const PatientsProvider = ({ children }: { children: React.ReactNode }) => {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [totalPatients, setTotalPatients] = useState(0);
   const [acceptedPatients, setAcceptedPatients] = useState(0);
@@ -55,13 +56,13 @@ export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
         if (search) params.append('search', search);
         params.append('status', status);
 
-        const res = await fetch(
-          `http://localhost:8000/api/patients?${params.toString()}`
-        );
-        if (!res.ok) throw new Error(`Error ${res.status}`);
-        const data = await res.json();
+        const url = `${BACKEND_URL}/api/patients?${params.toString()}`;
+        const response = await fetch(url);
 
-        const parsedPatients = data.data.map((p: Patient) => ({
+        if (!response.ok) throw new Error(`Error ${response.status}`);
+
+        const patientsData = await response.json();
+        const parsedPatients = patientsData.data.map((p: Patient) => ({
           ...p,
           asthma: Boolean(p.asthma),
           dm: Boolean(p.dm),
@@ -72,10 +73,10 @@ export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
         }));
 
         setPatients(parsedPatients);
-        setTotalPatients(data.total);
-        setAcceptedPatients(data.counts.accepted);
-        setRefusedPatients(data.counts.refused);
-        setPendingPatients(data.counts.pending);
+        setTotalPatients(patientsData.total);
+        setAcceptedPatients(patientsData.counts.accepted);
+        setRefusedPatients(patientsData.counts.refused);
+        setPendingPatients(patientsData.counts.pending);
         setError(null);
       } catch (err) {
         setError(getErrorMessage(err));

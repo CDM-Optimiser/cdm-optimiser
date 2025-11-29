@@ -7,11 +7,11 @@ import {
   type MouseEvent,
   type SetStateAction,
 } from 'react';
-import type {Patient} from '../../utils/types/patient.ts';
-import {SVGComponent} from '../ui/svg.component.tsx';
-import {useUpdatePatient} from '../../api/useUpdatePatient.tsx';
-import {AlertComponent} from '../ui/alert.component.tsx';
-import {getErrorMessage} from '../../utils/getErrorMessage.ts';
+import type { Patient } from '../../utils/types/patient.ts';
+import { SVGComponent } from '../ui/svg.component.tsx';
+import { AlertComponent } from '../ui/alert.component.tsx';
+import { getErrorMessage } from '../../utils/getErrorMessage.ts';
+import { useUpdatePatient } from '../../api/useUpdatePatient.ts';
 
 interface PatientCardProps {
   patient: Patient;
@@ -28,7 +28,7 @@ export function PatientCardComponent({
   const [localRefused, setLocalRefused] = useState(!!patient.refused);
   const [localError, setLocalError] = useState<string | null>(null);
 
-  const {updatePatient, updating, error} = useUpdatePatient();
+  const { updatePatient, updating, error } = useUpdatePatient();
 
   const handleAcceptedToggle = (event: ChangeEvent<HTMLInputElement>) => {
     const isChecked = event.target.checked;
