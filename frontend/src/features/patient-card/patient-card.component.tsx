@@ -7,11 +7,11 @@ import {
   type MouseEvent,
   type SetStateAction,
 } from 'react';
-import type { Patient } from '../../utils/types/patient.ts';
-import { SVGComponent } from '../ui/svg.component.tsx';
-import { AlertComponent } from '../ui/alert.component.tsx';
-import { getErrorMessage } from '../../utils/getErrorMessage.ts';
-import { useUpdatePatient } from '../../api/useUpdatePatient.ts';
+import type {Patient} from '../../utils/types/patient.ts';
+import {SVGComponent} from '../ui/svg.component.tsx';
+import {AlertComponent} from '../ui/alert.component.tsx';
+import {getErrorMessage} from '../../utils/getErrorMessage.ts';
+import {useUpdatePatient} from '../../api/useUpdatePatient.ts';
 
 interface PatientCardProps {
   patient: Patient;
@@ -24,24 +24,29 @@ export function PatientCardComponent({
 }: PatientCardProps) {
   const acceptedInputID = useId();
   const refusedInputID = useId();
-  const [localAccepted, setLocalAccepted] = useState(!!patient.accepted);
-  const [localRefused, setLocalRefused] = useState(!!patient.refused);
-  const [localError, setLocalError] = useState<string | null>(null);
+  const [updateAccepted, setUpdateAccepted] = useState(!!patient.accepted);
+  const [updateRefused, setUpdateRefused] = useState(!!patient.refused);
+  const [updateErrorMessage, setUpdateErrorMessage] = useState<string | null>(
+    null
+  );
+  const [updateSuccessMessage, setUpdateSuccessMessage] = useState<
+    string | null
+  >(null);
 
-  const { updatePatient, updating, error } = useUpdatePatient();
+  const {updatePatient, updating, error} = useUpdatePatient();
 
   const handleAcceptedToggle = (event: ChangeEvent<HTMLInputElement>) => {
     const isChecked = event.target.checked;
 
-    setLocalAccepted(isChecked);
-    setLocalRefused(false);
+    setUpdateAccepted(isChecked);
+    setUpdateRefused(false);
   };
 
   const handleRefusedToggle = (event: ChangeEvent<HTMLInputElement>) => {
     const isChecked = event.target.checked;
 
-    setLocalRefused(isChecked);
-    setLocalAccepted(false);
+    setUpdateRefused(isChecked);
+    setUpdateAccepted(false);
   };
 
   const handleUpdate = async (event: MouseEvent<HTMLButtonElement>) => {
@@ -51,8 +56,8 @@ export function PatientCardComponent({
     try {
       const updated = await updatePatient({
         ...patient,
-        accepted: localAccepted,
-        refused: localRefused,
+        accepted: updateAccepted,
+        refused: updateRefused,
       });
 
       if (updated) {
@@ -60,15 +65,20 @@ export function PatientCardComponent({
           prev.map((p) => (p.gms === updated.gms ? updated : p))
         );
       }
+
+      setUpdateSuccessMessage('Patient updated successfully!');
+      setUpdateErrorMessage(null);
     } catch (error) {
-      setLocalError(getErrorMessage(error));
+      const message = getErrorMessage(error);
+      setUpdateErrorMessage(message);
+      setUpdateSuccessMessage(null);
     }
   };
 
   useEffect(() => {
-    setLocalAccepted(!!patient.accepted);
-    setLocalRefused(!!patient.refused);
-    setLocalError(null);
+    setUpdateAccepted(!!patient.accepted);
+    setUpdateRefused(!!patient.refused);
+    setUpdateErrorMessage(null);
   }, [patient.gms, patient.accepted, patient.refused]);
 
   return (
@@ -203,7 +213,7 @@ export function PatientCardComponent({
                   id={acceptedInputID}
                   name={acceptedInputID}
                   title="toggle"
-                  checked={localAccepted}
+                  checked={updateAccepted}
                   onChange={handleAcceptedToggle}
                   className="absolute inset-0 cursor-pointer appearance-none"
                 />
@@ -252,7 +262,7 @@ export function PatientCardComponent({
                   id={refusedInputID}
                   name={refusedInputID}
                   title="toggle"
-                  checked={localRefused}
+                  checked={updateRefused}
                   onChange={handleRefusedToggle}
                   className="absolute inset-0 cursor-pointer appearance-none"
                 />
@@ -276,11 +286,20 @@ export function PatientCardComponent({
             text={error}
           />
         )}
-        {localError && (
+        {updateErrorMessage && (
           <AlertComponent
             type="error"
             title="Error updating the patient"
-            text={localError}
+            text={updateErrorMessage}
+          />
+        )}
+        {updateSuccessMessage && (
+          <AlertComponent
+            type="success"
+            title="Success"
+            text={updateSuccessMessage}
+            autoDismissMs={3000}
+            onDismiss={() => setUpdateSuccessMessage(null)}
           />
         )}
       </article>

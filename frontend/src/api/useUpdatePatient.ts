@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { BACKEND_URL } from '../env.ts';
-import type { Patient } from '../utils/types/patient.ts';
-import { getErrorMessage } from '../utils/getErrorMessage.ts';
+import {useState} from 'react';
+import {BACKEND_URL} from '../env.ts';
+import type {Patient} from '../utils/types/patient.ts';
+import {getErrorMessage} from '../utils/getErrorMessage.ts';
 
 export function useUpdatePatient() {
   const [updating, setUpdating] = useState(false);
@@ -11,17 +11,14 @@ export function useUpdatePatient() {
     try {
       setUpdating(true);
 
-      const response = await fetch(
-        `${BACKEND_URL}/api/patient/${patient.id}`,
-        {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            accepted: patient.accepted ?? null,
-            refused: patient.refused ?? null,
-          }),
-        }
-      );
+      const response = await fetch(`${BACKEND_URL}/api/patient/${patient.id}`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          accepted: patient.accepted ?? null,
+          refused: patient.refused ?? null,
+        }),
+      });
 
       if (!response.ok) {
         throw new Error(`Failed to update patient: ${response.status}`);

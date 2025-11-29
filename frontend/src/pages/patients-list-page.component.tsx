@@ -9,7 +9,7 @@ import {useDebounce} from '../utils/hooks/useDebounce.tsx';
 import {useInputChange} from '../utils/hooks/useInputChange.tsx';
 import {useResultsPerPage} from '../utils/hooks/useResultsPerPage.tsx';
 import {filterPatients} from '../utils/filterPatients.ts';
-import {usePatientsContext} from '../utils/hooks/patientsContext.tsx';
+import {usePatientsContext} from '../api/patientsContext.tsx';
 
 export function PatientsListPageComponent() {
   const inputSearchID = useId();
@@ -34,16 +34,13 @@ export function PatientsListPageComponent() {
   const {searchText, handleInputChange} = useInputChange();
   const debouncedSearchText = useDebounce(searchText, 400);
 
-  // Fetch all patients for filtering whenever search text changes
   useEffect(() => {
     loadPatients(undefined, undefined, debouncedSearchText, 'all');
     setCurrentPage(1);
   }, [debouncedSearchText, loadPatients]);
 
-  // Filter patients according to acceptedFilter
   const {filteredPatients} = filterPatients(patients, acceptedFilter);
 
-  // Slice for pagination
   const paginatedPatients = filteredPatients.slice(
     (currentPage - 1) * resultsPerPage,
     currentPage * resultsPerPage

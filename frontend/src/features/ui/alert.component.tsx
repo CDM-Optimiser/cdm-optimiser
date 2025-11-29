@@ -1,4 +1,4 @@
-import type {JSX} from 'react';
+import {useEffect, useState, type JSX} from 'react';
 
 type AlertTypes = 'error' | 'info' | 'success' | 'warning';
 
@@ -6,9 +6,41 @@ interface AlertProps {
   type?: AlertTypes;
   title: string;
   text: string;
+  autoDismissMs?: number;
+  onDismiss?: () => void;
 }
 
-export function AlertComponent({type = 'info', title, text}: AlertProps) {
+export function AlertComponent({
+  type = 'info',
+  title,
+  text,
+  autoDismissMs,
+  onDismiss = () => {},
+}: AlertProps) {
+  const [progressBar, setProgressBar] = useState(100);
+
+  useEffect(() => {
+    if (!autoDismissMs) return;
+
+    const interval = 50;
+    const decrement = (interval / autoDismissMs) * 100;
+
+    const timer = setInterval(() => {
+      setProgressBar((prev) => {
+        if (prev <= 0) {
+          clearInterval(timer);
+          setTimeout(onDismiss, 0);
+
+          return 0;
+        }
+
+        return prev - decrement;
+      });
+    }, interval);
+
+    return () => clearInterval(timer);
+  }, [autoDismissMs, onDismiss]);
+
   const bgColorClass: Record<AlertTypes, string> = {
     error: 'bg-red-50',
     info: 'bg-sky-50',
@@ -96,12 +128,22 @@ export function AlertComponent({type = 'info', title, text}: AlertProps) {
     <div
       className={`${bgColorClass[type]} border-l-4 ${borderClass[type]} rounded-xl p-4 shadow-md`}
     >
-      <div className="flex">
-        <div className="shrink-0">{icons[type]}</div>
-        <div className="ml-3">
-          <h3 className={`${textClass[type]} font-medium`}>{title}</h3>
-          <p className={`${textClass[type]} mt-2`}>{text}</p>
+      <div className="flex flex-col gap-4">
+        <div className="flex">
+          <div className="shrink-0">{icons[type]}</div>
+          <div className="ml-3">
+            <h3 className={`${textClass[type]} font-medium`}>{title}</h3>
+            <p className={`${textClass[type]} mt-2`}>{text}</p>
+          </div>
         </div>
+        {autoDismissMs && (
+          <div
+            className="h-1 rounded-b-xl bg-green-400 transition-all duration-50"
+            style={{width: `${progressBar}%`}}
+          >
+            <span className="sr-only">Progress bar</span>
+          </div>
+        )}
       </div>
     </div>
   );

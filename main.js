@@ -1,12 +1,14 @@
 const { app, BrowserWindow, dialog } = require("electron/main");
 const path = require("node:path");
 const { spawn } = require("child_process");
-const fetch = require("node-fetch");
 const fs = require("fs");
 
 const BACKEND_PORT = process.env.CDM_BACKEND_PORT || 8000;
 const BACKEND_HOST = process.env.CDM_BACKEND_HOST || "0.0.0.0";
 const BACKEND_URL = `http://127.0.0.1:${BACKEND_PORT}`;
+const CHECK_URL = `http://127.0.0.1:${BACKEND_PORT}`;
+
+const isDev = process.env.NODE_ENV === 'development';
 
 let backendProcess = null;
 let window = null;
@@ -64,12 +66,13 @@ function spawnBackend() {
 	}
 }
 
-async function waitForBackendReady(timeoutMs = 10000, intervalMs = 200) {
+async function waitForBackendReady(timeoutMs = 5000, intervalMs = 200) {
 	const start = Date.now();
 
 	while (Date.now() - start < timeoutMs) {
 		try {
-			const response = await fetch(`${BACKEND_URL}/api/patients`, { method: "GET" });
+			const response = await fetch(`${BACKEND_URL}/api/patients?status=all`, { method: "GET" });
+
 			if (response.ok) return true;
 		} catch (error) {
 		}
@@ -91,10 +94,17 @@ function createWindow() {
 		},
 	});
 
+	window.setMenuBarVisibility(false);
+	window.removeMenu();
+
+	if (isDev) {
+		window.webContents.openDevTools();
+	}
+
 	const indexPath = path.join(__dirname, "frontend", "dist", "index.html");
 
 	if (fs.existsSync(indexPath)) {
-		window.loadFile(indexPath);
+		window.loadFile(indexPath, { hash: "/" });
 
 		const INCREMENT = 0.03
 		const INTERVAL_DELAY = 100
@@ -116,8 +126,6 @@ function createWindow() {
 		window.loadURL(devUrl);
 	}
 
-	window.webContents.openDevTools();
-
 	window.on("closed", () => {
 		window = null;
 	});
@@ -126,7 +134,7 @@ function createWindow() {
 app.whenReady().then(async () => {
 	spawnBackend();
 
-	const ready = await waitForBackendReady(30000, 250);
+	const ready = await waitForBackendReady(5000, 250);
 
 	if (!ready) {
 		dialog.showMessageBox({

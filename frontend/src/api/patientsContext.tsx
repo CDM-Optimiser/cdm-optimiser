@@ -5,9 +5,9 @@ import {
   createContext,
   useContext,
 } from 'react';
-import { BACKEND_URL } from '../../env.ts';
-import { getErrorMessage } from '../../utils/getErrorMessage.ts';
-import type { Patient } from '../../utils/types/patient.ts';
+import {BACKEND_URL} from '../env.ts';
+import {getErrorMessage} from '../utils/getErrorMessage.ts';
+import type {Patient} from '../utils/types/patient.ts';
 
 type Status = 'all' | 'accepted' | 'refused' | 'pending';
 
@@ -32,7 +32,18 @@ const PatientsContext = createContext<PatientsContextType | undefined>(
   undefined
 );
 
-export const PatientsProvider = ({ children }: { children: React.ReactNode }) => {
+async function fetchWithRetry(url: string, attempts = 20, delay = 300) {
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const res = await fetch(url);
+      if (res.ok) return res;
+    } catch (_) {}
+    await new Promise((r) => setTimeout(r, delay));
+  }
+  throw new Error('Backend unavailable');
+}
+
+export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [totalPatients, setTotalPatients] = useState(0);
   const [acceptedPatients, setAcceptedPatients] = useState(0);
@@ -50,26 +61,31 @@ export const PatientsProvider = ({ children }: { children: React.ReactNode }) =>
     ) => {
       try {
         setLoading(true);
+
         const params = new URLSearchParams();
+
         if (limit != null) params.append('limit', limit.toString());
         if (offset != null) params.append('offset', offset.toString());
         if (search) params.append('search', search);
         params.append('status', status);
 
         const url = `${BACKEND_URL}/api/patients?${params.toString()}`;
-        const response = await fetch(url);
+
+        const response = await fetchWithRetry(url);
 
         if (!response.ok) throw new Error(`Error ${response.status}`);
 
         const patientsData = await response.json();
-        const parsedPatients = patientsData.data.map((p: Patient) => ({
-          ...p,
-          asthma: Boolean(p.asthma),
-          dm: Boolean(p.dm),
-          cvd: Boolean(p.cvd),
-          copd: Boolean(p.copd),
-          accepted: p.accepted != null ? Boolean(p.accepted) : undefined,
-          refused: p.refused != null ? Boolean(p.refused) : undefined,
+        const parsedPatients = patientsData.data.map((patient: Patient) => ({
+          ...patient,
+          asthma: Boolean(patient.asthma),
+          dm: Boolean(patient.dm),
+          cvd: Boolean(patient.cvd),
+          copd: Boolean(patient.copd),
+          accepted:
+            patient.accepted != null ? Boolean(patient.accepted) : undefined,
+          refused:
+            patient.refused != null ? Boolean(patient.refused) : undefined,
         }));
 
         setPatients(parsedPatients);
@@ -78,8 +94,8 @@ export const PatientsProvider = ({ children }: { children: React.ReactNode }) =>
         setRefusedPatients(patientsData.counts.refused);
         setPendingPatients(patientsData.counts.pending);
         setError(null);
-      } catch (err) {
-        setError(getErrorMessage(err));
+      } catch (error) {
+        setError(getErrorMessage(error));
       } finally {
         setLoading(false);
       }
@@ -93,19 +109,18 @@ export const PatientsProvider = ({ children }: { children: React.ReactNode }) =>
 
   useEffect(() => {
     setTotalPatients(patients.length);
-    setAcceptedPatients(patients.filter((p) => p.accepted === true).length);
-    setRefusedPatients(patients.filter((p) => p.refused === true).length);
-    setPendingPatients(
-      patients.filter((p) => !(p.accepted === true) && !(p.refused === true))
-        .length
+    setAcceptedPatients(
+      patients.filter((patient) => patient.accepted === true).length
     );
-  }, [
-    patients,
-    setTotalPatients,
-    setAcceptedPatients,
-    setRefusedPatients,
-    setPendingPatients,
-  ]);
+    setRefusedPatients(
+      patients.filter((patient) => patient.refused === true).length
+    );
+    setPendingPatients(
+      patients.filter(
+        (patient) => !(patient.accepted === true) && !(patient.refused === true)
+      ).length
+    );
+  }, [patients]);
 
   return (
     <PatientsContext.Provider
@@ -127,8 +142,10 @@ export const PatientsProvider = ({ children }: { children: React.ReactNode }) =>
 };
 
 export const usePatientsContext = () => {
-  const ctx = useContext(PatientsContext);
-  if (!ctx)
+  const context = useContext(PatientsContext);
+
+  if (!context)
     throw new Error('usePatientsContext must be used within PatientsProvider');
-  return ctx;
+
+  return context;
 };

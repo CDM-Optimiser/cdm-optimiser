@@ -15,8 +15,8 @@ export function FiltersComponent({
 
   return (
     <div className="flex w-full flex-1 flex-col flex-wrap gap-4 rounded-xl bg-white p-4 shadow-md xl:w-auto dark:bg-white/5 dark:ring dark:ring-gray-600">
-      <span>Filters:</span>
-      <div className="flex gap-2">
+      <span className="text-center xl:text-left">Filters:</span>
+      <div className="flex justify-center gap-2 xl:justify-start">
         <button
           type="button"
           className={`rounded-md border-b-4 border-sky-500 border-b-sky-600 bg-sky-500 px-4 py-2 text-white transition duration-200 ease-in-out hover:text-white hover:not-disabled:border-sky-800 hover:not-disabled:bg-sky-600 active:not-disabled:border-b-0 disabled:cursor-not-allowed dark:border-b-sky-700 dark:bg-sky-500 dark:hover:not-disabled:border-sky-900 dark:hover:not-disabled:bg-sky-800 ${
