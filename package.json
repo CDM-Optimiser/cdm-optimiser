@@ -13,7 +13,7 @@
     "postinstall": "cd frontend && npm install",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Jane Doe",
+  "author": "CDM Optimiser Developers",
   "license": "MIT",
   "devDependencies": {
     "concurrently": "^9.2.1",
