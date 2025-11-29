@@ -37,7 +37,8 @@
     "extraResources": [
     {
       "from": "dist/backend-server.exe",
-      "to": "backend-server.exe"
+      "to": ".",
+      "filter": ["**/*"]
     }
   ]
   },

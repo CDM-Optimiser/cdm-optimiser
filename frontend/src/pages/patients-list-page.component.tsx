@@ -58,67 +58,75 @@ export function PatientsListPageComponent() {
   const handleTextChange = (text: string) => handleInputChange(text);
 
   return (
-    <main className="mx-auto my-0 flex w-full max-w-7xl flex-col justify-center gap-6 p-6">
-      <SearchPatientComponent
-        inputSearchID={inputSearchID}
-        placeholder="Type to find a patient by its name, D.O.B or GMS number"
-        value={searchText}
-        onTextChange={handleTextChange}
-      />
-
-      <div className="flex flex-wrap items-center justify-center gap-4 xl:justify-between">
-        <FiltersComponent
-          filterSelected={acceptedFilter}
-          onFilterChange={handleFilterChange}
-        />
-        <LegendComponent
-          totalPatients={totalPatients}
-          acceptedPatientsText={`Accepted (${acceptedPatients})`}
-          refusedPatientsText={`Refused (${refusedPatients})`}
-          pendingPatientsText={`Pending (${pendingPatients})`}
-        />
-      </div>
-
-      {error && (
-        <AlertComponent
-          type="error"
-          text={error}
-          title="Error getting patients"
-        />
-      )}
+    <>
       {loading && (
-        <AlertComponent text="Fetching patients..." title="Loading patients" />
-      )}
-      {!loading && filteredPatients.length === 0 && !error && (
-        <AlertComponent
-          type="info"
-          text="No patients match your criteria"
-          title="No patients found"
-        />
-      )}
-
-      {!loading && filteredPatients.length > 0 && (
-        <>
-          <PaginationComponent
-            currentPage={currentPage}
-            totalPages={totalPages}
-            resultsPerPage={resultsPerPage}
-            onPageChange={handlePageChange}
-            onResultsPerPageChange={handleResultsPerPage}
+        <div className="mx-w-7xl mx-auto flex w-full items-center justify-center p-6">
+          <AlertComponent
+            title="Loading patients"
+            text="Fetching patients from database. It make take a few minutes..."
           />
-          <PatientsListComponent
-            patients={paginatedPatients}
-            onUpdatePatients={setPatients}
-          />
-          <PaginationComponent
-            currentPage={currentPage}
-            totalPages={totalPages}
-            resultsPerPage={resultsPerPage}
-            onPageChange={handlePageChange}
-            onResultsPerPageChange={handleResultsPerPage}
-          />
-        </>
+        </div>
       )}
-    </main>
+      {error && (
+        <div className="mx-w-7xl mx-auto flex w-full items-center justify-center p-6">
+          <AlertComponent
+            type="error"
+            title="Error getting patients"
+            text={error}
+          />
+        </div>
+      )}
+      {!loading && !error && (
+        <main className="mx-auto my-0 flex w-full max-w-7xl flex-col justify-center gap-6 p-6">
+          <SearchPatientComponent
+            inputSearchID={inputSearchID}
+            placeholder="Type to find a patient by its name, D.O.B or GMS number"
+            value={searchText}
+            onTextChange={handleTextChange}
+          />
+          <div className="flex flex-wrap items-center justify-center gap-4 xl:justify-between">
+            <FiltersComponent
+              filterSelected={acceptedFilter}
+              onFilterChange={handleFilterChange}
+            />
+            <LegendComponent
+              totalPatients={totalPatients}
+              acceptedPatientsText={`Accepted (${acceptedPatients})`}
+              refusedPatientsText={`Refused (${refusedPatients})`}
+              pendingPatientsText={`Pending (${pendingPatients})`}
+            />
+          </div>
+          {filteredPatients.length === 0 && (
+            <AlertComponent
+              type="info"
+              text="No patients match your criteria"
+              title="No patients found"
+            />
+          )}
+          {filteredPatients.length > 0 && (
+            <>
+              <PaginationComponent
+                currentPage={currentPage}
+                totalPages={totalPages}
+                resultsPerPage={resultsPerPage}
+                onPageChange={handlePageChange}
+                onResultsPerPageChange={handleResultsPerPage}
+              />
+              <PatientsListComponent
+                patients={paginatedPatients}
+                onUpdatePatients={setPatients}
+              />
+              <PaginationComponent
+                currentPage={currentPage}
+                totalPages={totalPages}
+                resultsPerPage={resultsPerPage}
+                onPageChange={handlePageChange}
+                onResultsPerPageChange={handleResultsPerPage}
+              />
+            </>
+          )}
+        </main>
+      )}
+    </>
   );
 }

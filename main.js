@@ -6,7 +6,6 @@ const fs = require("fs");
 const BACKEND_PORT = process.env.CDM_BACKEND_PORT || 8000;
 const BACKEND_HOST = process.env.CDM_BACKEND_HOST || "0.0.0.0";
 const BACKEND_URL = `http://127.0.0.1:${BACKEND_PORT}`;
-const CHECK_URL = `http://127.0.0.1:${BACKEND_PORT}`;
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -20,12 +19,19 @@ if (process.platform === "linux") {
 
 function getPackagedBackendPath() {
 	const resourcesDir = process.resourcesPath;
-	const possible = [
-		path.join(resourcesDir, "backend-server"),
-		path.join(resourcesDir, "backend-server.exe"),
+	const exeName = process.platform === 'win32' ? 'backend-server.exe' : 'backend-server';
+
+	const possiblePaths = [
+		path.join(resourcesDir, exeName),
+		path.join(resourcesDir, 'app.asar.unpacked', exeName),
+		path.join(__dirname, exeName),
 	];
 
-	return possible.find((package) => fs.existsSync(package)) || null;
+	const found = possiblePaths.find((path) => fs.existsSync(path));
+
+	if (!found) console.warn('Packaged backend not found in expected paths:', possiblePaths);
+
+	return found || null;
 }
 
 function spawnBackend() {
@@ -70,14 +76,15 @@ function spawnBackend() {
 
 function killBackend() {
 	if (!backendProcess) return;
+
 	try {
 		if (process.platform === "win32") {
 			spawn("taskkill", ["/pid", backendProcess.pid, "/f", "/t"]);
 		} else {
 			backendProcess.kill("SIGTERM");
 		}
-	} catch (err) {
-		console.error("Failed to kill backend:", err);
+	} catch (error) {
+		console.error("Failed to kill backend:", error);
 	}
 }
 
@@ -146,20 +153,8 @@ function createWindow() {
 	});
 }
 
-app.whenReady().then(async () => {
+app.whenReady().then(() => {
 	spawnBackend();
-
-	const ready = await waitForBackendReady(10000, 250);
-
-	if (!ready) {
-		dialog.showMessageBox({
-			type: "warning",
-			title: "Backend not responding",
-			message:
-				"The local backend did not become available within the timeout. The UI may not show data. Check logs in the console or run the backend manually.",
-		});
-	}
-
 	createWindow();
 });
 
@@ -174,17 +169,7 @@ app.on("window-all-closed", () => {
 });
 
 app.on("quit", () => {
-	if (backendProcess) {
-		try {
-			if (process.platform === "win32") {
-				spawn("taskkill", ["/pid", backendProcess.pid, "/f", "/t"]);
-			} else {
-				backendProcess.kill("SIGTERM");
-			}
-		} catch (e) {
-			console.error("Error killing backend:", e);
-		}
-	}
+	killBackend();
 });
 
 app.on("activate", function () {

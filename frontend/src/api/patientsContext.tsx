@@ -32,11 +32,12 @@ const PatientsContext = createContext<PatientsContextType | undefined>(
   undefined
 );
 
-async function fetchWithRetry(url: string, attempts = 20, delay = 300) {
+async function fetchWithRetry(url: string, attempts = 50, delay = 300) {
   for (let i = 0; i < attempts; i++) {
     try {
-      const res = await fetch(url);
-      if (res.ok) return res;
+      const response = await fetch(url);
+
+      if (response.ok) return response;
     } catch (_) {}
     await new Promise((r) => setTimeout(r, delay));
   }
