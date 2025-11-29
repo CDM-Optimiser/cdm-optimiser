@@ -4,9 +4,10 @@
   "description": "",
   "main": "main.js",
   "scripts": {
+    "build:backend": "pyinstaller --onefile backend/app.py --name backend-server --distpath dist",
     "build:frontend": "cd frontend && npm run build",
     "dev": "concurrently \"cd frontend && npm run dev\" \"electron .\"",
-    "dist": "electron-builder",
+    "dist": "npm run build:frontend && npm run build:backend && electron-builder",
     "start": "npm run build:frontend && electron .",
     "start-backend-dev": "python -m uvicorn backend.app:app --host 127.0.0.1 --port 8000 --log-level info",
     "pack": "electron-builder --dir",
