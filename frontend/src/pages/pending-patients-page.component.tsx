@@ -1,5 +1,5 @@
-import {useEffect, useMemo, useState} from 'react';
-import {usePatientsContext} from '../api/patientsContext.tsx';
+import {useMemo, useState} from 'react';
+import {usePatientsContext} from '../utils/hooks/usePatientsContext.tsx';
 import {PatientCardComponent} from '../features/patient-card/patient-card.component.tsx';
 import {AlertComponent} from '../features/ui/alert.component.tsx';
 
@@ -13,11 +13,11 @@ export function PendingPatientsPageComponent() {
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  useEffect(() => {
-    if (currentIndex >= pendingPatients.length) {
-      setCurrentIndex(Math.max(0, pendingPatients.length - 1));
-    }
-  }, [pendingPatients.length, currentIndex]);
+  const safeIndex = Math.min(
+    currentIndex,
+    Math.max(0, pendingPatients.length - 1)
+  );
+  const currentPatient = pendingPatients[safeIndex];
 
   const handlePrev = () =>
     setCurrentIndex((prev) => (prev > 0 ? prev - 1 : prev));
@@ -26,8 +26,6 @@ export function PendingPatientsPageComponent() {
     setCurrentIndex((prev) =>
       prev < pendingPatients.length - 1 ? prev + 1 : prev
     );
-
-  const currentPatient = pendingPatients[currentIndex];
 
   return (
     <section className="mx-auto max-w-7xl p-6">

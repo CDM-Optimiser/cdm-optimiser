@@ -1,48 +1,10 @@
-import {
-  useCallback,
-  useEffect,
-  useState,
-  createContext,
-  useContext,
-} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {BACKEND_URL} from '../env.ts';
-import {getErrorMessage} from '../utils/getErrorMessage.ts';
 import type {Patient} from '../utils/types/patient.ts';
-
-type Status = 'all' | 'accepted' | 'refused' | 'pending';
-
-type PatientsContextType = {
-  patients: Patient[];
-  totalPatients: number;
-  acceptedPatients: number;
-  refusedPatients: number;
-  pendingPatients: number;
-  loading: boolean;
-  error: string | null;
-  setPatients: React.Dispatch<React.SetStateAction<Patient[]>>;
-  loadPatients: (
-    limit?: number,
-    offset?: number,
-    search?: string,
-    status?: Status
-  ) => Promise<void>;
-};
-
-const PatientsContext = createContext<PatientsContextType | undefined>(
-  undefined
-);
-
-async function fetchWithRetry(url: string, attempts = 50, delay = 300) {
-  for (let i = 0; i < attempts; i++) {
-    try {
-      const response = await fetch(url);
-
-      if (response.ok) return response;
-    } catch (_) {}
-    await new Promise((r) => setTimeout(r, delay));
-  }
-  throw new Error('Backend unavailable');
-}
+import type {Status} from '../utils/types/statusType.ts';
+import {getErrorMessage} from '../utils/getErrorMessage.ts';
+import {PatientsContext} from '../utils/patientsContext.ts';
+import {fetchWithRetry} from '../utils/fetchWithRetry.ts';
 
 export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -140,13 +102,4 @@ export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
       {children}
     </PatientsContext.Provider>
   );
-};
-
-export const usePatientsContext = () => {
-  const context = useContext(PatientsContext);
-
-  if (!context)
-    throw new Error('usePatientsContext must be used within PatientsProvider');
-
-  return context;
 };

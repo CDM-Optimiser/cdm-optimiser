@@ -1,5 +1,4 @@
 import {
-  useEffect,
   useId,
   useState,
   type ChangeEvent,
@@ -74,12 +73,6 @@ export function PatientCardComponent({
       setUpdateSuccessMessage(null);
     }
   };
-
-  useEffect(() => {
-    setUpdateAccepted(!!patient.accepted);
-    setUpdateRefused(!!patient.refused);
-    setUpdateErrorMessage(null);
-  }, [patient.gms, patient.accepted, patient.refused]);
 
   return (
     <section className="mx-auto max-w-7xl">
