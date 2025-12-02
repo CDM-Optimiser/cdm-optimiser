@@ -1,5 +1,5 @@
 import {Routes, Route} from 'react-router';
-import {PatientsProvider} from './api/patientsContext.tsx';
+import {PatientsProvider} from './api/patientsProvider.tsx';
 import {FooterComponent} from './features/ui/footer.component.tsx';
 import {HeaderComponent} from './features/ui/header.component.tsx';
 import {PendingPatientsPageComponent} from './pages/pending-patients-page.component.tsx';

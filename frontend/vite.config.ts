@@ -1,6 +1,7 @@
 /// <reference types="vitest/config" />
 import path from 'path';
 import {defineConfig} from 'vite';
+import {playwright} from '@vitest/browser-playwright';
 import react from '@vitejs/plugin-react-swc';
 import tailwindcss from '@tailwindcss/vite';
 
@@ -17,8 +18,35 @@ export default defineConfig({
   },
   plugins: [react(), tailwindcss()],
   test: {
-    environment: 'jsdom',
-    globals: true,
-    include: ['src/test/**/*.test.{ts,tsx}'],
+    projects: [
+      {
+        test: {
+          include: [
+            'tests/unit/**/*.{test,spec}.ts',
+            'tests/unit/**/*.component.{test,spec}.ts',
+            'tests/**/*.unit.{test,spec}.ts',
+            'tests/**/*.component.unit.{test,spec}.ts',
+          ],
+          name: 'unit',
+          environment: 'jsdom',
+        },
+      },
+      {
+        test: {
+          include: [
+            'tests/browser/**/*.{test,spec}.ts',
+            'tests/browser/**/*.component.{test,spec}.ts',
+            'tests/**/*.browser.{test,spec}.ts',
+            'tests/**/*.component.browser.{test,spec}.ts',
+          ],
+          name: 'browser',
+          browser: {
+            enabled: true,
+            provider: playwright(),
+            instances: [{browser: 'chromium'}],
+          },
+        },
+      },
+    ],
   },
 });

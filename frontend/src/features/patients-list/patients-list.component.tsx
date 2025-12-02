@@ -12,12 +12,12 @@ import {useSelectedPatient} from '../../utils/hooks/useSelectedPatient.tsx';
 
 interface PatientsListProps {
   patients: Patient[];
-  onUpdatePatients: Dispatch<SetStateAction<Patient[]>>;
+  onUpdatePatient: Dispatch<SetStateAction<Patient[]>>;
 }
 
 export function PatientsListComponent({
   patients,
-  onUpdatePatients,
+  onUpdatePatient,
 }: PatientsListProps) {
   const {selectedPatient, setSelectedPatient, handleRowClick} =
     useSelectedPatient();
@@ -49,7 +49,7 @@ export function PatientsListComponent({
 
             return (
               <tr
-                key={patient.gms}
+                key={patient.id}
                 className={`transition duration-200 ease-in-out not-last:border-b not-last:border-gray-200 hover:cursor-pointer hover:bg-sky-100 dark:hover:bg-sky-500 ${rowBackground}`}
                 onClick={() => handleRowClick(patient)}
               >
@@ -116,7 +116,7 @@ export function PatientsListComponent({
         {selectedPatient && (
           <PatientCardComponent
             patient={selectedPatient}
-            onUpdatePatients={onUpdatePatients}
+            onUpdatePatient={onUpdatePatient}
           />
         )}
       </ModalComponent>

@@ -14,12 +14,12 @@ import {useUpdatePatient} from '../../api/useUpdatePatient.ts';
 
 interface PatientCardProps {
   patient: Patient;
-  onUpdatePatients: Dispatch<SetStateAction<Patient[]>>;
+  onUpdatePatient: Dispatch<SetStateAction<Patient[]>>;
 }
 
 export function PatientCardComponent({
   patient,
-  onUpdatePatients,
+  onUpdatePatient: onUpdatePatient,
 }: PatientCardProps) {
   const acceptedInputID = useId();
   const refusedInputID = useId();
@@ -60,8 +60,8 @@ export function PatientCardComponent({
       });
 
       if (updated) {
-        onUpdatePatients((prev) =>
-          prev.map((p) => (p.gms === updated.gms ? updated : p))
+        onUpdatePatient((prev) =>
+          prev.map((patient) => (patient.id === updated.id ? updated : patient))
         );
       }
 

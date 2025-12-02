@@ -118,7 +118,7 @@ export function PatientsListPageComponent() {
               />
               <PatientsListComponent
                 patients={paginatedPatients}
-                onUpdatePatients={setPatients}
+                onUpdatePatient={setPatients}
               />
               <PaginationComponent
                 currentPage={currentPage}

@@ -62,7 +62,7 @@ export function PendingPatientsPageComponent() {
           <section className="rounded-xl bg-white p-4 shadow-md dark:bg-white/5 dark:ring dark:ring-gray-600">
             <PatientCardComponent
               patient={currentPatient}
-              onUpdatePatients={setPatients}
+              onUpdatePatient={setPatients}
             />
           </section>
         </>
