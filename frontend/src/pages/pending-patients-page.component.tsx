@@ -1,10 +1,11 @@
-import {useMemo, useState} from 'react';
-import {usePatientsContext} from '../utils/hooks/usePatientsContext.tsx';
-import {PatientCardComponent} from '../features/patient-card/patient-card.component.tsx';
-import {AlertComponent} from '../features/ui/alert.component.tsx';
+import { useEffect, useMemo, useState } from 'react';
+import { usePatientsContext } from '../utils/hooks/usePatientsContext.tsx';
+import { PatientCardComponent } from '../features/patient-card/patient-card.component.tsx';
+import { AlertComponent } from '../features/ui/alert.component.tsx';
 
 export function PendingPatientsPageComponent() {
-  const {patients, setPatients} = usePatientsContext();
+  const [lastUpdateSuccess, setLastUpdateSuccess] = useState<string | null>(null);
+  const { patients, setPatients } = usePatientsContext();
 
   const pendingPatients = useMemo(
     () => patients.filter((patient) => !patient.accepted && !patient.refused),
@@ -12,6 +13,14 @@ export function PendingPatientsPageComponent() {
   );
 
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (pendingPatients.length === 0) {
+      setCurrentIndex(0);
+    } else if (currentIndex >= pendingPatients.length) {
+      setCurrentIndex(pendingPatients.length - 1);
+    }
+  }, [pendingPatients.length, currentIndex]);
 
   const safeIndex = Math.min(
     currentIndex,
@@ -27,8 +36,23 @@ export function PendingPatientsPageComponent() {
       prev < pendingPatients.length - 1 ? prev + 1 : prev
     );
 
+  const handlePatientUpdated = (patientName: string) => {
+    setLastUpdateSuccess(patientName);
+  };
+
   return (
     <section className="mx-auto max-w-7xl p-6">
+      {lastUpdateSuccess && (
+        <div className="mb-4">
+          <AlertComponent
+            type="success"
+            title="Update successful!"
+            text={`${lastUpdateSuccess} has been updated successfully.`}
+            autoDismissMs={3000}
+            onDismiss={() => setLastUpdateSuccess(null)}
+          />
+        </div>
+      )}
       {!pendingPatients || pendingPatients.length === 0 ? (
         <AlertComponent
           type="info"
@@ -64,6 +88,8 @@ export function PendingPatientsPageComponent() {
               key={currentPatient.id}
               patient={currentPatient}
               onUpdatePatient={setPatients}
+              onPendingPatientUpdated={handlePatientUpdated}
+              showAlert={false}
             />
           </section>
         </>

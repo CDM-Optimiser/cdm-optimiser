@@ -1,14 +1,14 @@
-import {type Dispatch, type SetStateAction} from 'react';
-import {PatientCardComponent} from '../patient-card/patient-card.component.tsx';
-import {ModalComponent} from '../ui/modal.component.tsx';
-import {SVGComponent} from '../ui/svg.component.tsx';
-import type {Patient} from '../../utils/types/patient.ts';
+import { type Dispatch, type SetStateAction } from 'react';
+import { PatientCardComponent } from '../patient-card/patient-card.component.tsx';
+import { ModalComponent } from '../ui/modal.component.tsx';
+import { SVGComponent } from '../ui/svg.component.tsx';
+import type { Patient } from '../../utils/types/patient.ts';
 import {
   booleanColumns,
   headerLabels,
   excludedColumns,
 } from '../../utils/patientsTableColumns.ts';
-import {useSelectedPatient} from '../../utils/hooks/useSelectedPatient.tsx';
+import { useSelectedPatient } from '../../utils/hooks/useSelectedPatient.tsx';
 
 interface PatientsListProps {
   patients: Patient[];
@@ -19,7 +19,7 @@ export function PatientsListComponent({
   patients,
   onUpdatePatient,
 }: PatientsListProps) {
-  const {selectedPatient, setSelectedPatient, handleRowClick} =
+  const { selectedPatient, setSelectedPatient, handleRowClick } =
     useSelectedPatient();
 
   return (
@@ -117,6 +117,7 @@ export function PatientsListComponent({
           <PatientCardComponent
             patient={selectedPatient}
             onUpdatePatient={onUpdatePatient}
+            onPendingPatientUpdated={() => { }}
           />
         )}
       </ModalComponent>

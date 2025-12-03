@@ -6,21 +6,25 @@ import {
   type MouseEvent,
   type SetStateAction,
 } from 'react';
-import type {Patient} from '../../utils/types/patient.ts';
-import {SVGComponent} from '../ui/svg.component.tsx';
-import {AlertComponent} from '../ui/alert.component.tsx';
-import {getErrorMessage} from '../../utils/getErrorMessage.ts';
-import {useUpdatePatient} from '../../api/useUpdatePatient.ts';
-import {usePatientsContext} from '../../utils/hooks/usePatientsContext.tsx';
+import type { Patient } from '../../utils/types/patient.ts';
+import { SVGComponent } from '../ui/svg.component.tsx';
+import { AlertComponent } from '../ui/alert.component.tsx';
+import { getErrorMessage } from '../../utils/getErrorMessage.ts';
+import { useUpdatePatient } from '../../api/useUpdatePatient.ts';
+import { usePatientsContext } from '../../utils/hooks/usePatientsContext.tsx';
 
 interface PatientCardProps {
   patient: Patient;
   onUpdatePatient: Dispatch<SetStateAction<Patient[]>>;
+  onPendingPatientUpdated: (patientName: string) => void;
+  showAlert?: boolean;
 }
 
 export function PatientCardComponent({
   patient,
-  onUpdatePatient: onUpdatePatient,
+  onUpdatePatient,
+  onPendingPatientUpdated,
+  showAlert = true
 }: PatientCardProps) {
   const acceptedInputID = useId();
   const refusedInputID = useId();
@@ -32,8 +36,9 @@ export function PatientCardComponent({
   const [updateSuccessMessage, setUpdateSuccessMessage] = useState<
     string | null
   >(null);
-  const {loadPatients} = usePatientsContext();
-  const {updatePatient, updating, error} = useUpdatePatient();
+
+  const { loadPatients } = usePatientsContext();
+  const { updatePatient, updating, error } = useUpdatePatient();
 
   const handleAcceptedToggle = (event: ChangeEvent<HTMLInputElement>) => {
     const isChecked = event.target.checked;
@@ -53,6 +58,9 @@ export function PatientCardComponent({
     event.preventDefault();
     event.stopPropagation();
 
+    setUpdateErrorMessage(null);
+    setUpdateSuccessMessage(null);
+
     try {
       const updated = await updatePatient({
         ...patient,
@@ -61,19 +69,21 @@ export function PatientCardComponent({
       });
 
       if (updated) {
+        onPendingPatientUpdated(updated.name);
+
         onUpdatePatient((prev) =>
           prev.map((patient) => (patient.id === updated.id ? updated : patient))
         );
 
-        setUpdateSuccessMessage('Patient updated successfully!');
-        setUpdateErrorMessage(null);
-
         setTimeout(async () => {
           await loadPatients(undefined, undefined, undefined, 'all', true);
-        }, 50);
+        }, 100);
+
+        if (showAlert) {
+          setUpdateSuccessMessage(`Patient ${updated.name} updated successfully!`);
+        }
       }
 
-      setUpdateSuccessMessage('Patient updated successfully!');
       setUpdateErrorMessage(null);
     } catch (error) {
       const message = getErrorMessage(error);
@@ -299,13 +309,15 @@ export function PatientCardComponent({
             text={updateErrorMessage}
           />
         )}
-        {updateSuccessMessage && (
+        {showAlert && updateSuccessMessage && (
           <AlertComponent
             type="success"
             title="Success"
             text={updateSuccessMessage}
             autoDismissMs={3000}
-            onDismiss={() => setUpdateSuccessMessage(null)}
+            onDismiss={() => {
+              setUpdateSuccessMessage(null);
+            }}
           />
         )}
       </article>

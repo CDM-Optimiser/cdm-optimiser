@@ -1,56 +1,76 @@
-import {useState} from 'react';
-import {useAuth} from '../utils/authProvider.tsx';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router';
+import { useAuth } from '../utils/authProvider.tsx';
+import { AlertComponent } from '../features/ui/alert.component.tsx';
+import { getErrorMessage } from '../utils/getErrorMessage.ts';
 
 export default function LoginPageComponent() {
-  const {login} = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
+  const [error, setErrorMessage] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
     setLoading(true);
-    setErrorMsg('');
+    setErrorMessage('');
 
     try {
       await login(email, password);
-    } catch (err: any) {
-      setErrorMsg(err.message);
+
+      navigate('/')
+    } catch (error) {
+      setErrorMessage(getErrorMessage(error));
     } finally {
       setLoading(false);
     }
   };
 
+  const handleEmail = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(event.target.value)
+  }
+
+  const handlePassword = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(event.target.value)
+  }
+
   return (
-    <div className="mx-auto max-w-md p-6">
-      <h1 className="mb-4 text-2xl font-bold">Login</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="rounded border p-2"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className="rounded border p-2"
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className="mt-2 rounded bg-blue-500 p-2 text-white"
-        >
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
-      {errorMsg && <p className="mt-2 text-red-500">{errorMsg}</p>}
+    <div className="h-dvh w-dvw flex flex-col align-center justify-center mx-auto max-w-md p-6">
+      <div className='bg-white dark:bg-white/5 dark:ring dark:ring-gray-600 p-8 rounded-md shadow-md flex flex-col gap-4'>
+        <h1 className="mb-4 text-2xl font-bold text-center">Login to CDM Optimiser</h1>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={handleEmail}
+            required
+            className="w-full rounded-md bg-white px-1 py-2 shadow-md outline-1 outline-offset-1 outline-gray-200 transition duration-200 ease-in-out focus:outline-4 focus:outline-offset-1 focus:outline-sky-500 dark:bg-white/5 dark:text-white dark:outline-gray-600"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={handlePassword}
+            required
+            className="w-full rounded-md bg-white px-1 py-2 shadow-md outline-1 outline-offset-1 outline-gray-200 transition duration-200 ease-in-out focus:outline-4 focus:outline-offset-1 focus:outline-sky-500 dark:bg-white/5 dark:text-white dark:outline-gray-600"
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className="rounded-md bg-sky-500 p-2 hover:bg-sky-700 duration-300 transition ease-in-out text-white"
+          >
+            {loading ? 'Logging in...' : 'Login'}
+          </button>
+        </form>
+        {error && <div className='mt-6'>
+          <AlertComponent type='error' title='Error' text={error} />
+        </div>}
+      </div>
     </div>
   );
 }

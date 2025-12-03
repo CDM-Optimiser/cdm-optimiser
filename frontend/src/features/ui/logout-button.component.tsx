@@ -1,10 +1,14 @@
-import {useAuth} from '../../utils/authProvider.tsx';
+import { useNavigate } from 'react-router';
+import { useAuth } from '../../utils/authProvider.tsx';
 
 export function LogoutButton() {
-  const {logout, user} = useAuth();
+  const { logout, user } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     await logout();
+
+    navigate('/login')
   };
 
   if (!user) return null;
