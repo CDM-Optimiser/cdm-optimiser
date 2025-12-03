@@ -1,5 +1,5 @@
-import type { Patient } from './patientType.ts';
-import type { Status } from './statusType.ts';
+import type {Patient} from './patientType.ts';
+import type {Status} from './statusType.ts';
 
 export type PatientsContextType = {
   patients: Patient[];

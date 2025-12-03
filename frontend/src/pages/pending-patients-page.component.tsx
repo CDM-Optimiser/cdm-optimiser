@@ -1,10 +1,10 @@
-import { useMemo, useState } from 'react';
-import { usePatientsContext } from '../utils/hooks/usePatientsContext.tsx';
-import { PatientCardComponent } from '../features/patient-card/patient-card.component.tsx';
-import { AlertComponent } from '../features/ui/alert.component.tsx';
+import {useMemo, useState} from 'react';
+import {usePatientsContext} from '../utils/hooks/usePatientsContext.tsx';
+import {PatientCardComponent} from '../features/patient-card/patient-card.component.tsx';
+import {AlertComponent} from '../features/ui/alert.component.tsx';
 
 export function PendingPatientsPageComponent() {
-  const { patients, setPatients } = usePatientsContext();
+  const {patients, setPatients} = usePatientsContext();
 
   const pendingPatients = useMemo(
     () => patients.filter((patient) => !patient.accepted && !patient.refused),

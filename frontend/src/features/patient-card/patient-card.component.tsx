@@ -6,12 +6,12 @@ import {
   type MouseEvent,
   type SetStateAction,
 } from 'react';
-import type { Patient } from '../../utils/types/patient.ts';
-import { SVGComponent } from '../ui/svg.component.tsx';
-import { AlertComponent } from '../ui/alert.component.tsx';
-import { getErrorMessage } from '../../utils/getErrorMessage.ts';
-import { useUpdatePatient } from '../../api/useUpdatePatient.ts';
-import { usePatientsContext } from '../../utils/hooks/usePatientsContext.tsx';
+import type {Patient} from '../../utils/types/patient.ts';
+import {SVGComponent} from '../ui/svg.component.tsx';
+import {AlertComponent} from '../ui/alert.component.tsx';
+import {getErrorMessage} from '../../utils/getErrorMessage.ts';
+import {useUpdatePatient} from '../../api/useUpdatePatient.ts';
+import {usePatientsContext} from '../../utils/hooks/usePatientsContext.tsx';
 
 interface PatientCardProps {
   patient: Patient;
@@ -32,8 +32,8 @@ export function PatientCardComponent({
   const [updateSuccessMessage, setUpdateSuccessMessage] = useState<
     string | null
   >(null);
-  const { loadPatients } = usePatientsContext();
-  const { updatePatient, updating, error } = useUpdatePatient();
+  const {loadPatients} = usePatientsContext();
+  const {updatePatient, updating, error} = useUpdatePatient();
 
   const handleAcceptedToggle = (event: ChangeEvent<HTMLInputElement>) => {
     const isChecked = event.target.checked;
@@ -177,8 +177,8 @@ export function PatientCardComponent({
               <span className="text-md ms-3 font-medium select-none">
                 Accepted
               </span>
-              <div className="group relative inline-flex h-6 w-12 rounded-xl bg-gray-300 p-0.5 outline-offset-2 transition duration-200 ease-in-out has-checked:bg-green-500">
-                <span className="relative inline-flex h-5 w-5 rounded-xl bg-white p-2 ring-1 ring-gray-300 transition duration-200 ease-in-out group-has-[input:checked]:translate-x-6 group-has-[input:checked]:ring-green-500">
+              <div className="group relative inline-flex h-6 w-12 rounded-xl bg-gray-300 p-0.5 outline-offset-2 transition duration-200 ease-in-out has-checked:bg-green-500 dark:bg-white/5 dark:ring dark:ring-gray-600">
+                <span className="relative inline-flex h-5 w-5 rounded-xl bg-white p-2 ring-1 ring-gray-300 transition duration-200 ease-in-out group-has-[input:checked]:translate-x-6 group-has-[input:checked]:ring-green-500 dark:ring-white/5">
                   <span
                     aria-hidden="true"
                     className="absolute inset-0 flex h-full w-full items-center justify-center opacity-100 transition-opacity duration-200 ease-in-out group-has-[input:checked]:opacity-0"
@@ -188,6 +188,7 @@ export function PatientCardComponent({
                       width="16"
                       fill="none"
                       strokeWidth="2"
+                      className="dark:text-gray-900"
                     >
                       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                       <path d="M5 12h2" />
@@ -204,6 +205,7 @@ export function PatientCardComponent({
                       width="16"
                       fill="none"
                       strokeWidth="2"
+                      className="dark:text-gray-900"
                     >
                       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                       <path d="M5 12l5 5l10 -10" />
@@ -225,7 +227,7 @@ export function PatientCardComponent({
               <span className="text-md ms-3 font-medium select-none">
                 Refused
               </span>
-              <div className="group relative inline-flex h-6 w-12 rounded-xl bg-gray-300 p-0.5 outline-offset-2 transition duration-200 ease-in-out has-checked:bg-red-500">
+              <div className="group relative inline-flex h-6 w-12 rounded-xl bg-gray-300 p-0.5 outline-offset-2 transition duration-200 ease-in-out has-checked:bg-red-500 dark:bg-white/5 dark:ring dark:ring-gray-600">
                 <span className="relative inline-flex h-5 w-5 rounded-xl bg-white p-2 ring-1 ring-gray-300 transition duration-200 ease-in-out group-has-[input:checked]:translate-x-6 group-has-[input:checked]:ring-red-500">
                   <span
                     aria-hidden="true"
@@ -236,6 +238,7 @@ export function PatientCardComponent({
                       width="16"
                       fill="none"
                       strokeWidth="2"
+                      className="dark:text-gray-900"
                     >
                       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                       <path d="M5 12h2" />
@@ -252,6 +255,7 @@ export function PatientCardComponent({
                       width="16"
                       fill="none"
                       strokeWidth="2"
+                      className="dark:text-gray-900"
                     >
                       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                       <path d="M18 6l-12 12" />

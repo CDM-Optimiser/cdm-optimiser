@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { supabase } from '../utils/supabase.ts';
-import type { Patient } from '../utils/types/patient.ts';
-import { getErrorMessage } from '../utils/getErrorMessage.ts';
+import {useState} from 'react';
+import {supabase} from '../utils/supabase.ts';
+import type {Patient} from '../utils/types/patient.ts';
+import {getErrorMessage} from '../utils/getErrorMessage.ts';
 
 export function useUpdatePatient() {
   const [updating, setUpdating] = useState(false);
@@ -15,7 +15,7 @@ export function useUpdatePatient() {
       const acceptedValue = patient.accepted ? 1 : 0;
       const refusedValue = patient.refused ? 1 : 0;
 
-      const { data: updated, error: supabaseError } = await supabase
+      const {data: updated, error: supabaseError} = await supabase
         .from('patient')
         .update({
           accepted: acceptedValue,
