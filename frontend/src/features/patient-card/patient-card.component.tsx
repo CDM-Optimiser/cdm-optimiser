@@ -6,12 +6,12 @@ import {
   type MouseEvent,
   type SetStateAction,
 } from 'react';
-import type { Patient } from '../../utils/types/patient.ts';
-import { SVGComponent } from '../ui/svg.component.tsx';
-import { AlertComponent } from '../ui/alert.component.tsx';
-import { getErrorMessage } from '../../utils/getErrorMessage.ts';
-import { useUpdatePatient } from '../../api/useUpdatePatient.ts';
-import { usePatientsContext } from '../../utils/hooks/usePatientsContext.tsx';
+import type {Patient} from '../../utils/types/patient.ts';
+import {SVGComponent} from '../ui/svg.component.tsx';
+import {AlertComponent} from '../ui/alert.component.tsx';
+import {getErrorMessage} from '../../utils/getErrorMessage.ts';
+import {useUpdatePatient} from '../../api/useUpdatePatient.ts';
+import {usePatientsContext} from '../../utils/hooks/usePatientsContext.tsx';
 
 interface PatientCardProps {
   patient: Patient;
@@ -24,7 +24,7 @@ export function PatientCardComponent({
   patient,
   onUpdatePatient,
   onPendingPatientUpdated,
-  showAlert = true
+  showAlert = true,
 }: PatientCardProps) {
   const acceptedInputID = useId();
   const refusedInputID = useId();
@@ -37,8 +37,8 @@ export function PatientCardComponent({
     string | null
   >(null);
 
-  const { loadPatients } = usePatientsContext();
-  const { updatePatient, updating, error } = useUpdatePatient();
+  const {loadPatients} = usePatientsContext();
+  const {updatePatient, updating, error} = useUpdatePatient();
 
   const handleAcceptedToggle = (event: ChangeEvent<HTMLInputElement>) => {
     const isChecked = event.target.checked;
@@ -80,7 +80,9 @@ export function PatientCardComponent({
         }, 100);
 
         if (showAlert) {
-          setUpdateSuccessMessage(`Patient ${updated.name} updated successfully!`);
+          setUpdateSuccessMessage(
+            `Patient ${updated.name} updated successfully!`
+          );
         }
       }
 

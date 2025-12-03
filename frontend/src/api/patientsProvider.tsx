@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
-import { supabase } from '../utils/supabase.ts';
-import type { Patient } from '../utils/types/patient.ts';
-import type { Status } from '../utils/types/statusType.ts';
-import { getErrorMessage } from '../utils/getErrorMessage.ts';
-import { PatientsContext } from '../utils/patientsContext.ts';
-import { useAuth } from '../utils/authProvider.tsx';
+import {useCallback, useEffect, useState} from 'react';
+import {supabase} from '../utils/supabase.ts';
+import type {Patient} from '../utils/types/patient.ts';
+import type {Status} from '../utils/types/statusType.ts';
+import {getErrorMessage} from '../utils/getErrorMessage.ts';
+import {PatientsContext} from '../utils/patientsContext.ts';
+import {useAuth} from '../utils/authProvider.tsx';
 
-export const PatientsProvider = ({ children }: { children: React.ReactNode }) => {
+export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [totalPatients, setTotalPatients] = useState(0);
   const [acceptedPatients, setAcceptedPatients] = useState(0);
@@ -16,7 +16,7 @@ export const PatientsProvider = ({ children }: { children: React.ReactNode }) =>
   const [fetching, setFetching] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { user } = useAuth();
+  const {user} = useAuth();
 
   const MIN_LOAD_TIME_MS = 500;
 
@@ -48,14 +48,14 @@ export const PatientsProvider = ({ children }: { children: React.ReactNode }) =>
 
       const totalQuery = supabase
         .from('patient')
-        .select('id', { count: 'exact' });
+        .select('id', {count: 'exact'});
       const acceptedQuery = supabase
         .from('patient')
-        .select('id', { count: 'exact' })
+        .select('id', {count: 'exact'})
         .eq('accepted', 1);
       const refusedQuery = supabase
         .from('patient')
-        .select('id', { count: 'exact' })
+        .select('id', {count: 'exact'})
         .eq('refused', 1);
 
       const countQueriesPromise = Promise.all([
@@ -66,9 +66,9 @@ export const PatientsProvider = ({ children }: { children: React.ReactNode }) =>
 
       try {
         const [
-          { count: totalCount, error: totalError },
-          { count: acceptedCount, error: acceptedError },
-          { count: refusedCount, error: refusedError },
+          {count: totalCount, error: totalError},
+          {count: acceptedCount, error: acceptedError},
+          {count: refusedCount, error: refusedError},
         ] = await countQueriesPromise;
 
         if (totalError || acceptedError || refusedError) {
@@ -95,7 +95,7 @@ export const PatientsProvider = ({ children }: { children: React.ReactNode }) =>
       }
 
       try {
-        let query = supabase.from('patient').select('*', { count: 'exact' });
+        let query = supabase.from('patient').select('*', {count: 'exact'});
 
         if (status === 'accepted') query = query.eq('accepted', 1);
         else if (status === 'refused') query = query.eq('refused', 1);
@@ -103,12 +103,12 @@ export const PatientsProvider = ({ children }: { children: React.ReactNode }) =>
           query = query.eq('accepted', 0).eq('refused', 0);
         if (search) query = query.ilike('name', `%${search}%`);
 
-        query = query.order('id', { ascending: true });
+        query = query.order('id', {ascending: true});
 
         if (limit != null && offset != null)
           query = query.range(offset, offset + limit - 1);
 
-        const { data, error } = await query;
+        const {data, error} = await query;
 
         if (error) {
           setError(getErrorMessage(error));

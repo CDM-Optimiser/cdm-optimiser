@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router';
-import { useAuth } from '../utils/authProvider.tsx';
-import { AlertComponent } from '../features/ui/alert.component.tsx';
-import { getErrorMessage } from '../utils/getErrorMessage.ts';
+import React, {useState} from 'react';
+import {useNavigate} from 'react-router';
+import {useAuth} from '../utils/authProvider.tsx';
+import {AlertComponent} from '../features/ui/alert.component.tsx';
+import {getErrorMessage} from '../utils/getErrorMessage.ts';
 
 export default function LoginPageComponent() {
   const [email, setEmail] = useState('');
@@ -11,7 +11,7 @@ export default function LoginPageComponent() {
   const [error, setErrorMessage] = useState('');
 
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const {login} = useAuth();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -22,7 +22,7 @@ export default function LoginPageComponent() {
     try {
       await login(email, password);
 
-      navigate('/')
+      navigate('/');
     } catch (error) {
       setErrorMessage(getErrorMessage(error));
     } finally {
@@ -31,17 +31,19 @@ export default function LoginPageComponent() {
   };
 
   const handleEmail = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(event.target.value)
-  }
+    setEmail(event.target.value);
+  };
 
   const handlePassword = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(event.target.value)
-  }
+    setPassword(event.target.value);
+  };
 
   return (
-    <div className="h-dvh w-dvw flex flex-col align-center justify-center mx-auto max-w-md p-6">
-      <div className='bg-white dark:bg-white/5 dark:ring dark:ring-gray-600 p-8 rounded-md shadow-md flex flex-col gap-4'>
-        <h1 className="mb-4 text-2xl font-bold text-center">Login to CDM Optimiser</h1>
+    <div className="align-center mx-auto flex h-dvh w-dvw max-w-md flex-col justify-center p-6">
+      <div className="flex flex-col gap-4 rounded-md bg-white p-8 shadow-md dark:bg-white/5 dark:ring dark:ring-gray-600">
+        <h1 className="mb-4 text-center text-2xl font-bold">
+          Login to CDM Optimiser
+        </h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
             type="email"
@@ -62,14 +64,16 @@ export default function LoginPageComponent() {
           <button
             type="submit"
             disabled={loading}
-            className="rounded-md bg-sky-500 p-2 hover:bg-sky-700 duration-300 transition ease-in-out text-white"
+            className="rounded-md bg-sky-500 p-2 text-white transition duration-300 ease-in-out hover:bg-sky-700"
           >
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
-        {error && <div className='mt-6'>
-          <AlertComponent type='error' title='Error' text={error} />
-        </div>}
+        {error && (
+          <div className="mt-6">
+            <AlertComponent type="error" title="Error" text={error} />
+          </div>
+        )}
       </div>
     </div>
   );
