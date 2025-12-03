@@ -1,7 +1,7 @@
-import {useState} from 'react';
-import {BACKEND_URL} from '../env.ts';
-import type {Patient} from '../utils/types/patient.ts';
-import {getErrorMessage} from '../utils/getErrorMessage.ts';
+import { useState } from 'react';
+import { supabase } from '../utils/supabase.ts';
+import type { Patient } from '../utils/types/patient.ts';
+import { getErrorMessage } from '../utils/getErrorMessage.ts';
 
 export function useUpdatePatient() {
   const [updating, setUpdating] = useState(false);
@@ -10,21 +10,24 @@ export function useUpdatePatient() {
   const updatePatient = async (patient: Patient) => {
     try {
       setUpdating(true);
+      setError(null);
 
-      const response = await fetch(`${BACKEND_URL}/api/patient/${patient.id}`, {
-        method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          accepted: patient.accepted ?? null,
-          refused: patient.refused ?? null,
-        }),
-      });
+      const acceptedValue = patient.accepted ? 1 : 0;
+      const refusedValue = patient.refused ? 1 : 0;
 
-      if (!response.ok) {
-        throw new Error(`Failed to update patient: ${response.status}`);
+      const { data: updated, error: supabaseError } = await supabase
+        .from('patient')
+        .update({
+          accepted: acceptedValue,
+          refused: refusedValue,
+        })
+        .eq('id', patient.id)
+        .select()
+        .single();
+
+      if (supabaseError) {
+        throw new Error(supabaseError.message);
       }
-
-      const updated = await response.json();
 
       return updated;
     } catch (error) {

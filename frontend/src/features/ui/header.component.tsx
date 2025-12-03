@@ -1,4 +1,5 @@
 import {NavLink} from 'react-router';
+import {LogoutButton} from './logout-button.component.tsx';
 
 interface HeaderProps {
   title: string;
@@ -29,6 +30,7 @@ export function HeaderComponent({title}: HeaderProps) {
         >
           Pending Patients
         </NavLink>
+        <LogoutButton />
       </nav>
     </header>
   );

@@ -1,5 +1,5 @@
-import type {Patient} from './patientType.ts';
-import type {Status} from './statusType.ts';
+import type { Patient } from './patientType.ts';
+import type { Status } from './statusType.ts';
 
 export type PatientsContextType = {
   patients: Patient[];
@@ -14,6 +14,7 @@ export type PatientsContextType = {
     limit?: number,
     offset?: number,
     search?: string,
-    status?: Status
+    status?: Status,
+    isBackgroundRefresh?: boolean
   ) => Promise<void>;
 };

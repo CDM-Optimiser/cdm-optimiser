@@ -1,10 +1,10 @@
-import {useMemo, useState} from 'react';
-import {usePatientsContext} from '../utils/hooks/usePatientsContext.tsx';
-import {PatientCardComponent} from '../features/patient-card/patient-card.component.tsx';
-import {AlertComponent} from '../features/ui/alert.component.tsx';
+import { useMemo, useState } from 'react';
+import { usePatientsContext } from '../utils/hooks/usePatientsContext.tsx';
+import { PatientCardComponent } from '../features/patient-card/patient-card.component.tsx';
+import { AlertComponent } from '../features/ui/alert.component.tsx';
 
 export function PendingPatientsPageComponent() {
-  const {patients, setPatients} = usePatientsContext();
+  const { patients, setPatients } = usePatientsContext();
 
   const pendingPatients = useMemo(
     () => patients.filter((patient) => !patient.accepted && !patient.refused),
@@ -52,7 +52,7 @@ export function PendingPatientsPageComponent() {
               </button>
               <button
                 onClick={handleNext}
-                disabled={currentIndex === patients.length - 1}
+                disabled={currentIndex === pendingPatients.length - 1}
                 className="rounded-md border-b-4 border-b-sky-700 bg-sky-500 px-4 py-2 text-white transition hover:not-disabled:border-b-0 hover:not-disabled:bg-sky-700 disabled:cursor-not-allowed disabled:border-b-gray-500 disabled:bg-gray-200 disabled:text-gray-600"
               >
                 Next patient
@@ -61,6 +61,7 @@ export function PendingPatientsPageComponent() {
           </div>
           <section className="rounded-xl bg-white p-4 shadow-md dark:bg-white/5 dark:ring dark:ring-gray-600">
             <PatientCardComponent
+              key={currentPatient.id}
               patient={currentPatient}
               onUpdatePatient={setPatients}
             />
