@@ -99,12 +99,11 @@ export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
           .rpc('search_patients', {
             search_term: search || '',
             p_status: status,
+            p_limit: limit,
+            p_offset: offset,
           })
           .select('*, total_count')
           .order('id', {ascending: true});
-
-        if (limit != null && offset != null)
-          rpc = rpc.range(offset, offset + limit - 1);
 
         const {data, error} = await rpc;
 

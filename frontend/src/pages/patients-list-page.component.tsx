@@ -8,6 +8,7 @@ import {SearchPatientComponent} from '../features/patients-list/search-patient.c
 import {useDebounce} from '../utils/hooks/useDebounce.tsx';
 import {useInputChange} from '../utils/hooks/useInputChange.tsx';
 import {useResultsPerPage} from '../utils/hooks/useResultsPerPage.tsx';
+import {filterPatients} from '../utils/filterPatients.ts';
 import {usePatientsContext} from '../utils/hooks/usePatientsContext.tsx';
 
 export function PatientsListPageComponent() {
@@ -35,32 +36,34 @@ export function PatientsListPageComponent() {
 
   useEffect(() => {
     const fetchPatients = async () => {
-      const offset = (currentPage - 1) * resultsPerPage;
-      await loadPatients(
-        resultsPerPage,
-        offset,
-        debouncedSearchText,
-        acceptedFilter
-      );
+      await loadPatients(undefined, undefined, debouncedSearchText, 'all');
+      setCurrentPage(1);
     };
 
     fetchPatients();
-  }, [
-    debouncedSearchText,
-    acceptedFilter,
-    currentPage,
-    resultsPerPage,
-    loadPatients,
-  ]);
+  }, [debouncedSearchText, loadPatients]);
 
-  const totalPages = Math.ceil(totalPatients / resultsPerPage);
+  const {filteredPatients} = filterPatients(patients, acceptedFilter);
+
+  const paginatedPatients = filteredPatients.slice(
+    (currentPage - 1) * resultsPerPage,
+    currentPage * resultsPerPage
+  );
+
+  const totalPages = Math.ceil(filteredPatients.length / resultsPerPage);
 
   const handlePageChange = (page: number) => setCurrentPage(page);
 
   const handleResultsPerPageChange = (newResultsPerPage: number) => {
     handleResultsPerPage(newResultsPerPage);
 
-    setCurrentPage(1);
+    const newTotalPages = Math.ceil(
+      filteredPatients.length / newResultsPerPage
+    );
+
+    if (currentPage > newTotalPages) {
+      setCurrentPage(newTotalPages > 0 ? newTotalPages : 1);
+    }
   };
 
   const handleFilterChange = (
@@ -102,7 +105,7 @@ export function PatientsListPageComponent() {
             pendingPatientsText={`Pending (${pendingPatients})`}
           />
         </div>
-        {totalPatients === 0 ? (
+        {filteredPatients.length === 0 ? (
           <AlertComponent
             type="info"
             title="No patients found"
@@ -125,7 +128,7 @@ export function PatientsListPageComponent() {
                   onResultsPerPageChange={handleResultsPerPageChange}
                 />
                 <PatientsListComponent
-                  patients={patients}
+                  patients={paginatedPatients}
                   onUpdatePatient={setPatients}
                 />
                 <PaginationComponent
