@@ -8,11 +8,15 @@ import {SearchPatientComponent} from '../features/patients-list/search-patient.c
 import {useDebounce} from '../utils/hooks/useDebounce.tsx';
 import {useInputChange} from '../utils/hooks/useInputChange.tsx';
 import {useResultsPerPage} from '../utils/hooks/useResultsPerPage.tsx';
-import {filterPatients} from '../utils/filterPatients.ts';
 import {usePatientsContext} from '../utils/hooks/usePatientsContext.tsx';
 
 export function PatientsListPageComponent() {
   const inputSearchID = useId();
+  const [acceptedFilter, setAcceptedFilter] = useState<
+    'all' | 'accepted' | 'refused' | 'pending'
+  >('all');
+  const [currentPage, setCurrentPage] = useState(1);
+
   const {
     patients,
     totalPatients,
@@ -25,45 +29,38 @@ export function PatientsListPageComponent() {
     loadPatients,
   } = usePatientsContext();
 
-  const [acceptedFilter, setAcceptedFilter] = useState<
-    'all' | 'accepted' | 'refused' | 'pending'
-  >('all');
-  const [currentPage, setCurrentPage] = useState(1);
-
   const {resultsPerPage, handleResultsPerPage} = useResultsPerPage();
   const {searchText, handleInputChange} = useInputChange();
   const debouncedSearchText = useDebounce(searchText, 500);
 
   useEffect(() => {
     const fetchPatients = async () => {
-      await loadPatients(undefined, undefined, debouncedSearchText, 'all');
-      setCurrentPage(1);
+      const offset = (currentPage - 1) * resultsPerPage;
+      await loadPatients(
+        resultsPerPage,
+        offset,
+        debouncedSearchText,
+        acceptedFilter
+      );
     };
 
     fetchPatients();
-  }, [debouncedSearchText, loadPatients]);
+  }, [
+    debouncedSearchText,
+    acceptedFilter,
+    currentPage,
+    resultsPerPage,
+    loadPatients,
+  ]);
 
-  const {filteredPatients} = filterPatients(patients, acceptedFilter);
-
-  const paginatedPatients = filteredPatients.slice(
-    (currentPage - 1) * resultsPerPage,
-    currentPage * resultsPerPage
-  );
-
-  const totalPages = Math.ceil(filteredPatients.length / resultsPerPage);
+  const totalPages = Math.ceil(totalPatients / resultsPerPage);
 
   const handlePageChange = (page: number) => setCurrentPage(page);
 
   const handleResultsPerPageChange = (newResultsPerPage: number) => {
     handleResultsPerPage(newResultsPerPage);
 
-    const newTotalPages = Math.ceil(
-      filteredPatients.length / newResultsPerPage
-    );
-
-    if (currentPage > newTotalPages) {
-      setCurrentPage(newTotalPages > 0 ? newTotalPages : 1);
-    }
+    setCurrentPage(1);
   };
 
   const handleFilterChange = (
@@ -105,7 +102,7 @@ export function PatientsListPageComponent() {
             pendingPatientsText={`Pending (${pendingPatients})`}
           />
         </div>
-        {filteredPatients.length === 0 ? (
+        {totalPatients === 0 ? (
           <AlertComponent
             type="info"
             title="No patients found"
@@ -128,7 +125,7 @@ export function PatientsListPageComponent() {
                   onResultsPerPageChange={handleResultsPerPageChange}
                 />
                 <PatientsListComponent
-                  patients={paginatedPatients}
+                  patients={patients}
                   onUpdatePatient={setPatients}
                 />
                 <PaginationComponent

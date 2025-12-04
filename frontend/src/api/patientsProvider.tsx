@@ -72,7 +72,7 @@ export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
         ] = await countQueriesPromise;
 
         if (totalError || acceptedError || refusedError) {
-          throw new Error(
+          setError(
             getErrorMessage(totalError || acceptedError || refusedError)
           );
         }
@@ -95,28 +95,43 @@ export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
       }
 
       try {
-        let query = supabase.from('patient').select('*', {count: 'exact'});
-
-        if (status === 'accepted') query = query.eq('accepted', 1);
-        else if (status === 'refused') query = query.eq('refused', 1);
-        else if (status === 'pending')
-          query = query.eq('accepted', 0).eq('refused', 0);
-        if (search) query = query.ilike('name', `%${search}%`);
-
-        query = query.order('id', {ascending: true});
+        let rpc = supabase
+          .rpc('search_patients', {
+            search_term: search || '',
+            p_status: status,
+          })
+          .select('*, total_count')
+          .order('id', {ascending: true});
 
         if (limit != null && offset != null)
-          query = query.range(offset, offset + limit - 1);
+          rpc = rpc.range(offset, offset + limit - 1);
 
-        const {data, error} = await query;
+        const {data, error} = await rpc;
 
         if (error) {
           setError(getErrorMessage(error));
           setPatients([]);
+          setTotalPatients(0);
+
           return;
         }
 
-        setPatients(data ?? []);
+        const fetchedPatients = data ?? [];
+
+        const totalFilteredCount =
+          fetchedPatients.length > 0
+            ? (fetchedPatients[0] as {total_count: number}).total_count
+            : 0;
+
+        const cleanedPatients = fetchedPatients.map((patient: Patient) => {
+          const {total_count, ...rest} = patient as Patient & {
+            total_count: number;
+          };
+          return rest as Patient;
+        });
+
+        setPatients(cleanedPatients);
+        setTotalPatients(totalFilteredCount);
       } catch (error) {
         setError(getErrorMessage(error));
       } finally {
@@ -126,7 +141,7 @@ export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
         setFetching(false);
       }
     },
-    [user]
+    []
   );
 
   useEffect(() => {
@@ -141,7 +156,8 @@ export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
           schema: 'public',
           table: 'patient',
         },
-        async () => {
+        async (payload) => {
+          console.log('patient channel payload:', payload);
           await loadPatients(undefined, undefined, undefined, 'all', true);
         }
       )
@@ -156,7 +172,7 @@ export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
     if (user) {
       loadPatients();
     }
-  }, [user, loadPatients]);
+  }, [loadPatients]);
 
   return (
     <PatientsContext.Provider
