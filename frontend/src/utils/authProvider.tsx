@@ -1,16 +1,7 @@
-import {createContext, useContext, useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import type {Session, User} from '@supabase/supabase-js';
 import {supabase} from '../utils/supabase.ts';
-
-interface AuthContextType {
-  session: Session | null;
-  user: User | null;
-  loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+import {AuthContext} from './auth/authContext.tsx';
 
 export const AuthProvider = ({children}: {children: React.ReactNode}) => {
   const [session, setSession] = useState<Session | null>(null);
@@ -18,8 +9,6 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let mounted = true;
-
     supabase.auth.getSession().then(({data: {session}}) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -35,7 +24,6 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
     });
 
     return () => {
-      mounted = false;
       subscription.unsubscribe();
     };
   }, []);
@@ -80,12 +68,4 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-
-  if (!context) throw new Error('useAuth must be used inside AuthProvider');
-
-  return context;
 };

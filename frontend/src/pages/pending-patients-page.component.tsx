@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
 import {usePatientsContext} from '../utils/hooks/usePatientsContext.tsx';
 import {PatientCardComponent} from '../features/patient-card/patient-card.component.tsx';
 import {AlertComponent} from '../features/ui/alert.component.tsx';
@@ -16,18 +16,17 @@ export function PendingPatientsPageComponent() {
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  useEffect(() => {
-    if (pendingPatients.length === 0) {
-      setCurrentIndex(0);
-    } else if (currentIndex >= pendingPatients.length) {
-      setCurrentIndex(pendingPatients.length - 1);
-    }
-  }, [pendingPatients.length, currentIndex]);
+  if (currentIndex >= pendingPatients.length && pendingPatients.length > 0) {
+    setCurrentIndex(pendingPatients.length - 1);
+  } else if (pendingPatients.length === 0 && currentIndex !== 0) {
+    setCurrentIndex(0);
+  }
 
   const safeIndex = Math.min(
     currentIndex,
     Math.max(0, pendingPatients.length - 1)
   );
+
   const currentPatient = pendingPatients[safeIndex];
 
   const handlePrev = () =>

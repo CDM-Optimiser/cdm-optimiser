@@ -1,5 +1,5 @@
 import {NavLink} from 'react-router';
-import {useAuth} from '../../utils/authProvider.tsx';
+import {useAuth} from '../../utils/hooks/useAuth.tsx';
 import {LogoutButton} from './logout-button.component.tsx';
 
 interface HeaderProps {

@@ -1,11 +1,12 @@
 import {Navigate, Routes, Route} from 'react-router';
-import {useAuth, AuthProvider} from './utils/authProvider.tsx';
 import {PatientsProvider} from './api/patientsProvider.tsx';
-import {FooterComponent} from './features/ui/footer.component.tsx';
-import {HeaderComponent} from './features/ui/header.component.tsx';
-import LoginPageComponent from './pages/login-page.component.tsx';
+import {useAuth} from './utils/hooks/useAuth.tsx';
+import {AuthProvider} from './utils/authProvider.tsx';
+import {LoginPageComponent} from './pages/login-page.component.tsx';
 import {PendingPatientsPageComponent} from './pages/pending-patients-page.component.tsx';
 import {PatientsListPageComponent} from './pages/patients-list-page.component.tsx';
+import {FooterComponent} from './features/ui/footer.component.tsx';
+import {HeaderComponent} from './features/ui/header.component.tsx';
 
 function ProtectedRoutesWrapper() {
   const {session} = useAuth();

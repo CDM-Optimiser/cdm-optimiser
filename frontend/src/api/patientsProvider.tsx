@@ -1,10 +1,10 @@
 import {useCallback, useEffect, useState} from 'react';
 import {supabase} from '../utils/supabase.ts';
-import type {Patient} from '../utils/types/patient.ts';
-import type {Status} from '../utils/types/statusType.ts';
 import {getErrorMessage} from '../utils/getErrorMessage.ts';
 import {PatientsContext} from '../utils/patientsContext.ts';
-import {useAuth} from '../utils/authProvider.tsx';
+import {useAuth} from '../utils/hooks/useAuth.tsx';
+import type {Patient} from '../utils/types/patient.ts';
+import type {Status} from '../utils/types/statusType.ts';
 
 export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -17,6 +17,7 @@ export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
   const [error, setError] = useState<string | null>(null);
 
   const {user} = useAuth();
+  const userId = user?.id;
 
   const MIN_LOAD_TIME_MS = 500;
 
@@ -28,7 +29,7 @@ export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
       status: Status = 'all',
       isBackgroundRefresh: boolean = false
     ) => {
-      if (!user) return;
+      if (!userId) return;
 
       if (!isBackgroundRefresh && initialLoading) {
         setInitialLoading(true);
@@ -95,7 +96,7 @@ export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
       }
 
       try {
-        let rpc = supabase
+        const rpc = supabase
           .rpc('search_patients', {
             search_term: search || '',
             p_status: status,
@@ -123,9 +124,11 @@ export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
             : 0;
 
         const cleanedPatients = fetchedPatients.map((patient: Patient) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const {total_count, ...rest} = patient as Patient & {
             total_count: number;
           };
+
           return rest as Patient;
         });
 
@@ -140,11 +143,11 @@ export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
         setFetching(false);
       }
     },
-    []
+    [initialLoading, userId]
   );
 
   useEffect(() => {
-    if (!user) return;
+    if (!userId) return;
 
     const patientChannel = supabase
       .channel('patient-updates')
@@ -165,13 +168,13 @@ export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
     return () => {
       supabase.removeChannel(patientChannel);
     };
-  }, [user, loadPatients]);
+  }, [loadPatients, userId]);
 
   useEffect(() => {
-    if (user) {
+    if (userId) {
       loadPatients();
     }
-  }, [loadPatients]);
+  }, [loadPatients, userId]);
 
   return (
     <PatientsContext.Provider

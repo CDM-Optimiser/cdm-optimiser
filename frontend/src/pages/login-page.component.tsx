@@ -1,10 +1,10 @@
 import React, {useState} from 'react';
 import {useNavigate} from 'react-router';
-import {useAuth} from '../utils/authProvider.tsx';
-import {AlertComponent} from '../features/ui/alert.component.tsx';
+import {useAuth} from '../utils/hooks/useAuth.tsx';
 import {getErrorMessage} from '../utils/getErrorMessage.ts';
+import {AlertComponent} from '../features/ui/alert.component.tsx';
 
-export default function LoginPageComponent() {
+export function LoginPageComponent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);

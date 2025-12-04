@@ -1,5 +1,5 @@
 import {useNavigate} from 'react-router';
-import {useAuth} from '../../utils/authProvider.tsx';
+import {useAuth} from '../../utils/hooks/useAuth.tsx';
 
 export function LogoutButton() {
   const {logout, user} = useAuth();
