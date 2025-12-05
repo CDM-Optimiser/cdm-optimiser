@@ -21,7 +21,7 @@ jobs:
         # Use a version of Node.js compatible with Electron/electron-builder (e.g., 20.x or 22.x)
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 20
 
       # Install dependencies.
       # The "postinstall" script in package.json (cd frontend && npm install)
