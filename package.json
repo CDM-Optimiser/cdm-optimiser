@@ -30,6 +30,7 @@
   },
   "build": {
     "appId": "com.cdm-optimiser.cdm-optimiser",
+    "productName": "CDM Optimiser",
     "files": [
       "main.js",
       "preload.js",
