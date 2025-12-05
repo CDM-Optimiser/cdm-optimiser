@@ -1,7 +1,7 @@
 /// <reference types="vitest/config" />
 import path from 'path';
-import { defineConfig } from 'vite';
-import { playwright } from '@vitest/browser-playwright';
+import {defineConfig} from 'vite';
+import {playwright} from '@vitest/browser-playwright';
 import react from '@vitejs/plugin-react-swc';
 import tailwindcss from '@tailwindcss/vite';
 
@@ -41,7 +41,7 @@ export default defineConfig({
           browser: {
             enabled: true,
             provider: playwright(),
-            instances: [{ browser: 'chromium' }],
+            instances: [{browser: 'chromium'}],
           },
         },
       },
