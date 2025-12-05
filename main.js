@@ -18,6 +18,8 @@ function createWindow() {
 
 	win.removeMenu();
 
+	win.webContents.openDevTools();
+
 	const indexPath = join(app.getAppPath(), 'frontend/dist/index.html');
 	win.loadFile(join(indexPath));
 }
