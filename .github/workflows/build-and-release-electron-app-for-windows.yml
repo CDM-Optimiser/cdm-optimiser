@@ -25,8 +25,8 @@ jobs:
       - name: 1. Build Frontend Assets with Supabase Config
         run: npm run build:frontend
         env:
-          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       - name: 2. Package Electron App for Windows
         run: electron-builder --publish=never
