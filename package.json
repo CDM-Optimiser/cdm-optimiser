@@ -10,7 +10,7 @@
   "scripts": {
     "build:frontend": "cd frontend && npm run build",
     "dev": "concurrently \"cd frontend && npm run dev\" \"electron .\"",
-    "dist": "npm run build:frontend && npm run build:backend && electron-builder",
+    "dist": "npm run build:frontend && electron-builder",
     "lint": "eslint .",
     "pack": "electron-builder --dir",
     "postinstall": "cd frontend && npm install",

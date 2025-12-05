@@ -1,0 +1,60 @@
+# Workflow to build and package the Electron app for Windows using electron-builder.
+name: Build & Release for Windows
+
+on:
+  push:
+    branches:
+      - main
+  # Optional: AlloI ws manual triggering of the workflow from the GitHub Actions UI
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    # Use a Windows runner since we are building a Windows executable
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        # Use a version of Node.js compatible with Electron/electron-builder (e.g., 20.x or 22.x)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Install dependencies.
+      # The "postinstall" script in package.json (cd frontend && npm install)
+      # will automatically run after this step completes.
+      - name: Install dependencies (including frontend)
+        run: npm install
+
+      # The "dist" script runs "build:frontend" and then "electron-builder"
+      # This step creates the packaged executable (.exe installer)
+      - name: Package Electron App for Windows
+        run: npm run dist
+        env:
+          # Required for electron-builder to authenticate and avoid rate limits during download
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Find the generated artifact files (installer and unpacked directory)
+      # electron-builder outputs artifacts to the 'dist' directory.
+      - name: Locate and Upload Windows Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cdm-optimiser-windows-release
+          # This path contains the installer file (e.g., .exe) and other related files
+          path: dist/
+          retention-days: 7
+
+      # Optional: Create a GitHub Release
+      # Uncomment this section if you want to automatically create a draft release
+      # after a successful build.
+      # - name: Create Release
+      #   id: create_release
+      #   uses: softprops/action-gh-release@v1
+      #   if: startsWith(github.ref, 'refs/tags/')
+      #   with:
+      #     draft: true
+      #     prerelease: false
+      #     files: dist/*.exe
