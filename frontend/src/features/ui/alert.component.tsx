@@ -1,6 +1,7 @@
-import {useEffect, useState, type JSX} from 'react';
-
-type AlertTypes = 'error' | 'info' | 'success' | 'warning';
+import type {JSX} from 'react';
+import {useAutoDismiss} from '../../utils/hooks/useAutoDismiss.tsx';
+import type {AlertTypes} from '../../utils/types/alert.ts';
+import {SVGComponent} from './svg.component.tsx';
 
 interface AlertProps {
   type?: AlertTypes;
@@ -17,29 +18,7 @@ export function AlertComponent({
   autoDismissMs,
   onDismiss = () => {},
 }: AlertProps) {
-  const [progressBar, setProgressBar] = useState(100);
-
-  useEffect(() => {
-    if (!autoDismissMs) return;
-
-    const interval = 50;
-    const decrement = (interval / autoDismissMs) * 100;
-
-    const timer = setInterval(() => {
-      setProgressBar((prev) => {
-        if (prev <= 0) {
-          clearInterval(timer);
-          setTimeout(onDismiss, 0);
-
-          return 0;
-        }
-
-        return prev - decrement;
-      });
-    }, interval);
-
-    return () => clearInterval(timer);
-  }, [autoDismissMs, onDismiss]);
+  const {progressBar} = useAutoDismiss(autoDismissMs as number, onDismiss);
 
   const bgColorClass: Record<AlertTypes, string> = {
     error: 'bg-red-50',
@@ -126,6 +105,7 @@ export function AlertComponent({
 
   return (
     <div
+      role="alert"
       className={`${bgColorClass[type]} border-l-4 ${borderClass[type]} rounded-xl p-4 shadow-md`}
     >
       <div className="flex flex-col gap-4">
@@ -135,8 +115,24 @@ export function AlertComponent({
             <h3 className={`${textClass[type]} font-medium`}>{title}</h3>
             <p className={`${textClass[type]} mt-2`}>{text}</p>
           </div>
+          <div className="ml-auto pl-3">
+            <div className="-mi-1.5 -mb-1.5">
+              <button
+                type="button"
+                aria-label="Close alert"
+                className={`cursor-pointer ${type === 'error' ? 'text-red-400' : ''}${type === 'info' ? 'text-sky-400' : ''}${type === 'success' ? 'text-green-400' : ''}${type === 'warning' ? 'text-yellow-400' : ''}`}
+                onClick={onDismiss}
+              >
+                <SVGComponent>
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M19 2h-14a3 3 0 0 0 -3 3v14a3 3 0 0 0 3 3h14a3 3 0 0 0 3 -3v-14a3 3 0 0 0 -3 -3zm-9.387 6.21l.094 .083l2.293 2.292l2.293 -2.292a1 1 0 0 1 1.497 1.32l-.083 .094l-2.292 2.293l2.292 2.293a1 1 0 0 1 -1.32 1.497l-.094 -.083l-2.293 -2.292l-2.293 2.292a1 1 0 0 1 -1.497 -1.32l.083 -.094l2.292 -2.293l-2.292 -2.293a1 1 0 0 1 1.32 -1.497z" />
+                </SVGComponent>
+                <span className="sr-only">Close alert</span>
+              </button>
+            </div>
+          </div>
         </div>
-        {autoDismissMs && (
+        {autoDismissMs !== undefined && autoDismissMs > 0 && (
           <div
             className="h-1 rounded-b-xl bg-green-400 transition-all duration-50"
             style={{width: `${progressBar}%`}}
