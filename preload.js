@@ -1,7 +1,8 @@
-const { contextBridge } = require("electron");
+const {contextBridge, ipcRenderer} = require('electron/renderer');
 
-contextBridge.exposeInMainWorld("__cdm_env", {
-	BACKEND_HOST: process.env.CDM_BACKEND_HOST || "127.0.0.1",
-	BACKEND_PORT: process.env.CDM_BACKEND_PORT || 8000,
-	BACKEND_URL: `http://${process.env.CDM_BACKEND_HOST || "127.0.0.1"}:${process.env.CDM_BACKEND_PORT || 8000}`,
+contextBridge.exposeInMainWorld('darkMode', {
+  getThemeSource: () => ipcRenderer.invoke('dark-mode:get-source'),
+  set: (mode) => ipcRenderer.invoke('dark-mode:set', mode),
+  system: () => ipcRenderer.invoke('dark-mode:system'),
+  toggle: () => ipcRenderer.invoke('dark-mode:toggle'),
 });

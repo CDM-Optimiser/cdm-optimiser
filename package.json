@@ -1,47 +1,47 @@
 {
   "name": "cdm-optimiser",
   "version": "1.0.0",
-  "description": "",
+  "description": "CDM Optimiser",
+  "author": "CDM Optimiser Developers",
+  "license": "MIT",
   "main": "main.js",
+  "type": "module",
+  "private": true,
   "scripts": {
-    "build:backend": "pyinstaller --onefile backend/app.py --name backend-server --distpath dist",
     "build:frontend": "cd frontend && npm run build",
     "dev": "concurrently \"cd frontend && npm run dev\" \"electron .\"",
     "dist": "npm run build:frontend && npm run build:backend && electron-builder",
-    "start": "npm run build:frontend && electron .",
-    "start-backend-dev": "python -m uvicorn backend.app:app --host 127.0.0.1 --port 8000 --log-level info",
+    "lint": "eslint .",
     "pack": "electron-builder --dir",
     "postinstall": "cd frontend && npm install",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prettier": "npx prettier . --write",
+    "start": "npm run build:frontend && electron ."
   },
-  "author": "CDM Optimiser Developers",
-  "license": "MIT",
   "devDependencies": {
+    "@eslint/js": "^9.39.1",
     "concurrently": "^9.2.1",
     "electron": "^39.2.4",
     "electron-builder": "^26.0.12",
-    "node-fetch": "^3.3.2"
+    "eslint": "^9.39.1",
+    "globals": "^16.5.0",
+    "node-fetch": "^3.3.2",
+    "prettier": "3.7.4",
+    "prettier-plugin-tailwindcss": "^0.7.1"
   },
   "build": {
     "appId": "com.cdm-optimiser.cdm-optimiser",
     "files": [
       "main.js",
       "preload.js",
-      "../frontend/dist/**",
-      "../backend/**",
-      "package.json"
+      "package.json",
+      "frontend/dist/**"
     ],
     "directories": {
       "buildResources": "build"
-    },
-    "extraResources": [
-    {
-      "from": "dist/backend-server.exe",
-      "to": ".",
-      "filter": ["**/*"]
     }
-  ]
   },
-  "dependencies": {
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CDM-Optimiser/cdm-optimiser.git"
   }
 }

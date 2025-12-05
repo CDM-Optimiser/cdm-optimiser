@@ -1,11 +1,19 @@
-export {};
+import type {ThemeValue} from './theme.ts';
 
-declare global {
+interface DarkModeApi {
+  getThemeSource: () => Promise<ThemeValue>;
+  set: (mode: ThemeValue) => Promise<boolean>;
+  system: () => Promise<void>;
+  toggle: () => Promise<boolean>;
+}
+
+interface IElectronAPI {
+  loadPreferences: () => Promise<void>;
+}
+
+export declare global {
   interface Window {
-    __cdm_env: {
-      BACKEND_HOST: string;
-      BACKEND_PORT: number;
-      BACKEND_URL: string;
-    };
+    darkMode: DarkModeApi;
+    electronAPI: IElectronAPI;
   }
 }
