@@ -1,7 +1,7 @@
 import {Navigate, Routes, Route} from 'react-router';
 import {PatientsProvider} from './api/patientsProvider.tsx';
 import {useAuth} from './utils/hooks/useAuth.tsx';
-import {AuthProvider} from './utils/authProvider.tsx';
+import {AuthProvider} from './utils/auth/authProvider.tsx';
 import {LoginPageComponent} from './pages/login-page.component.tsx';
 import {PendingPatientsPageComponent} from './pages/pending-patients-page.component.tsx';
 import {PatientsListPageComponent} from './pages/patients-list-page.component.tsx';

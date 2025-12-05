@@ -1,4 +1,4 @@
-import type {Patient} from './types/patient.ts';
+import type {Patient} from '../types/patient.ts';
 
 export type PatientFilter = 'all' | 'accepted' | 'refused' | 'pending';
 

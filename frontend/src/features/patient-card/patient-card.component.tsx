@@ -9,7 +9,7 @@ import {
 import type {Patient} from '../../utils/types/patient.ts';
 import {SVGComponent} from '../ui/svg.component.tsx';
 import {AlertComponent} from '../ui/alert.component.tsx';
-import {getErrorMessage} from '../../utils/getErrorMessage.ts';
+import {getErrorMessage} from '../../utils/functions/getErrorMessage.ts';
 import {useUpdatePatient} from '../../api/useUpdatePatient.ts';
 import {usePatientsContext} from '../../utils/hooks/usePatientsContext.tsx';
 

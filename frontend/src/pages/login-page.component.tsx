@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {useNavigate} from 'react-router';
 import {useAuth} from '../utils/hooks/useAuth.tsx';
-import {getErrorMessage} from '../utils/getErrorMessage.ts';
+import {getErrorMessage} from '../utils/functions/getErrorMessage.ts';
 import {AlertComponent} from '../features/ui/alert.component.tsx';
 
 export function LoginPageComponent() {
@@ -64,7 +64,7 @@ export function LoginPageComponent() {
           <button
             type="submit"
             disabled={loading}
-            className="rounded-md bg-sky-500 p-2 text-white transition duration-300 ease-in-out hover:bg-sky-700"
+            className="rounded-md border-b-4 border-sky-500 border-b-sky-600 bg-sky-500 px-4 py-2 text-white transition duration-200 ease-in-out hover:border-sky-800 hover:bg-sky-600 hover:text-white active:border-b-0 disabled:cursor-not-allowed dark:border-b-sky-700 dark:bg-sky-500 dark:hover:border-sky-900 dark:hover:bg-sky-800"
           >
             {loading ? 'Logging in...' : 'Login'}
           </button>

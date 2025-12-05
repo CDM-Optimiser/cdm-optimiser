@@ -1,5 +1,5 @@
 import {useContext} from 'react';
-import {PatientsContext} from '../patientsContext.ts';
+import {PatientsContext} from '../functions/patientsContext.ts';
 
 export const usePatientsContext = () => {
   const context = useContext(PatientsContext);

@@ -1,7 +1,7 @@
 import {useState} from 'react';
-import {supabase} from '../utils/supabase.ts';
+import {supabase} from '../utils/api/supabase.ts';
 import type {Patient} from '../utils/types/patient.ts';
-import {getErrorMessage} from '../utils/getErrorMessage.ts';
+import {getErrorMessage} from '../utils/functions/getErrorMessage.ts';
 
 export function useUpdatePatient() {
   const [updating, setUpdating] = useState(false);

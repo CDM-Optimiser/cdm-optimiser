@@ -1,6 +1,7 @@
 import {NavLink} from 'react-router';
 import {useAuth} from '../../utils/hooks/useAuth.tsx';
 import {LogoutButton} from './logout-button.component.tsx';
+import {DarkModeComponent} from '../dark-mode/dark-mode.component.tsx';
 
 interface HeaderProps {
   title: string;
@@ -40,6 +41,7 @@ export function HeaderComponent({title}: HeaderProps) {
           </>
         )}
         <LogoutButton />
+        <DarkModeComponent />
       </nav>
     </header>
   );

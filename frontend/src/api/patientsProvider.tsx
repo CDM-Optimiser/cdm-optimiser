@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useState} from 'react';
-import {supabase} from '../utils/supabase.ts';
-import {getErrorMessage} from '../utils/getErrorMessage.ts';
-import {PatientsContext} from '../utils/patientsContext.ts';
+import {supabase} from '../utils/api/supabase.ts';
+import {getErrorMessage} from '../utils/functions/getErrorMessage.ts';
+import {PatientsContext} from '../utils/functions/patientsContext.ts';
 import {useAuth} from '../utils/hooks/useAuth.tsx';
 import type {Patient} from '../utils/types/patient.ts';
 import type {Status} from '../utils/types/statusType.ts';

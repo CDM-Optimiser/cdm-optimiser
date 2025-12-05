@@ -8,7 +8,7 @@ import {SearchPatientComponent} from '../features/patients-list/search-patient.c
 import {useDebounce} from '../utils/hooks/useDebounce.tsx';
 import {useInputChange} from '../utils/hooks/useInputChange.tsx';
 import {useResultsPerPage} from '../utils/hooks/useResultsPerPage.tsx';
-import {filterPatients} from '../utils/filterPatients.ts';
+import {filterPatients} from '../utils/functions/filterPatients.ts';
 import {usePatientsContext} from '../utils/hooks/usePatientsContext.tsx';
 
 export function PatientsListPageComponent() {

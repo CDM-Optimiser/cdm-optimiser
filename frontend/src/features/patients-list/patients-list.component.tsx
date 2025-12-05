@@ -7,7 +7,7 @@ import {
   booleanColumns,
   headerLabels,
   excludedColumns,
-} from '../../utils/patientsTableColumns.ts';
+} from '../../utils/functions/patientsTableColumns.ts';
 import {useSelectedPatient} from '../../utils/hooks/useSelectedPatient.tsx';
 
 interface PatientsListProps {

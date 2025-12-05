@@ -1,5 +1,5 @@
 import {useId, type ChangeEvent, type MouseEvent} from 'react';
-import {getVisiblePages} from '../../utils/getVisiblePagesButtons.ts';
+import {getVisiblePages} from '../../utils/functions/getVisiblePagesButtons.ts';
 import {PatientsPerPageComponent} from './patients-per-page.component.tsx';
 
 interface PaginationProps {
