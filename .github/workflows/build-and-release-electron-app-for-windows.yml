@@ -29,7 +29,7 @@ jobs:
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       - name: 2. Package Electron App for Windows
-        run: electron-builder --publish=never
+        run: npx electron-builder --publish=never
         env:
           GH_TOKEN: ${{ github.token }}
 
