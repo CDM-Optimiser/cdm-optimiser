@@ -1,7 +1,6 @@
 import {beforeEach, describe, expect, test, vi} from 'vitest';
 import {render} from 'vitest-browser-react';
 import {AlertComponent} from '../../../../src/features/ui/alert.component.tsx';
-import {useAutoDismiss} from '../../../../src/utils/hooks/useAutoDismiss.tsx';
 
 const mocks = vi.hoisted(() => {
   return {
@@ -25,7 +24,7 @@ describe('Alert component tests', async () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    vi.mocked(useAutoDismiss).mockReturnValue({progressBar: 100});
+    mocks.useAutoDismiss.mockReturnValue({progressBar: 100});
   });
 
   test('renders correctly with default (info) type', async () => {
@@ -47,7 +46,7 @@ describe('Alert component tests', async () => {
     expect(alertElement).toHaveClass('bg-sky-50');
     expect(alertElement).toHaveClass('border-sky-400');
 
-    expect(useAutoDismiss).toHaveBeenCalledWith(
+    expect(mocks.useAutoDismiss).toHaveBeenCalledWith(
       undefined,
       defaultProps.onDismiss
     );
@@ -75,7 +74,7 @@ describe('Alert component tests', async () => {
   test('displays the progress bar when autoDismissMs is provided', async () => {
     const autoDismissMs = 3000;
 
-    vi.mocked(mocks.useAutoDismiss).mockReturnValue({progressBar: 75});
+    mocks.useAutoDismiss.mockReturnValue({progressBar: 75});
 
     const screen = await render(
       <AlertComponent {...defaultProps} autoDismissMs={autoDismissMs} />
@@ -108,7 +107,7 @@ describe('Alert component tests', async () => {
   });
 
   test('progress bar is rendered and width matches hook value', async () => {
-    vi.mocked(useAutoDismiss).mockReturnValue({progressBar: 42});
+    mocks.useAutoDismiss.mockReturnValue({progressBar: 42});
 
     const screen = await render(
       <AlertComponent {...defaultProps} autoDismissMs={3000} />
@@ -121,7 +120,7 @@ describe('Alert component tests', async () => {
   });
 
   test('progress bar width is 0% when hook returns 0', async () => {
-    vi.mocked(useAutoDismiss).mockReturnValue({progressBar: 0});
+    mocks.useAutoDismiss.mockReturnValue({progressBar: 0});
 
     const screen = await render(
       <AlertComponent {...defaultProps} autoDismissMs={3000} />
@@ -133,7 +132,7 @@ describe('Alert component tests', async () => {
   });
 
   test('renders without onDismiss safely', async () => {
-    vi.mocked(useAutoDismiss).mockReturnValue({progressBar: 100});
+    mocks.useAutoDismiss.mockReturnValue({progressBar: 100});
 
     const screen = await render(
       <AlertComponent title="Test" text="No dismiss callback" />
