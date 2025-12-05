@@ -21,7 +21,7 @@ jobs:
         # Use a version of Node.js compatible with Electron/electron-builder (e.g., 20.x or 22.x)
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       # Install dependencies.
       # The "postinstall" script in package.json (cd frontend && npm install)
@@ -35,7 +35,7 @@ jobs:
         run: npm run dist
         env:
           # Required for electron-builder to authenticate and avoid rate limits during download
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.ACTION_TOKEN }}
 
       # Find the generated artifact files (installer and unpacked directory)
       # electron-builder outputs artifacts to the 'dist' directory.
