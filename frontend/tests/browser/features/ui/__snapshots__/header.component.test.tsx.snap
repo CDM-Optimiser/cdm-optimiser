@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Header component tests > matches snapshot 1`] = `"<header class="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4 border-b-2 border-sky-400 p-4"><h1 class="text-3xl">CDM Optimiser</h1><nav class="flex items-center justify-between gap-6"><a aria-current="page" class="text-underline text-xl text-sky-700 underline transition duration-200 ease-in-out" href="/" data-discover="true">Patients List</a><a class="text-underline text-xl text-sky-500 underline transition duration-200 ease-in-out hover:text-sky-700" href="/pending-patients" data-discover="true">Pending Patients</a><div data-testid="logout-button-mock">Logout Placeholder</div></nav></header>"`;
