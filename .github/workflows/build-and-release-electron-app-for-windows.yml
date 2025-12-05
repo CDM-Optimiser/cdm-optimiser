@@ -22,12 +22,16 @@ jobs:
       - name: Install dependencies (including frontend)
         run: npm install
 
-      - name: Package Electron App for Windows
-        run: npm run dist
+      - name: 1. Build Frontend Assets with Supabase Config
+        run: npm run build:frontend
         env:
-          GH_TOKEN: ${{ github.token }}
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+      - name: 2. Package Electron App for Windows
+        run: electron-builder --publish=never
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Locate and Upload Windows Artifact
         uses: actions/upload-artifact@v4
