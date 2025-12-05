@@ -10,6 +10,7 @@
     "prettier": "npx prettier . --write",
     "preview": "vite preview",
     "test": "vitest",
+    "test:clear-snapshot": "vitest -u",
     "test:ui": "vitest --ui"
   },
   "dependencies": {
