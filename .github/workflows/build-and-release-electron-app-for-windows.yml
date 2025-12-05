@@ -35,7 +35,7 @@ jobs:
         run: npm run dist
         env:
           # Required for electron-builder to authenticate and avoid rate limits during download
-          GH_TOKEN: ${{ secrets.ACTION_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
 
       # Find the generated artifact files (installer and unpacked directory)
       # electron-builder outputs artifacts to the 'dist' directory.
