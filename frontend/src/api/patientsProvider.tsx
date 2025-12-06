@@ -1,12 +1,12 @@
-import {useCallback, useEffect, useState} from 'react';
-import {supabase} from '../utils/api/supabase.ts';
-import {getErrorMessage} from '../utils/functions/getErrorMessage.ts';
-import {PatientsContext} from '../utils/functions/patientsContext.ts';
-import {useAuth} from '../utils/hooks/useAuth.tsx';
-import type {Patient} from '../utils/types/patient.ts';
-import type {Status} from '../utils/types/statusType.ts';
+import { useCallback, useEffect, useState } from 'react';
+import { supabase } from '../utils/api/supabase.ts';
+import { getErrorMessage } from '../utils/functions/getErrorMessage.ts';
+import { PatientsContext } from '../utils/functions/patientsContext.ts';
+import { useAuth } from '../utils/hooks/useAuth.tsx';
+import type { Patient } from '../utils/types/patient.ts';
+import type { Status } from '../utils/types/statusType.ts';
 
-export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
+export const PatientsProvider = ({ children }: { children: React.ReactNode }) => {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [totalPatients, setTotalPatients] = useState(0);
   const [acceptedPatients, setAcceptedPatients] = useState(0);
@@ -16,7 +16,7 @@ export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
   const [fetching, setFetching] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const {user} = useAuth();
+  const { user } = useAuth();
   const userId = user?.id;
 
   const MIN_LOAD_TIME_MS = 500;
@@ -48,15 +48,15 @@ export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
       );
 
       const totalQuery = supabase
-        .from('patient')
-        .select('id', {count: 'exact'});
+        .from('patient_decrypted')
+        .select('id', { count: 'exact' });
       const acceptedQuery = supabase
-        .from('patient')
-        .select('id', {count: 'exact'})
+        .from('patient_decrypted')
+        .select('id', { count: 'exact' })
         .eq('accepted', 1);
       const refusedQuery = supabase
-        .from('patient')
-        .select('id', {count: 'exact'})
+        .from('patient_decrypted')
+        .select('id', { count: 'exact' })
         .eq('refused', 1);
 
       const countQueriesPromise = Promise.all([
@@ -67,9 +67,9 @@ export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
 
       try {
         const [
-          {count: totalCount, error: totalError},
-          {count: acceptedCount, error: acceptedError},
-          {count: refusedCount, error: refusedError},
+          { count: totalCount, error: totalError },
+          { count: acceptedCount, error: acceptedError },
+          { count: refusedCount, error: refusedError },
         ] = await countQueriesPromise;
 
         if (totalError || acceptedError || refusedError) {
@@ -104,9 +104,9 @@ export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
             p_offset: offset,
           })
           .select('*, total_count')
-          .order('id', {ascending: true});
+          .order('id', { ascending: true });
 
-        const {data, error} = await rpc;
+        const { data, error } = await rpc;
 
         if (error) {
           setError(getErrorMessage(error));
@@ -120,12 +120,12 @@ export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
 
         const totalFilteredCount =
           fetchedPatients.length > 0
-            ? (fetchedPatients[0] as {total_count: number}).total_count
+            ? (fetchedPatients[0] as { total_count: number }).total_count
             : 0;
 
         const cleanedPatients = fetchedPatients.map((patient: Patient) => {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const {total_count, ...rest} = patient as Patient & {
+          const { total_count, ...rest } = patient as Patient & {
             total_count: number;
           };
 
@@ -156,7 +156,7 @@ export const PatientsProvider = ({children}: {children: React.ReactNode}) => {
         {
           event: '*',
           schema: 'public',
-          table: 'patient',
+          table: 'patient_decrypred',
         },
         async (payload) => {
           console.log('patient channel payload:', payload);

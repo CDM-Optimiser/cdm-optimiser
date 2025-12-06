@@ -1,7 +1,7 @@
-import {useState} from 'react';
-import {supabase} from '../utils/api/supabase.ts';
-import type {Patient} from '../utils/types/patient.ts';
-import {getErrorMessage} from '../utils/functions/getErrorMessage.ts';
+import { useState } from 'react';
+import { supabase } from '../utils/api/supabase.ts';
+import type { Patient } from '../utils/types/patient.ts';
+import { getErrorMessage } from '../utils/functions/getErrorMessage.ts';
 
 export function useUpdatePatient() {
   const [updating, setUpdating] = useState(false);
@@ -15,8 +15,8 @@ export function useUpdatePatient() {
       const acceptedValue = patient.accepted ? 1 : 0;
       const refusedValue = patient.refused ? 1 : 0;
 
-      const {data: updated, error: supabaseError} = await supabase
-        .from('patient')
+      const { data: updated, error: supabaseError } = await supabase
+        .from('patient_decrypted')
         .update({
           accepted: acceptedValue,
           refused: refusedValue,
