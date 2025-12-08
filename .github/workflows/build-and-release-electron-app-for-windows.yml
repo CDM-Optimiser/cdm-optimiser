@@ -34,7 +34,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
 
       - name: Locate and Upload Windows Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: cdm-optimiser-windows-release
           path: dist/
