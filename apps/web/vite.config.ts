@@ -18,8 +18,8 @@ function contentSecurityPolicy(supabaseUrl: string | undefined): Plugin {
   if (supabaseUrl) {
     const supabase = new URL(supabaseUrl);
 
-    // REST and auth over HTTPS; realtime over a WebSocket on the same host.
-    connectSources.push(supabase.origin, `wss://${supabase.host}`);
+    // REST and auth over HTTPS. The app uses no realtime, so no WebSocket.
+    connectSources.push(supabase.origin);
   }
 
   const policy = [

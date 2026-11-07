@@ -1,97 +1,62 @@
-import {
-  useId,
-  useState,
-  type ChangeEvent,
-  type Dispatch,
-  type MouseEvent,
-  type SetStateAction,
-} from 'react';
-import type {Patient} from '../model/patient.ts';
+import {useId, useState, type ChangeEvent, type MouseEvent} from 'react';
+import type {Patient, PatientStatus} from '../model/patient.ts';
 import {AlertComponent} from '@cdm-optimiser/ui/components/alert-component.tsx';
 import {SVGComponent} from '@cdm-optimiser/ui/components/svg-component.tsx';
 import {getErrorMessage} from '../../../lib/get-error-message.ts';
-import {useUpdatePatient} from '../api/use-update-patient.ts';
-import {usePatientsContext} from '../api/use-patients-context.ts';
+import {useUpdatePatientStatus} from '../api/use-update-patient-status.ts';
 
 interface PatientCardProps {
   patient: Patient;
-  onUpdatePatient: Dispatch<SetStateAction<Patient[]>>;
-  onPendingPatientUpdated: (patientName: string) => void;
+  /** Called with the saved patient, once the lists have refreshed. */
+  onUpdated?: (patient: Patient) => void;
+  /** Show the success message inside the card. */
   showAlert?: boolean;
 }
 
 export function PatientCardComponent({
   patient,
-  onUpdatePatient,
-  onPendingPatientUpdated,
+  onUpdated,
   showAlert = true,
 }: PatientCardProps) {
   const acceptedInputID = useId();
   const refusedInputID = useId();
-  const [updateAccepted, setUpdateAccepted] = useState(!!patient.accepted);
-  const [updateRefused, setUpdateRefused] = useState(!!patient.refused);
-  const [updateErrorMessage, setUpdateErrorMessage] = useState<string | null>(
-    null
-  );
+  // One value, so "accepted" and "refused" can never both be on.
+  const [status, setStatus] = useState<PatientStatus>(patient.status);
   const [updateSuccessMessage, setUpdateSuccessMessage] = useState<
     string | null
   >(null);
 
-  const {loadPatients} = usePatientsContext();
-  const {updatePatient, updating, error} = useUpdatePatient();
+  const updateStatus = useUpdatePatientStatus();
 
   const handleAcceptedToggle = (event: ChangeEvent<HTMLInputElement>) => {
-    const isChecked = event.target.checked;
-
-    setUpdateAccepted(isChecked);
-    setUpdateRefused(false);
+    setStatus(event.target.checked ? 'accepted' : 'pending');
   };
 
   const handleRefusedToggle = (event: ChangeEvent<HTMLInputElement>) => {
-    const isChecked = event.target.checked;
-
-    setUpdateRefused(isChecked);
-    setUpdateAccepted(false);
+    setStatus(event.target.checked ? 'refused' : 'pending');
   };
 
   const handleUpdate = async (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
 
-    setUpdateErrorMessage(null);
     setUpdateSuccessMessage(null);
 
+    // mutateAsync, not mutate: on the pending page this card unmounts as soon
+    // as the saved patient leaves the list, and `mutate` callbacks don't run
+    // after unmount.
+    let updated: Patient;
+
     try {
-      const updated = await updatePatient({
-        ...patient,
-        accepted: updateAccepted,
-        refused: updateRefused,
-      });
+      updated = await updateStatus.mutateAsync({id: patient.id, status});
+    } catch {
+      return; // shown from updateStatus.error below
+    }
 
-      if (updated) {
-        onPendingPatientUpdated(updated.name);
+    onUpdated?.(updated);
 
-        onUpdatePatient((prev) =>
-          prev.map((patient) => (patient.id === updated.id ? updated : patient))
-        );
-
-        setTimeout(async () => {
-          await loadPatients(undefined, undefined, undefined, 'all', true);
-        }, 100);
-
-        if (showAlert) {
-          setUpdateSuccessMessage(
-            `Patient ${updated.name} updated successfully!`
-          );
-        }
-      }
-
-      setUpdateErrorMessage(null);
-    } catch (error) {
-      const message = getErrorMessage(error);
-
-      setUpdateErrorMessage(message);
-      setUpdateSuccessMessage(null);
+    if (showAlert) {
+      setUpdateSuccessMessage(`Patient ${updated.name} updated successfully!`);
     }
   };
 
@@ -229,7 +194,7 @@ export function PatientCardComponent({
                   id={acceptedInputID}
                   name={acceptedInputID}
                   title="toggle"
-                  checked={updateAccepted}
+                  checked={status === 'accepted'}
                   onChange={handleAcceptedToggle}
                   className="absolute inset-0 cursor-pointer appearance-none"
                 />
@@ -280,7 +245,7 @@ export function PatientCardComponent({
                   id={refusedInputID}
                   name={refusedInputID}
                   title="toggle"
-                  checked={updateRefused}
+                  checked={status === 'refused'}
                   onChange={handleRefusedToggle}
                   className="absolute inset-0 cursor-pointer appearance-none"
                 />
@@ -291,24 +256,17 @@ export function PatientCardComponent({
             type="button"
             title="Update patient"
             onClick={handleUpdate}
-            disabled={updating}
+            disabled={updateStatus.isPending}
             className="rounded-md border-b-4 border-sky-500 border-b-sky-600 bg-sky-500 px-4 py-2 text-white transition duration-200 ease-in-out hover:text-white hover:not-disabled:border-sky-800 hover:not-disabled:bg-sky-600 active:not-disabled:border-b-0 disabled:cursor-not-allowed dark:border-b-sky-700 dark:bg-sky-500 dark:hover:not-disabled:border-sky-900 dark:hover:not-disabled:bg-sky-800"
           >
-            {updating ? 'Updating patient...' : 'Update patient'}
+            {updateStatus.isPending ? 'Updating patient…' : 'Update patient'}
           </button>
         </div>
-        {error && (
+        {updateStatus.isError && (
           <AlertComponent
             type="error"
             title="Error updating the patient"
-            text={error}
-          />
-        )}
-        {updateErrorMessage && (
-          <AlertComponent
-            type="error"
-            title="Error updating the patient"
-            text={updateErrorMessage}
+            text={getErrorMessage(updateStatus.error)}
           />
         )}
         {showAlert && updateSuccessMessage && (

@@ -1,7 +1,7 @@
-import {useEffect, useId, useState} from 'react';
+import {useId, useState} from 'react';
 import {AlertComponent} from '@cdm-optimiser/ui/components/alert-component.tsx';
-import {usePatientsContext} from '../features/patients/api/use-patients-context.ts';
-import {filterPatients} from '../features/patients/list/filter-patients.ts';
+import {usePatientCounts} from '../features/patients/api/use-patient-counts.ts';
+import {usePatientsPage} from '../features/patients/api/use-patients-page.ts';
 import {PatientsTableComponent} from '../features/patients/list/patients-table-component.tsx';
 import {SearchPatientComponent} from '../features/patients/list/search-patient-component.tsx';
 import {StatusFilterComponent} from '../features/patients/list/status-filter-component.tsx';
@@ -9,95 +9,88 @@ import {StatusLegendComponent} from '../features/patients/list/status-legend-com
 import type {StatusFilter} from '../features/patients/model/patient.ts';
 import {PaginationComponent} from '../features/patients/pagination/pagination-component.tsx';
 import {useDebounce} from '../hooks/use-debounce.ts';
+import {getErrorMessage} from '../lib/get-error-message.ts';
 
 export function PatientsListPageComponent() {
   const inputSearchID = useId();
-  const [acceptedFilter, setAcceptedFilter] = useState<StatusFilter>('all');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [resultsPerPage, setResultsPerPage] = useState(10);
+  const [status, setStatus] = useState<StatusFilter>('all');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [searchText, setSearchText] = useState('');
+  const search = useDebounce(searchText, 500);
 
-  const {
-    patients,
-    totalPatients,
-    acceptedPatients,
-    refusedPatients,
-    pendingPatients,
-    loading,
-    error,
-    setPatients,
-    loadPatients,
-  } = usePatientsContext();
+  const patientsPage = usePatientsPage({search, status, page, pageSize});
+  const counts = usePatientCounts();
 
-  const debouncedSearchText = useDebounce(searchText, 500);
+  const total = patientsPage.data?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
-  useEffect(() => {
-    const fetchPatients = async () => {
-      await loadPatients(undefined, undefined, debouncedSearchText, 'all');
-      setCurrentPage(1);
-    };
+  // After a save, the list can shrink below the current page (for example
+  // the last pending patient on the last page). Move to the new last page.
+  // Adjusting state while rendering is React's pattern for this; it re-renders
+  // straight away, before anything is shown.
+  if (
+    patientsPage.data &&
+    !patientsPage.isPlaceholderData &&
+    page > totalPages
+  ) {
+    setPage(totalPages);
+  }
 
-    fetchPatients();
-  }, [debouncedSearchText, loadPatients]);
-
-  const {filteredPatients} = filterPatients(patients, acceptedFilter);
-
-  const paginatedPatients = filteredPatients.slice(
-    (currentPage - 1) * resultsPerPage,
-    currentPage * resultsPerPage
-  );
-
-  const totalPages = Math.ceil(filteredPatients.length / resultsPerPage);
-
-  const handlePageChange = (page: number) => setCurrentPage(page);
-
-  const handleResultsPerPageChange = (newResultsPerPage: number) => {
-    setResultsPerPage(newResultsPerPage);
-
-    const newTotalPages = Math.ceil(
-      filteredPatients.length / newResultsPerPage
-    );
-
-    if (currentPage > newTotalPages) {
-      setCurrentPage(newTotalPages > 0 ? newTotalPages : 1);
-    }
+  const handleSearchChange = (text: string) => {
+    setSearchText(text);
+    setPage(1);
   };
 
   const handleFilterChange = (filter: StatusFilter) => {
-    setAcceptedFilter(filter);
-    setCurrentPage(1);
+    setStatus(filter);
+    setPage(1);
   };
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setPage(1);
+  };
+
+  const pagination = (
+    <PaginationComponent
+      currentPage={page}
+      totalPages={totalPages}
+      resultsPerPage={pageSize}
+      onPageChange={setPage}
+      onResultsPerPageChange={handlePageSizeChange}
+    />
+  );
 
   return (
     <>
-      {error && (
-        <div className="mx-w-7xl mx-auto flex w-full items-center justify-center p-6">
-          <AlertComponent
-            type="error"
-            title="Error getting patients"
-            text={error}
-          />
-        </div>
-      )}
       <SearchPatientComponent
         inputSearchID={inputSearchID}
-        placeholder="Type to find a patient by its name, D.O.B or GMS number"
+        placeholder="Type to find a patient by name, D.O.B. or GMS number"
         value={searchText}
-        onTextChange={setSearchText}
+        onTextChange={handleSearchChange}
       />
       <div className="flex flex-wrap items-center justify-center gap-4 xl:justify-between">
         <StatusFilterComponent
-          filterSelected={acceptedFilter}
+          filterSelected={status}
           onFilterChange={handleFilterChange}
         />
         <StatusLegendComponent
-          totalPatients={totalPatients}
-          acceptedPatientsText={`Accepted (${acceptedPatients})`}
-          refusedPatientsText={`Refused (${refusedPatients})`}
-          pendingPatientsText={`Pending (${pendingPatients})`}
+          totalPatients={counts.data?.total ?? 0}
+          acceptedPatientsText={`Accepted (${counts.data?.accepted ?? 0})`}
+          refusedPatientsText={`Refused (${counts.data?.refused ?? 0})`}
+          pendingPatientsText={`Pending (${counts.data?.pending ?? 0})`}
         />
       </div>
-      {filteredPatients.length === 0 ? (
+      {patientsPage.isError ? (
+        <AlertComponent
+          type="error"
+          title="Error getting patients"
+          text={getErrorMessage(patientsPage.error)}
+        />
+      ) : patientsPage.isPending ? (
+        <AlertComponent title="Loading patients" text="Loading patients…" />
+      ) : total === 0 ? (
         <AlertComponent
           type="info"
           title="No patients found"
@@ -105,33 +98,18 @@ export function PatientsListPageComponent() {
         />
       ) : (
         <>
-          {loading ? (
-            <AlertComponent
-              title="Loading patients"
-              text="Fetching patients from database. It make take a few minutes..."
-            />
-          ) : (
-            <>
-              <PaginationComponent
-                currentPage={currentPage}
-                totalPages={totalPages}
-                resultsPerPage={resultsPerPage}
-                onPageChange={handlePageChange}
-                onResultsPerPageChange={handleResultsPerPageChange}
-              />
-              <PatientsTableComponent
-                patients={paginatedPatients}
-                onUpdatePatient={setPatients}
-              />
-              <PaginationComponent
-                currentPage={currentPage}
-                totalPages={totalPages}
-                resultsPerPage={resultsPerPage}
-                onPageChange={handlePageChange}
-                onResultsPerPageChange={setResultsPerPage}
-              />
-            </>
-          )}
+          {pagination}
+          <div
+            aria-busy={patientsPage.isPlaceholderData}
+            className={
+              patientsPage.isPlaceholderData
+                ? 'opacity-60 transition-opacity'
+                : 'transition-opacity'
+            }
+          >
+            <PatientsTableComponent patients={patientsPage.data.patients} />
+          </div>
+          {pagination}
         </>
       )}
     </>
