@@ -23,9 +23,6 @@ jobs:
     name: Lint, typecheck, test and build
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    env:
-      # This job never runs Electron, so skip its binary download.
-      ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
 
     steps:
       - name: Checkout repository

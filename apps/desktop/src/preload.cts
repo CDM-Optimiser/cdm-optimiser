@@ -1,12 +1,15 @@
-// Runs in the sandboxed renderer before the web app loads. Sandboxed preload
-// scripts are CommonJS and can only require() a few Electron modules, so the
-// shared contract is imported as types only: it compiles away completely.
+// Runs in the sandboxed renderer before the web app loads. A sandboxed preload
+// can only require() a few Electron modules, and the compiled file must stay a
+// plain script: no `import` statements, so TypeScript emits no `exports`
+// boilerplate. The shared contract is therefore referenced through inline
+// `import()` types, which compile away completely (see moduleDetection in
+// ../tsconfig.json).
 
-import type {
-  DarkModeApi,
-  DesktopIpcChannel,
-  DesktopIpcChannels,
-} from '@cdm-optimiser/desktop-bridge';
+type DarkModeApi = import('@cdm-optimiser/desktop-bridge').DarkModeApi;
+type DesktopIpcChannel =
+  import('@cdm-optimiser/desktop-bridge').DesktopIpcChannel;
+type DesktopIpcChannels =
+  import('@cdm-optimiser/desktop-bridge').DesktopIpcChannels;
 
 const {
   contextBridge,

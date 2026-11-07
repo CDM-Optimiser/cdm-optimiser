@@ -27,9 +27,11 @@ lint rule or delete a test to get a green run. Report what fails instead.
   dependencies). Repo-wide tools (ESLint, Prettier, TypeScript) live in the
   root: `yarn add -D <pkg>`.
 - Use `yarn dlx <pkg>` for one-off tools.
-- Yarn blocks dependency install scripts by default. Only `electron` is allowed
-  to run one (`dependenciesMeta` in the root `package.json`). Allow another
-  package only if it can't work without its script, and say why.
+- Yarn blocks dependency install scripts by default, and no package currently
+  needs one (Electron downloads its binary the first time it runs). If a new
+  package can't work without its script, allow only that package with
+  `dependenciesMeta.<name>.built: true` in the root `package.json`, and say
+  why.
 - Yarn skips package versions published less than 24 hours ago
   (`npmMinimalAgeGate`). Don't override it.
 - Yarn's built-in commands win over scripts with the same name: `yarn pack`
@@ -166,8 +168,11 @@ The app processes health data of real patients (GDPR special-category data).
 
 - A fresh shell may default to a Node version without Corepack (Node 25+).
   Run `nvm use` first.
-- Web-only installs (Netlify, CI checks) set `ELECTRON_SKIP_BINARY_DOWNLOAD=1`
-  to avoid downloading Electron.
+- The first `yarn dev:desktop` or `yarn workspace @cdm-optimiser/desktop start`
+  downloads the Electron binary (about 100 MB); later runs reuse it.
+- New package versions are installable only once they're 24 hours old. If
+  `yarn add` reports a version as "quarantined", use the newest version that
+  isn't, and let the next update pick up the latest.
 - Known failing tests, owned by the bug-fix plan (5 of 20; they also fail on
   the original `main`). Remove this note once they're fixed.
   - `footer.component.test.tsx` (3 tests): hardcodes the year 2025, but the
