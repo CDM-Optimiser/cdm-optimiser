@@ -13,12 +13,14 @@ data**: follow the privacy rules in `.claude/instructions.md`.
 
 ## Repository map
 
-| Path           | Package                  | Contents                                                                                                                   |
-| -------------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
-| `apps/web`     | `@cdm-optimiser/web`     | React 19 + Vite + Tailwind 4 SPA. Entry `src/main.tsx`, routes `src/App.tsx`, Supabase client `src/utils/api/supabase.ts`. |
-| `apps/desktop` | `@cdm-optimiser/desktop` | Electron main process `src/main.js`, preload `src/preload.cjs`, packaging config `electron-builder.yml`.                   |
-| `scripts/`     | (root)                   | Changed-files helpers behind `yarn prettier` and `yarn linc`.                                                              |
-| `.github/`     | (root)                   | `ci.yml` (checks on every PR), `release-desktop.yml` (Windows installer on `v*` tags).                                     |
+| Path                      | Package                         | Contents                                                                                                                   |
+| ------------------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `apps/web`                | `@cdm-optimiser/web`            | React 19 + Vite + Tailwind 4 SPA. Entry `src/main.tsx`, routes `src/App.tsx`, Supabase client `src/utils/api/supabase.ts`. |
+| `apps/desktop`            | `@cdm-optimiser/desktop`        | Electron main process `src/main.ts`, preload `src/preload.cts`, packaging config `electron-builder.yml`.                   |
+| `packages/ui`             | `@cdm-optimiser/ui`             | Presentational components (alert, dropdown, footer, modal, svg) and their hook. Consumed as TypeScript source.             |
+| `packages/desktop-bridge` | `@cdm-optimiser/desktop-bridge` | Types-only IPC contract shared by the Electron main process, the preload and the web app (`src/index.d.ts`).               |
+| `scripts/`                | (root)                          | Changed-files helpers behind `yarn prettier` and `yarn linc`.                                                              |
+| `.github/`                | (root)                          | `ci.yml` (checks on every PR), `release-desktop.yml` (Windows installer on `v*` tags).                                     |
 
 ## Commands
 
@@ -48,14 +50,22 @@ yarn dist:desktop            # Windows installer in apps/desktop/release
   `file://` inside Electron. Don't switch to `BrowserRouter` or absolute asset
   paths.
 - **Desktop loads the web build.** `yarn build:renderer` (desktop workspace)
-  writes the web build to `apps/desktop/renderer/`, which `main.js` loads. In
-  development `main.js` loads `VITE_DEV_SERVER_URL` instead.
+  writes the web build to `apps/desktop/renderer/`, which the main process
+  loads. In development it loads `VITE_DEV_SERVER_URL` instead. `tsc -b`
+  compiles `apps/desktop/src` to `apps/desktop/dist`.
 - **One process boundary.** The renderer reaches Electron only through
-  `window.darkMode`, exposed by `preload.cjs` and typed in
-  `apps/web/src/utils/types/electron.d.ts`. Change the IPC handler in
-  `main.js`, the preload and the types together.
+  `window.darkMode`, exposed by the preload. The contract (channels, payloads,
+  `Window` typing) lives in `packages/desktop-bridge`; change it first, then
+  `main.ts` and `preload.cts`, and the compiler flags any mismatch.
 - **The web app must also work in a plain browser,** where `window.darkMode`
   doesn't exist.
+- **`packages/ui` stays presentational:** no Supabase, router or app state.
+  The web app's `index.css` has an `@source` line so Tailwind scans it; keep it
+  if the package moves.
+- **Content Security Policy:** production builds get a CSP `<meta>` tag from
+  a plugin in `apps/web/vite.config.ts`, allowing only the app itself and the
+  Supabase origin. A new external origin (API, font, image host) must be
+  added there, or the browser and Electron will block it.
 - **Configuration** comes from `VITE_SUPABASE_URL` and
   `VITE_SUPABASE_ANON_KEY` in `apps/web/.env.local` (copy `.env.example`).
   They are bundled into the client, so only the anon key belongs there.
@@ -66,5 +76,8 @@ yarn dist:desktop            # Windows installer in apps/desktop/release
 - TypeScript stays below 6.1, because typescript-eslint doesn't support
   TypeScript 7 yet.
 - Electron is pinned to an exact version, which electron-builder requires.
+- The packaged desktop app is named `cdm-optimiser` (`extraMetadata` in
+  `electron-builder.yml`), not the workspace name. Changing it moves users'
+  data folder and signs them out.
 
 @.claude/instructions.md

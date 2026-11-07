@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tsbuildinfo",
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "types": [],
+    // This package is a single declaration file, so it must not be skipped.
+    "skipLibCheck": false
+  },
+  "include": ["src"]
+}

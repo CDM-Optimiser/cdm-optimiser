@@ -1,5 +1,5 @@
 import {useEffect, useId, useState} from 'react';
-import {AlertComponent} from '../features/ui/alert.component.tsx';
+import {AlertComponent} from '@cdm-optimiser/ui';
 import {FiltersComponent} from '../features/patients-list/filters.component.tsx';
 import {LegendComponent} from '../features/patients-list/legend.component.tsx';
 import {PaginationComponent} from '../features/patients-list/pagination.component.tsx';

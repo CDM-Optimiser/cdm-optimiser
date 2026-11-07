@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {useNavigate} from 'react-router';
 import {useAuth} from '../utils/hooks/useAuth.tsx';
 import {getErrorMessage} from '../utils/functions/getErrorMessage.ts';
-import {AlertComponent} from '../features/ui/alert.component.tsx';
+import {AlertComponent} from '@cdm-optimiser/ui';
 
 export function LoginPageComponent() {
   const [email, setEmail] = useState('');

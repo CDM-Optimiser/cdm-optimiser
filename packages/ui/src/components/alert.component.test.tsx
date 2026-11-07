@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, test, vi} from 'vitest';
 import {render} from 'vitest-browser-react';
-import {AlertComponent} from '../../../../src/features/ui/alert.component.tsx';
+import {AlertComponent} from './alert.component.tsx';
 
 const mocks = vi.hoisted(() => {
   return {
@@ -8,7 +8,7 @@ const mocks = vi.hoisted(() => {
   };
 });
 
-vi.mock('../../../../src/utils/hooks/useAutoDismiss.tsx', () => {
+vi.mock('../hooks/useAutoDismiss.tsx', () => {
   return {
     useAutoDismiss: mocks.useAutoDismiss,
   };

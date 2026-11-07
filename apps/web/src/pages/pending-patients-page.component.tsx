@@ -1,7 +1,7 @@
 import {useMemo, useState} from 'react';
 import {usePatientsContext} from '../utils/hooks/usePatientsContext.tsx';
 import {PatientCardComponent} from '../features/patient-card/patient-card.component.tsx';
-import {AlertComponent} from '../features/ui/alert.component.tsx';
+import {AlertComponent} from '@cdm-optimiser/ui';
 
 export function PendingPatientsPageComponent() {
   const [lastUpdateSuccess, setLastUpdateSuccess] = useState<string | null>(

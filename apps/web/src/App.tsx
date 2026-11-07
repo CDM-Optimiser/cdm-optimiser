@@ -5,8 +5,8 @@ import {AuthProvider} from './utils/auth/authProvider.tsx';
 import {LoginPageComponent} from './pages/login-page.component.tsx';
 import {PendingPatientsPageComponent} from './pages/pending-patients-page.component.tsx';
 import {PatientsListPageComponent} from './pages/patients-list-page.component.tsx';
-import {FooterComponent} from './features/ui/footer.component.tsx';
-import {HeaderComponent} from './features/ui/header.component.tsx';
+import {FooterComponent} from '@cdm-optimiser/ui';
+import {HeaderComponent} from './features/layout/header.component.tsx';
 
 function ProtectedRoutesWrapper() {
   const {session} = useAuth();

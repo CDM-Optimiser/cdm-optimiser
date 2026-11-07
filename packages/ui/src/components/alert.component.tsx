@@ -1,6 +1,6 @@
 import type {JSX} from 'react';
-import {useAutoDismiss} from '../../utils/hooks/useAutoDismiss.tsx';
-import type {AlertTypes} from '../../utils/types/alert.ts';
+import {useAutoDismiss} from '../hooks/useAutoDismiss.tsx';
+import type {AlertTypes} from '../types/alert.ts';
 import {SVGComponent} from './svg.component.tsx';
 
 interface AlertProps {

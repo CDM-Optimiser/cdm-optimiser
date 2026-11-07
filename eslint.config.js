@@ -28,9 +28,25 @@ export default defineConfig([
     languageOptions: {sourceType: 'commonjs'},
   },
 
-  // React renderer code (web app).
+  // TypeScript for Node.js: Electron main process, preload, IPC contract.
   {
-    files: ['apps/web/**/*.{ts,tsx}'],
+    files: [
+      'apps/desktop/**/*.{ts,cts,mts}',
+      'packages/desktop-bridge/**/*.ts',
+    ],
+    extends: [js.configs.recommended, tseslint.configs.recommended],
+    languageOptions: {globals: globals.node},
+  },
+  {
+    // CommonJS TypeScript (the sandboxed preload) has to load modules with
+    // require().
+    files: ['**/*.cts'],
+    rules: {'@typescript-eslint/no-require-imports': 'off'},
+  },
+
+  // React code: web app and shared UI package.
+  {
+    files: ['apps/web/**/*.{ts,tsx}', 'packages/ui/**/*.{ts,tsx}'],
     extends: [
       js.configs.recommended,
       tseslint.configs.recommended,

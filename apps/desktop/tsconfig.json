@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // Kept inside dist/ so deleting dist/ always forces a rebuild.
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",
+    "target": "ES2024",
+    "lib": ["ES2024"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "types": ["node", "electron"],
+
+    /* Emits dist/main.js (ESM) and dist/preload.cjs (CommonJS) for Electron. */
+    "noEmit": false,
+    "allowImportingTsExtensions": false,
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+  "include": ["src"]
+}

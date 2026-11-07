@@ -1,5 +1,5 @@
 import type {ChangeEvent} from 'react';
-import {SVGComponent} from '../ui/svg.component.tsx';
+import {SVGComponent} from '@cdm-optimiser/ui';
 
 interface SearchPatientProps {
   inputSearchID: string;
