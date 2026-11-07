@@ -3,9 +3,9 @@ import {setElectronTheme} from '../../utils/functions/setElectronTheme.ts';
 import {
   type DropdownItem,
   DropdownComponent,
-} from '../ui/dropdown.component.tsx';
-import type {ThemeValue} from '../../utils/types/theme.ts';
-import {SVGComponent} from '../ui/svg.component.tsx';
+  SVGComponent,
+} from '@cdm-optimiser/ui';
+import type {ThemeValue} from '@cdm-optimiser/desktop-bridge';
 import {getErrorMessage} from '../../utils/functions/getErrorMessage.ts';
 
 const themeOptions: DropdownItem<ThemeValue>[] = [

@@ -1,4 +1,4 @@
-import type {ThemeValue} from '../types/theme.ts';
+import type {ThemeValue} from '@cdm-optimiser/desktop-bridge';
 import {getErrorMessage} from './getErrorMessage.ts';
 
 export const setElectronTheme = async (theme: ThemeValue) => {

@@ -1,0 +1,18 @@
+{
+  "name": "@cdm-optimiser/desktop-bridge",
+  "version": "0.0.0",
+  "description": "Typed IPC contract between the Electron app and the web app (types only)",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts"
+    }
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3"
+  }
+}

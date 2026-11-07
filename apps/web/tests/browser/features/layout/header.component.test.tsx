@@ -2,7 +2,7 @@ import {beforeEach, describe, expect, test, vi} from 'vitest';
 import {render} from 'vitest-browser-react';
 import {MemoryRouter} from 'react-router';
 import type {User} from '@supabase/supabase-js';
-import {HeaderComponent} from '../../../../src/features/ui/header.component.tsx';
+import {HeaderComponent} from '../../../../src/features/layout/header.component.tsx';
 
 const mocks = vi.hoisted(() => {
   return {
@@ -13,13 +13,13 @@ const mocks = vi.hoisted(() => {
   };
 });
 
-vi.mock('./../../../src/utils/hooks/useAuth.tsx ', () => {
+vi.mock('../../../../src/utils/hooks/useAuth.tsx', () => {
   return {
     useAuth: mocks.useAuth,
   };
 });
 
-vi.mock('../../../../src/features/ui/logout-button.component.tsx', () => ({
+vi.mock('../../../../src/features/layout/logout-button.component.tsx', () => ({
   LogoutButton: mocks.LogoutButton,
 }));
 

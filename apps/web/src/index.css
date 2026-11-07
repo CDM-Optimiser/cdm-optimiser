@@ -1,1 +1,4 @@
 @import 'tailwindcss';
+
+/* Tailwind only scans this app by default; include the shared UI package. */
+@source '../../../packages/ui/src';

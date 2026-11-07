@@ -6,19 +6,23 @@
   "license": "UNLICENSED",
   "private": true,
   "type": "module",
-  "main": "src/main.js",
+  "main": "dist/main.js",
   "scripts": {
+    "build": "tsc -b",
     "build:renderer": "yarn workspace @cdm-optimiser/web build --outDir ../desktop/renderer --emptyOutDir",
-    "dev": "concurrently --kill-others --names web,electron \"yarn workspace @cdm-optimiser/web dev\" \"wait-on http://localhost:5173 && cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
-    "dist": "yarn build:renderer && electron-builder --win --publish never",
-    "pack:dir": "yarn build:renderer && electron-builder --dir",
-    "start": "yarn build:renderer && electron ."
+    "dev": "yarn build && concurrently --kill-others --names web,electron \"yarn workspace @cdm-optimiser/web dev\" \"wait-on http://localhost:5173 && cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
+    "dist": "yarn build && yarn build:renderer && electron-builder --win --publish never",
+    "pack:dir": "yarn build && yarn build:renderer && electron-builder --dir",
+    "start": "yarn build && yarn build:renderer && electron ."
   },
   "devDependencies": {
+    "@cdm-optimiser/desktop-bridge": "workspace:*",
+    "@types/node": "^24.10.1",
     "concurrently": "^9.2.1",
     "cross-env": "^10.1.0",
     "electron": "39.8.10",
     "electron-builder": "^26.0.12",
+    "typescript": "~5.9.3",
     "wait-on": "^9.5.1"
   }
 }

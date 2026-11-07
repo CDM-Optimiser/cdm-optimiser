@@ -42,27 +42,36 @@ lint rule or delete a test to get a green run. Report what fails instead.
 
 - `apps/web/src`: everything the user sees.
   - `pages/`: one component per route.
-  - `features/<area>/`: components grouped by feature; `features/ui/` holds
-    the generic building blocks (alert, modal, dropdown, svg).
+  - `features/<area>/`: components grouped by feature; `features/layout/`
+    holds the header and logout button.
   - `api/`: Supabase data hooks and providers.
   - `utils/`: hooks, helper functions and types.
   - Components are named `<name>.component.tsx`; hooks `use<Name>.tsx`.
+- `packages/ui/src`: generic, presentational building blocks (alert,
+  dropdown, footer, modal, svg). They take everything through props and must
+  not import Supabase, the router or anything from `apps/`. Export new
+  components from `src/index.ts`; apps import from `@cdm-optimiser/ui`.
+- `packages/desktop-bridge/src/index.d.ts`: the IPC contract. Types only,
+  never runtime code: the sandboxed preload can't import modules.
 - `apps/desktop/src`: Electron only (window setup, IPC handlers, preload). No
   application logic.
-- Imports inside `apps/web` use explicit file extensions
+- Relative imports in TypeScript use explicit file extensions
   (`'./foo.component.tsx'`), as `allowImportingTsExtensions` requires.
+  `apps/desktop` is the exception: it is compiled with `tsc` and only imports
+  packages.
 
 ## Testing
 
-- **Component tests** live in `apps/web/tests/browser/` and run in Vitest
+- **Component tests** live next to the code's workspace:
+  `apps/web/tests/browser/` and `packages/ui/tests/`. They run in Vitest
   browser mode with Playwright Chromium and `vitest-browser-react`. Prefer
   `await expect.element(locator)` for assertions that wait for the DOM.
 - **Pure logic tests** go in `apps/web/tests/unit/`, which runs in jsdom.
 - `vi.mock()` paths are relative to the test file and must resolve to the real
   module. A wrong path silently mocks nothing.
-- **Snapshots:** update them with
-  `yarn workspace @cdm-optimiser/web test:update` only when the UI change is
-  intended, and review the snapshot diff.
+- **Snapshots:** update them with `yarn workspace <package> test:update`
+  (e.g. `@cdm-optimiser/ui`) only when the UI change is intended, and review
+  the snapshot diff.
 - **End-to-end:** `apps/web/e2e` runs against the production build, so run
   `yarn build:web` first. Keep it a smoke test that needs no real Supabase
   project.
@@ -73,15 +82,19 @@ lint rule or delete a test to get a green run. Report what fails instead.
 
 ## Electron security
 
-- Keep `contextIsolation: true` and `nodeIntegration: false`. Don't disable the
-  sandbox.
+- Keep `contextIsolation: true`, `nodeIntegration: false` and `sandbox: true`.
 - Expose renderer APIs only through `contextBridge` in the preload, one small
   function per IPC channel. Never expose `ipcRenderer` itself.
-- Treat every IPC payload as untrusted: validate it in the `main.js` handler.
-- Don't load remote content into the window; it only loads the bundled
-  renderer or, in development, the Vite dev server.
+- Register handlers with the typed `handle()` helper in `main.ts`. Payloads
+  arrive as `unknown`: validate them before use (see `isThemeValue`).
+- The window only shows the app: `will-navigate` blocks other URLs and
+  `setWindowOpenHandler` sends `https:` links to the system browser. Don't
+  load remote content into the window.
 - DevTools open only in development or with the `--devtools` flag. Don't make
   them open in packaged builds.
+- Packaged builds have Electron fuses set in `electron-builder.yml` (no
+  run-as-node, no `NODE_OPTIONS` or `--inspect`, asar-only with integrity
+  checks). Don't turn them off.
 
 ## Patient data and privacy
 
@@ -148,6 +161,8 @@ The app processes health data of real patients (GDPR special-category data).
   Run `nvm use` first.
 - Web-only installs (Netlify, CI checks) set `ELECTRON_SKIP_BINARY_DOWNLOAD=1`
   to avoid downloading Electron.
-- Known failing tests, owned by the bug-fix plan: the footer test (hardcodes
-  the year 2025), and the header and logout-button tests (their `vi.mock`
-  paths point at a non-existent file). Remove this note once they're fixed.
+- Known test issues, owned by the bug-fix plan: the footer test hardcodes the
+  year 2025, so it fails in other years. The header and logout-button tests
+  had `vi.mock` paths pointing at a non-existent file; the paths were
+  corrected when the files moved, but the tests' assertions haven't been
+  re-verified. Remove this note once they're fixed.

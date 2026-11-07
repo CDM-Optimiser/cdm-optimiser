@@ -1,4 +1,9 @@
 {
   "files": [],
-  "references": [{"path": "./apps/web"}]
+  "references": [
+    {"path": "./apps/web"},
+    {"path": "./apps/desktop"},
+    {"path": "./packages/ui"},
+    {"path": "./packages/desktop-bridge"}
+  ]
 }

@@ -14,6 +14,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@cdm-optimiser/ui": "workspace:*",
     "@react-router/node": "^7.9.6",
     "@react-router/serve": "^7.9.6",
     "@supabase/supabase-js": "^2.86.0",
@@ -24,6 +25,7 @@
     "tailwindcss": "^4.1.17"
   },
   "devDependencies": {
+    "@cdm-optimiser/desktop-bridge": "workspace:*",
     "@playwright/test": "^1.57.0",
     "@react-router/dev": "^7.9.6",
     "@types/node": "^24.10.1",

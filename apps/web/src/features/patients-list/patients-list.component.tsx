@@ -1,7 +1,6 @@
 import {type Dispatch, type SetStateAction} from 'react';
 import {PatientCardComponent} from '../patient-card/patient-card.component.tsx';
-import {ModalComponent} from '../ui/modal.component.tsx';
-import {SVGComponent} from '../ui/svg.component.tsx';
+import {ModalComponent, SVGComponent} from '@cdm-optimiser/ui';
 import type {Patient} from '../../utils/types/patient.ts';
 import {
   booleanColumns,

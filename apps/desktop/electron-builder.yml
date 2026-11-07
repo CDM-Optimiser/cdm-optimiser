@@ -1,11 +1,29 @@
 appId: com.cdm-optimiser.cdm-optimiser
 productName: CDM Optimiser
+# Keep the packaged app's identity from before the monorepo move. Electron
+# derives the user-data folder (which holds the Supabase session) and the
+# Linux executable name from package.json "name", which is now
+# "@cdm-optimiser/desktop" in the repository.
+extraMetadata:
+  name: cdm-optimiser
 directories:
   output: release
   buildResources: build
 files:
-  - src/**
+  - dist/**
+  - '!dist/.tsbuildinfo'
   - renderer/**
   - package.json
 win:
   target: nsis
+
+# Hardening for the packaged app (https://www.electronjs.org/docs/latest/tutorial/fuses).
+electronFuses:
+  # The app binary can't be used as a plain Node.js runtime.
+  runAsNode: false
+  # NODE_OPTIONS and --inspect can't inject code into the main process.
+  enableNodeOptionsEnvironmentVariable: false
+  enableNodeCliInspectArguments: false
+  # Only the signed-off app.asar is loaded, and its integrity is checked.
+  onlyLoadAppFromAsar: true
+  enableEmbeddedAsarIntegrityValidation: true

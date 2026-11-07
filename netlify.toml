@@ -17,6 +17,18 @@
   to = "/index.html"
   status = 200
 
+# Security headers. The Content-Security-Policy for scripts, styles and
+# connections is a <meta> tag added at build time (see apps/web/vite.config.ts),
+# so Netlify and Electron share it. Headers add what a <meta> tag can't set.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "frame-ancestors 'none'"
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+
 # Vite fingerprints everything in /assets, so it can be cached forever.
 [[headers]]
   for = "/assets/*"
