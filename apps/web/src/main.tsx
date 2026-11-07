@@ -3,7 +3,7 @@ import {createRoot} from 'react-dom/client';
 import {HashRouter} from 'react-router';
 import './reset.css';
 import './index.css';
-import App from './app/App.tsx';
+import App from './app/app.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
