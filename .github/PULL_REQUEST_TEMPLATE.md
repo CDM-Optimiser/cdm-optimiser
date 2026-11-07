@@ -2,6 +2,14 @@
 
 <!-- Example: feat: add login functionality, docs: update README -->
 
+<!--
+Labels: add at least one to every PR, one per kind of change:
+feat → enhancement, fix → bug, refactor → refactor, test → tests,
+docs → documentation, build → project, dependency updates → dependencies,
+ci → ci/cd, chore → chore. Add security or accessibility when they apply.
+The full list is in .claude/instructions.md, under "Labels".
+-->
+
 &nbsp;
 
 # Pull Request Description
