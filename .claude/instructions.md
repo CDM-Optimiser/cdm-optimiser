@@ -44,7 +44,7 @@ lint rule or delete a test to get a green run. Report what fails instead.
 
 - `apps/web/src`: everything the user sees. Code is grouped by feature, not
   by kind of file.
-  - `app/`: the app shell (`App.tsx` with the routes).
+  - `app/`: the app shell (`app.tsx` with the routes).
   - `pages/`: one component per route. Pages compose features; they hold no
     data access of their own.
   - `features/<area>/`: everything for one area of the app, together.
@@ -60,17 +60,15 @@ lint rule or delete a test to get a green run. Report what fails instead.
     Feature hooks live in their feature folder.
   - Don't add a `utils/` folder: put each helper next to the feature that
     uses it, or in `lib/` if several features do.
-  - Components are named `<name>.component.tsx`, with their test in
-    `<name>.component.test.tsx` next to them. Hooks are `use<Name>.ts`
-    (`.tsx` only if they contain JSX). Other modules are camelCase `.ts`.
   - One component per file. Don't wrap a single `useState` in a custom
     hook; write a hook when it holds real logic.
   - Types for patient status come from `features/patients/model/patient.ts`.
     Don't redeclare the `'accepted' | 'refused' | 'pending'` union.
 - `packages/ui/src`: generic, presentational building blocks. They take
   everything through props and must not import Supabase, the router or
-  anything from `apps/`. Export new components from `src/index.ts`; apps
-  import from `@cdm-optimiser/ui`.
+  anything from `apps/`. Apps import each one from its own file through the
+  package's `exports`
+  (`import {ButtonComponent} from '@cdm-optimiser/ui/components/button-component.tsx'`).
   - `components/`: alert, button (`primary`, `segment`), card, dropdown,
     footer, modal (a native `<dialog>`), svg, switch and text field.
   - `icons/`: one component per icon, decorative (`aria-hidden`) by default.
@@ -83,17 +81,53 @@ lint rule or delete a test to get a green run. Report what fails instead.
 - `apps/desktop/src`: Electron only (window setup, IPC handlers, preload). No
   application logic.
 - Relative imports in TypeScript use explicit file extensions
-  (`'./foo.component.tsx'`), as `allowImportingTsExtensions` requires.
+  (`'./header-component.tsx'`), as `allowImportingTsExtensions` requires.
   `apps/desktop` is the exception: it is compiled with `tsc` and only imports
   packages.
 
+### File names
+
+**Every file name is kebab-case**: lowercase words joined by dashes, never
+camelCase or PascalCase. A file is named after what it exports, converted to
+kebab-case, and keeps its suffixes after the first dot:
+
+| Export                          | File                                                  |
+| ------------------------------- | ----------------------------------------------------- |
+| `StatusLegendComponent`         | `status-legend-component.tsx`                         |
+| its test and snapshot           | `status-legend-component.test.tsx(.snap)`             |
+| `AuthProvider`, `LogoutButton`  | `auth-provider.tsx`, `logout-button.tsx`              |
+| `useAutoDismiss`                | `use-auto-dismiss.ts`                                 |
+| `getErrorMessage`               | `get-error-message.ts`                                |
+| `AuthContext`                   | `auth-context.ts`                                     |
+| `CheckIcon`                     | `check-icon.tsx`                                      |
+| several related types or values | a kebab-case noun: `patient.ts`, `patient-columns.ts` |
+
+- Hooks and modules without JSX are `.ts`; anything with JSX is `.tsx`.
+- Folders are kebab-case too (`features/patients`, `__snapshots__` aside).
+- The only exceptions are names that tools require, all lowercase already:
+  `main.tsx`, `vite-env.d.ts`, `*.config.ts`, `index.html`, `*.spec.ts`
+  (Playwright), workflow files and Supabase migrations.
+
+### No barrel files
+
+Never create a barrel: an `index.ts` (or any file) whose job is to re-export
+other modules. Import every value from the file that defines it.
+
+- Inside an app or package, import the file directly
+  (`'../features/auth/use-auth.ts'`).
+- A package exposes its folders through `exports` in its `package.json`
+  (`"./components/*": "./src/components/*"`), so other workspaces import
+  files directly as well.
+- `packages/desktop-bridge/src/index.d.ts` is not a barrel: it is the
+  package's only module, and it defines the types itself.
+
 ## Testing
 
-- **Tests sit next to the code they test:** `header.component.tsx` has
-  `header.component.test.tsx` in the same folder, and its snapshots in a
+- **Tests sit next to the code they test:** `header-component.tsx` has
+  `header-component.test.tsx` in the same folder, and its snapshots in a
   `__snapshots__/` folder beside them. Every new component gets its test file
   alongside it. Import the code under test with `./`
-  (`import {HeaderComponent} from './header.component.tsx'`).
+  (`import {HeaderComponent} from './header-component.tsx'`).
 - **The file name picks the environment.** `*.test.tsx` files run in Vitest
   browser mode with Playwright Chromium and `vitest-browser-react`; prefer
   `await expect.element(locator)` for assertions that wait for the DOM.
@@ -111,7 +145,7 @@ lint rule or delete a test to get a green run. Report what fails instead.
 - `vi.mock()` paths are relative to the test file and must resolve to the real
   module. A wrong path silently mocks nothing.
 - Test files are never bundled: Vite only builds what `index.html` imports,
-  and `packages/ui` exports from `src/index.ts` only.
+  following imports file by file.
 - **Snapshots:** update them with `yarn workspace <package> test:update`
   (e.g. `@cdm-optimiser/ui`) only when the UI change is intended, and review
   the snapshot diff.
@@ -184,8 +218,12 @@ The app processes health data of real patients (GDPR special-category data).
 - Branch from `main`. Use Conventional Commits: `feat`, `fix`, `refactor`,
   `test`, `docs`, `build`, `ci`, `chore` (Dependabot uses `build(deps):`).
 - Fill in `.github/PULL_REQUEST_TEMPLATE.md`.
-- Keep formatting-only changes in their own commit and add its hash to
-  `.git-blame-ignore-revs`.
+- Keep formatting-only changes in their own commit.
+- Never commit database material: schema or policy exports, SQL or Edge
+  Function code. Maintainers keep it outside this repository; changes to the
+  database are applied in the Supabase dashboard.
+- Keep local Git helper files (such as a blame-ignore list) out of the
+  repository: list them in `.git/info/exclude`, not `.gitignore`.
 
 ### Labels
 
