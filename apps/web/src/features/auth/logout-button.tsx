@@ -1,24 +1,20 @@
-import {useNavigate} from 'react-router';
+import {ButtonComponent} from '@cdm-optimiser/ui/components/button-component.tsx';
+import {getErrorMessage} from '../../lib/get-error-message.ts';
 import {useAuth} from './use-auth.ts';
 
+/**
+ * Signs the user out. The protected layout then sends them to the login
+ * page, because the session is gone.
+ */
 export function LogoutButton() {
-  const {logout, user} = useAuth();
-  const navigate = useNavigate();
+  const {logout} = useAuth();
 
-  const handleLogout = async () => {
-    await logout();
-
-    navigate('/login');
+  const handleLogout = () => {
+    logout().catch((error: unknown) => {
+      // The user stays signed in and can try again.
+      console.warn('Logout failed:', getErrorMessage(error));
+    });
   };
 
-  if (!user) return null;
-
-  return (
-    <button
-      onClick={handleLogout}
-      className="rounded-md border-b-4 border-sky-500 border-b-sky-600 bg-sky-500 px-4 py-2 text-white transition duration-200 ease-in-out hover:border-sky-800 hover:bg-sky-600 hover:text-white active:border-b-0 dark:border-b-sky-700 dark:bg-sky-500 dark:hover:border-sky-900 dark:hover:bg-sky-800"
-    >
-      Logout
-    </button>
-  );
+  return <ButtonComponent onClick={handleLogout}>Logout</ButtonComponent>;
 }

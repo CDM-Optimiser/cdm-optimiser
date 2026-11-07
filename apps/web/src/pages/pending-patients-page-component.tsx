@@ -42,17 +42,15 @@ export function PendingPatientsPageComponent() {
   };
 
   return (
-    <section className="mx-auto max-w-7xl p-6">
+    <>
       {lastUpdateSuccess && (
-        <div className="mb-4">
-          <AlertComponent
-            type="success"
-            title="Update successful!"
-            text={`${lastUpdateSuccess} has been updated successfully.`}
-            autoDismissMs={3000}
-            onDismiss={() => setLastUpdateSuccess(null)}
-          />
-        </div>
+        <AlertComponent
+          type="success"
+          title="Update successful!"
+          text={`${lastUpdateSuccess} has been updated successfully.`}
+          autoDismissMs={3000}
+          onDismiss={() => setLastUpdateSuccess(null)}
+        />
       )}
       {!pendingPatients || pendingPatients.length === 0 ? (
         <AlertComponent
@@ -62,7 +60,7 @@ export function PendingPatientsPageComponent() {
         />
       ) : (
         <>
-          <div className="mb-4 flex items-center justify-between rounded-xl bg-white p-4 shadow-md dark:bg-white/5 dark:ring dark:ring-gray-600">
+          <div className="flex items-center justify-between rounded-xl bg-white p-4 shadow-md dark:bg-white/5 dark:ring dark:ring-gray-600">
             <span className="font-medium text-gray-900 dark:text-gray-200">
               Pending patient: {currentIndex + 1} of {pendingPatients.length}{' '}
               patient/s
@@ -95,6 +93,6 @@ export function PendingPatientsPageComponent() {
           </section>
         </>
       )}
-    </section>
+    </>
   );
 }
