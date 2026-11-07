@@ -153,6 +153,45 @@ The app processes health data of real patients (GDPR special-category data).
 - Keep formatting-only changes in their own commit and add its hash to
   `.git-blame-ignore-revs`.
 
+### Labels
+
+**Every pull request gets labels, with no exceptions.** Add them when you
+create it (`gh pr create --label bug --label ci/cd …`), or straight afterwards
+with `gh pr edit <number> --add-label <name>`. Check that they're there before
+you report the PR.
+
+Add one label for each kind of change in the PR (its Conventional Commit
+types):
+
+| Change in the PR                                      | Label            |
+| ----------------------------------------------------- | ---------------- |
+| `feat`: new feature or behaviour                      | `enhancement`    |
+| `fix`: bug fix                                        | `bug`            |
+| `refactor` or `perf`: no change in behaviour          | `refactor`       |
+| `test`: tests or test tooling                         | `tests`          |
+| `docs`: documentation, README, Claude Code files      | `documentation`  |
+| `build`: project structure, tooling, new dependencies | `project`        |
+| `build(deps)`: dependency updates                     | `dependencies`   |
+| GitHub Actions updates (with `dependencies`)          | `github_actions` |
+| `ci`: workflows, Netlify, release pipeline            | `ci/cd`          |
+| `chore`: other maintenance                            | `chore`          |
+
+Also add these when they apply, whatever the type:
+
+| The PR…                                                    | Label           |
+| ---------------------------------------------------------- | --------------- |
+| Hardens security or fixes a vulnerability (CSP, Electron)  | `security`      |
+| Improves accessibility (contrast, keyboard, screen reader) | `accessibility` |
+
+- See the current labels with `gh label list`. Don't use `duplicate`,
+  `invalid`, `question`, `wontfix`, `good first issue` or `help wanted` on
+  pull requests you open; they're for triage.
+- If no label fits, create one rather than leaving the PR unlabelled:
+  `gh label create <name> --color <hex> --description "<one sentence>"`,
+  lowercase and in the style of the existing ones. Add it to the tables
+  above in the same PR, and tell the maintainer you created it.
+- Dependabot labels its own PRs (`labels` in `.github/dependabot.yml`).
+
 ## Deploys and releases
 
 - **Web:** Netlify builds every push to `main` (and PR previews) from
