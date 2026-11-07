@@ -1,15 +1,16 @@
+import {Link} from 'react-router';
+
 export function NotFoundPageComponent() {
   return (
-    <main className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-4 py-6">
-      <h1 className="text-5xl">404</h1>
-      <h2 className="text-4xl">Página no encontrada</h2>
-      <p className="text-xl">La página que buscas no existe.</p>
-      <a
-        href="/"
+    <div className="flex flex-col items-center gap-4 py-6 text-center">
+      <h1 className="text-4xl">Page not found</h1>
+      <p className="text-xl">The page you are looking for doesn’t exist.</p>
+      <Link
+        to="/"
         className="text-sky-500 underline transition duration-200 ease-in-out hover:text-sky-700"
       >
-        Volver al inicio
-      </a>
-    </main>
+        Go to the patients list
+      </Link>
+    </div>
   );
 }

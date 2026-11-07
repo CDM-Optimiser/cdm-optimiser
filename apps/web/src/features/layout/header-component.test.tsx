@@ -44,12 +44,12 @@ describe('Header component tests', () => {
 
     expect(screen.container.firstChild).toBeNull();
 
-    expect(
-      screen.getByRole('link', {name: 'Patients List'})
-    ).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('link', {name: 'Pending Patients'})
-    ).not.toBeInTheDocument();
+    await expect
+      .element(screen.getByRole('link', {name: 'Patients List'}))
+      .not.toBeInTheDocument();
+    await expect
+      .element(screen.getByRole('link', {name: 'Pending Patients'}))
+      .not.toBeInTheDocument();
   });
 
   test('renders the title and navigation when the user IS authenticated', async () => {
