@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, test, vi} from 'vitest';
 import {render} from 'vitest-browser-react';
 import type {User} from '@supabase/supabase-js';
-import {LogoutButton} from '../../../../src/features/layout/logout-button.component.tsx';
+import {LogoutButton} from './logout-button.component.tsx';
 
 const mocks = vi.hoisted(() => {
   return {
@@ -10,7 +10,7 @@ const mocks = vi.hoisted(() => {
   };
 });
 
-vi.mock('../../../../src/utils/hooks/useAuth.tsx', () => {
+vi.mock('../../utils/hooks/useAuth.tsx', () => {
   return {
     useAuth: mocks.useAuth,
   };

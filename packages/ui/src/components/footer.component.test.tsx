@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, test, vi} from 'vitest';
 import {render} from 'vitest-browser-react';
-import {FooterComponent} from '../src/components/footer.component.tsx';
+import {FooterComponent} from './footer.component.tsx';
 
 const MOCKED_YEAR = 2025;
 

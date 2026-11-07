@@ -46,7 +46,8 @@ lint rule or delete a test to get a green run. Report what fails instead.
     holds the header and logout button.
   - `api/`: Supabase data hooks and providers.
   - `utils/`: hooks, helper functions and types.
-  - Components are named `<name>.component.tsx`; hooks `use<Name>.tsx`.
+  - Components are named `<name>.component.tsx`, with their test in
+    `<name>.component.test.tsx` next to them; hooks are `use<Name>.tsx`.
 - `packages/ui/src`: generic, presentational building blocks (alert,
   dropdown, footer, modal, svg). They take everything through props and must
   not import Supabase, the router or anything from `apps/`. Export new
@@ -62,13 +63,19 @@ lint rule or delete a test to get a green run. Report what fails instead.
 
 ## Testing
 
-- **Component tests** live next to the code's workspace:
-  `apps/web/tests/browser/` and `packages/ui/tests/`. They run in Vitest
-  browser mode with Playwright Chromium and `vitest-browser-react`. Prefer
+- **Tests sit next to the code they test:** `header.component.tsx` has
+  `header.component.test.tsx` in the same folder, and its snapshots in a
+  `__snapshots__/` folder beside them. Every new component gets its test file
+  alongside it. Import the code under test with `./`
+  (`import {HeaderComponent} from './header.component.tsx'`).
+- **The file name picks the environment.** `*.test.tsx` files run in Vitest
+  browser mode with Playwright Chromium and `vitest-browser-react`; prefer
   `await expect.element(locator)` for assertions that wait for the DOM.
-- **Pure logic tests** go in `apps/web/tests/unit/`, which runs in jsdom.
+  Pure-logic tests named `*.unit.test.ts` run in jsdom instead (web app only).
 - `vi.mock()` paths are relative to the test file and must resolve to the real
   module. A wrong path silently mocks nothing.
+- Test files are never bundled: Vite only builds what `index.html` imports,
+  and `packages/ui` exports from `src/index.ts` only.
 - **Snapshots:** update them with `yarn workspace <package> test:update`
   (e.g. `@cdm-optimiser/ui`) only when the UI change is intended, and review
   the snapshot diff.
@@ -161,8 +168,10 @@ The app processes health data of real patients (GDPR special-category data).
   Run `nvm use` first.
 - Web-only installs (Netlify, CI checks) set `ELECTRON_SKIP_BINARY_DOWNLOAD=1`
   to avoid downloading Electron.
-- Known test issues, owned by the bug-fix plan: the footer test hardcodes the
-  year 2025, so it fails in other years. The header and logout-button tests
-  had `vi.mock` paths pointing at a non-existent file; the paths were
-  corrected when the files moved, but the tests' assertions haven't been
-  re-verified. Remove this note once they're fixed.
+- Known failing tests, owned by the bug-fix plan (5 of 20; they also fail on
+  the original `main`). Remove this note once they're fixed.
+  - `footer.component.test.tsx` (3 tests): hardcodes the year 2025, but the
+    component reads the real year when the module loads.
+  - `alert.component.test.tsx` (2 tests): expects `useAutoDismiss` to be
+    called with `(undefined, onDismiss)`, but the component calls it with
+    `(0, handleDismiss)`.

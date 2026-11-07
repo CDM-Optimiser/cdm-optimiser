@@ -6,7 +6,9 @@ export default defineConfig({
   plugins: [react()],
   test: {
     name: 'ui',
-    include: ['tests/**/*.{test,spec}.{ts,tsx}'],
+    // Tests sit next to the component they test, e.g.
+    // src/components/alert.component.test.tsx.
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
     browser: {
       enabled: true,
       provider: playwright(),

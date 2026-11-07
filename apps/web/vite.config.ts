@@ -5,6 +5,9 @@ import {playwright} from '@vitest/browser-playwright';
 import react from '@vitejs/plugin-react-swc';
 import tailwindcss from '@tailwindcss/vite';
 
+/** Tests that run in jsdom instead of a browser (see `test` below). */
+const UNIT_TESTS = 'src/**/*.unit.{test,spec}.{ts,tsx}';
+
 /**
  * Adds a Content-Security-Policy <meta> tag to production builds. The same
  * build runs on Netlify and inside Electron, so one policy covers both. Dev
@@ -67,26 +70,22 @@ export default defineConfig(({mode}) => ({
     port: 5173,
     strictPort: true,
   },
+  // Tests sit next to the code they test, in src/. Files named
+  // `*.unit.test.ts(x)` run in jsdom; every other `*.test.ts(x)` file (such
+  // as `header.component.test.tsx`) runs in a real browser.
   test: {
     projects: [
       {
         test: {
-          include: [
-            'tests/unit/**/*.{test,spec}.{ts,tsx}',
-            'tests/**/*.unit.{test,spec}.{ts,tsx}',
-            'tests/**/*.component.unit.{test,spec}.{ts,tsx}',
-          ],
+          include: [UNIT_TESTS],
           name: 'unit',
           environment: 'jsdom',
         },
       },
       {
         test: {
-          include: [
-            'tests/browser/**/*.{test,spec}.{ts,tsx}',
-            'tests/**/*.browser.{test,spec}.{ts,tsx}',
-            'tests/**/*.component.browser.{test,spec}.{ts,tsx}',
-          ],
+          include: ['src/**/*.{test,spec}.{ts,tsx}'],
+          exclude: [UNIT_TESTS],
           name: 'browser',
           browser: {
             enabled: true,
