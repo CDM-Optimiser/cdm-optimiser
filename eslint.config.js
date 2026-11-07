@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import checkFile from 'eslint-plugin-check-file';
 import globals from 'globals';
 import reactHooks from 'eslint-plugin-react-hooks';
 import {reactRefresh} from 'eslint-plugin-react-refresh';
@@ -16,6 +17,39 @@ export default defineConfig([
     '**/playwright-report',
     '**/test-results',
   ]),
+
+  // Repository conventions (see .claude/instructions.md): kebab-case file
+  // and folder names, and no barrel files.
+  {
+    files: ['**/*.{js,mjs,cjs,ts,tsx,cts,mts}'],
+    plugins: {'check-file': checkFile},
+    rules: {
+      // Only the part before the first dot is checked, so
+      // `status-legend-component.test.tsx` and `vite.config.ts` are fine.
+      'check-file/filename-naming-convention': [
+        'error',
+        {'**/*.{js,mjs,cjs,ts,tsx,cts,mts}': 'KEBAB_CASE'},
+        {ignoreMiddleExtensions: true},
+      ],
+      'check-file/folder-naming-convention': [
+        'error',
+        {'{apps,packages,scripts}/**/': 'KEBAB_CASE'},
+      ],
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'ExportAllDeclaration',
+          message:
+            'No barrel files: import from the file that defines the value instead of re-exporting it.',
+        },
+        {
+          selector: 'ExportNamedDeclaration[source]',
+          message:
+            'No barrel files: import from the file that defines the value instead of re-exporting it.',
+        },
+      ],
+    },
+  },
 
   // Node.js scripts and configs: Electron main process, repo scripts.
   {
@@ -59,11 +93,13 @@ export default defineConfig([
     },
     rules: {
       // TODO(bug-fix plan): newer eslint-plugin-react-hooks flags
-      // `loadPatients()` in an effect (apps/web/src/api/patientsProvider.tsx),
-      // the duplicate-fetch issue. Restore to 'error' once that is fixed.
+      // `loadPatients()` in an effect
+      // (apps/web/src/features/patients/api/patients-provider.tsx), the
+      // duplicate-fetch issue. Restore to 'error' once that is fixed.
       'react-hooks/set-state-in-effect': 'warn',
       // TODO(bug-fix plan): ESLint 10 flags the rethrow without `cause` in
-      // apps/web/src/api/useUpdatePatient.ts. Restore to 'error' once fixed.
+      // apps/web/src/features/patients/api/use-update-patient.ts. Restore to
+      // 'error' once fixed.
       'preserve-caught-error': 'warn',
     },
   },
