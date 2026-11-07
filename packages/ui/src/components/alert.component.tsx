@@ -1,15 +1,70 @@
-import type {JSX} from 'react';
-import {useAutoDismiss} from '../hooks/useAutoDismiss.tsx';
+import type {ComponentType} from 'react';
+import {useAutoDismiss} from '../hooks/useAutoDismiss.ts';
+import {AlertCircleFilledIcon} from '../icons/alert-circle-filled.icon.tsx';
+import {AlertTriangleFilledIcon} from '../icons/alert-triangle-filled.icon.tsx';
+import {CircleCheckFilledIcon} from '../icons/circle-check-filled.icon.tsx';
+import type {IconProps} from '../icons/iconProps.ts';
+import {InfoCircleFilledIcon} from '../icons/info-circle-filled.icon.tsx';
+import {SquareXFilledIcon} from '../icons/square-x-filled.icon.tsx';
 import type {AlertTypes} from '../types/alert.ts';
-import {SVGComponent} from './svg.component.tsx';
 
 interface AlertProps {
   type?: AlertTypes;
   title: string;
   text: string;
+  /** Dismiss automatically after this many milliseconds, with a progress bar. */
   autoDismissMs?: number | null;
+  /** Shows a close button, and is called when the alert is dismissed. */
   onDismiss?: () => void;
 }
+
+interface AlertStyle {
+  container: string;
+  accent: string;
+  text: string;
+  bar: string;
+  icon: ComponentType<IconProps>;
+  /**
+   * `alert` interrupts screen readers; keep it for problems. `status` is
+   * read politely, for information and confirmations.
+   */
+  role: 'alert' | 'status';
+}
+
+const STYLES: Record<AlertTypes, AlertStyle> = {
+  error: {
+    container: 'bg-red-50 border-red-400',
+    accent: 'text-red-400',
+    text: 'text-red-800',
+    bar: 'bg-red-400',
+    icon: AlertCircleFilledIcon,
+    role: 'alert',
+  },
+  warning: {
+    container: 'bg-yellow-50 border-yellow-400',
+    accent: 'text-yellow-400',
+    text: 'text-yellow-700',
+    bar: 'bg-yellow-400',
+    icon: AlertTriangleFilledIcon,
+    role: 'alert',
+  },
+  info: {
+    container: 'bg-sky-50 border-sky-400',
+    accent: 'text-sky-400',
+    text: 'text-sky-800',
+    bar: 'bg-sky-400',
+    icon: InfoCircleFilledIcon,
+    role: 'status',
+  },
+  success: {
+    container: 'bg-green-50 border-green-400',
+    accent: 'text-green-400',
+    text: 'text-green-800',
+    bar: 'bg-green-400',
+    icon: CircleCheckFilledIcon,
+    role: 'status',
+  },
+};
 
 export function AlertComponent({
   type = 'info',
@@ -18,140 +73,41 @@ export function AlertComponent({
   autoDismissMs,
   onDismiss,
 }: AlertProps) {
-  const shouldAutoDismiss = autoDismissMs && autoDismissMs > 0;
-
-  const handleDismiss = () => {
-    if (onDismiss) {
-      onDismiss();
-    }
-  };
-
-  const {progressBar} = useAutoDismiss(
-    shouldAutoDismiss ? autoDismissMs : 0,
-    handleDismiss
-  );
-
-  const bgColorClass: Record<AlertTypes, string> = {
-    error: 'bg-red-50',
-    info: 'bg-sky-50',
-    success: 'bg-green-50',
-    warning: 'bg-yellow-50',
-  };
-
-  const borderClass: Record<AlertTypes, string> = {
-    error: 'border-red-400',
-    info: 'border-sky-400',
-    success: 'border-green-400',
-    warning: 'border-yellow-400',
-  };
-
-  const svgClass: Record<AlertTypes, string> = {
-    error: 'text-red-400',
-    info: 'text-sky-400',
-    success: 'text-green-400',
-    warning: 'text-yellow-400',
-  };
-
-  const textClass: Record<AlertTypes, string> = {
-    error: 'text-red-800',
-    info: 'text-sky-800',
-    success: 'text-green-800',
-    warning: 'text-yellow-700',
-  };
-
-  const icons: Record<AlertTypes, JSX.Element> = {
-    error: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-        className={`${svgClass[type]}`}
-      >
-        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-        <path d="M12 2c5.523 0 10 4.477 10 10a10 10 0 0 1 -19.995 .324l-.005 -.324l.004 -.28c.148 -5.393 4.566 -9.72 9.996 -9.72zm.01 13l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007zm-.01 -8a1 1 0 0 0 -.993 .883l-.007 .117v4l.007 .117a1 1 0 0 0 1.986 0l.007 -.117v-4l-.007 -.117a1 1 0 0 0 -.993 -.883z" />
-      </svg>
-    ),
-    info: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-        className={`${svgClass[type]}`}
-      >
-        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-        <path d="M12 2c5.523 0 10 4.477 10 10a10 10 0 0 1 -19.995 .324l-.005 -.324l.004 -.28c.148 -5.393 4.566 -9.72 9.996 -9.72zm0 9h-1l-.117 .007a1 1 0 0 0 0 1.986l.117 .007v3l.007 .117a1 1 0 0 0 .876 .876l.117 .007h1l.117 -.007a1 1 0 0 0 .876 -.876l.007 -.117l-.007 -.117a1 1 0 0 0 -.764 -.857l-.112 -.02l-.117 -.006v-3l-.007 -.117a1 1 0 0 0 -.876 -.876l-.117 -.007zm.01 -3l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007z" />
-      </svg>
-    ),
-    success: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-        className={`${svgClass[type]}`}
-      >
-        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-        <path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
-      </svg>
-    ),
-    warning: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-        className={`${svgClass[type]}`}
-      >
-        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-        <path d="M12 1.67c.955 0 1.845 .467 2.39 1.247l.105 .16l8.114 13.548a2.914 2.914 0 0 1 -2.307 4.363l-.195 .008h-16.225a2.914 2.914 0 0 1 -2.582 -4.2l.099 -.185l8.11 -13.538a2.914 2.914 0 0 1 2.491 -1.403zm.01 13.33l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007zm-.01 -7a1 1 0 0 0 -.993 .883l-.007 .117v4l.007 .117a1 1 0 0 0 1.986 0l.007 -.117v-4l-.007 -.117a1 1 0 0 0 -.993 -.883z" />
-      </svg>
-    ),
-  };
+  const delay = autoDismissMs && autoDismissMs > 0 ? autoDismissMs : 0;
+  const {progressRef} = useAutoDismiss(delay, onDismiss);
+  const style = STYLES[type];
+  const Icon = style.icon;
 
   return (
     <div
-      role="alert"
-      className={`${bgColorClass[type]} border-l-4 ${borderClass[type]} rounded-xl p-4 shadow-md`}
+      role={style.role}
+      className={`rounded-xl border-l-4 p-4 shadow-md ${style.container}`}
     >
       <div className="flex flex-col gap-4">
         <div className="flex">
-          <div className="shrink-0">{icons[type]}</div>
+          <Icon className={`shrink-0 ${style.accent}`} />
           <div className="ml-3">
-            <h3 className={`${textClass[type]} font-medium`}>{title}</h3>
-            <p className={`${textClass[type]} mt-2`}>{text}</p>
+            <h3 className={`font-medium ${style.text}`}>{title}</h3>
+            <p className={`mt-2 ${style.text}`}>{text}</p>
           </div>
-          {(onDismiss || shouldAutoDismiss) && (
-            <div className="ml-auto pl-3">
-              <div className="-mi-1.5 -mb-1.5">
-                <button
-                  type="button"
-                  aria-label="Close alert"
-                  className={`cursor-pointer ${svgClass[type]}`}
-                  onClick={onDismiss}
-                >
-                  <SVGComponent>
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M19 2h-14a3 3 0 0 0 -3 3v14a3 3 0 0 0 3 3h14a3 3 0 0 0 3 -3v-14a3 3 0 0 0 -3 -3zm-9.387 6.21l.094 .083l2.293 2.292l2.293 -2.292a1 1 0 0 1 1.497 1.32l-.083 .094l-2.292 2.293l2.292 2.293a1 1 0 0 1 -1.32 1.497l-.094 -.083l-2.293 -2.292l-2.293 2.292a1 1 0 0 1 -1.497 -1.32l.083 -.094l2.292 -2.293l-2.292 -2.293a1 1 0 0 1 1.32 -1.497z" />
-                  </SVGComponent>
-                  <span className="sr-only">Close alert</span>
-                </button>
-              </div>
-            </div>
+          {onDismiss && (
+            <button
+              type="button"
+              onClick={onDismiss}
+              className={`ml-auto shrink-0 cursor-pointer self-start pl-3 ${style.accent}`}
+            >
+              <SquareXFilledIcon />
+              <span className="sr-only">Close alert</span>
+            </button>
           )}
         </div>
-        {shouldAutoDismiss && (
+        {delay > 0 && (
           <div
-            className="h-1 rounded-b-xl bg-green-400 transition-all duration-50"
-            style={{width: `${progressBar}%`}}
-          >
-            <span className="sr-only">Progress bar</span>
-          </div>
+            ref={progressRef}
+            aria-hidden="true"
+            data-testid="alert-progress"
+            className={`h-1 origin-left rounded-b-xl ${style.bar}`}
+          />
         )}
       </div>
     </div>

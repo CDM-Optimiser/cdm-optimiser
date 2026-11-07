@@ -1,34 +1,40 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useEffectEvent, useRef} from 'react';
 
-export const useAutoDismiss = (
+/**
+ * Calls `onDismiss` once, `autoDismissMs` after the component mounts (or the
+ * delay changes). Attach `progressRef` to an element to shrink it to zero
+ * over the same time; the browser animates it, so the component doesn't
+ * re-render while waiting. A delay of 0 or less turns it off.
+ */
+export function useAutoDismiss<T extends HTMLElement = HTMLDivElement>(
   autoDismissMs: number,
-  onDismiss: () => void
-) => {
-  const [progressBar, setProgressBar] = useState(100);
+  onDismiss?: () => void
+) {
+  const progressRef = useRef<T>(null);
+  // Always calls the latest onDismiss without restarting the timer.
+  const dismiss = useEffectEvent(() => onDismiss?.());
 
   useEffect(() => {
-    if (!autoDismissMs) return;
+    if (autoDismissMs <= 0) return;
 
-    const interval = 50;
-    const decrement = (interval / autoDismissMs) * 100;
+    const reduceMotion = window.matchMedia?.(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
 
-    const timer = setInterval(() => {
-      setProgressBar((prev) => {
-        if (prev <= 0) {
-          clearInterval(timer);
-          setTimeout(onDismiss, 0);
+    const animation = reduceMotion
+      ? undefined
+      : progressRef.current?.animate(
+          [{transform: 'scaleX(1)'}, {transform: 'scaleX(0)'}],
+          {duration: autoDismissMs, easing: 'linear', fill: 'forwards'}
+        );
 
-          return 0;
-        }
+    const timer = setTimeout(() => dismiss(), autoDismissMs);
 
-        return prev - decrement;
-      });
-    }, interval);
+    return () => {
+      clearTimeout(timer);
+      animation?.cancel();
+    };
+  }, [autoDismissMs]);
 
-    return () => clearInterval(timer);
-  }, [autoDismissMs, onDismiss]);
-
-  return {
-    progressBar,
-  };
-};
+  return {progressRef};
+}
