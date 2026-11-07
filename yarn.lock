@@ -263,6 +263,7 @@ __metadata:
     "@playwright/test": "npm:^1.65.0"
     "@supabase/supabase-js": "npm:^2.119.0"
     "@tailwindcss/vite": "npm:^4.3.4"
+    "@tanstack/react-query": "npm:^5.106.1"
     "@types/node": "npm:^24.19.2"
     "@types/react": "npm:^19.3.0"
     "@types/react-dom": "npm:^19.3.0"
@@ -1181,6 +1182,43 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tanstack/eslint-plugin-query@npm:^5.106.1":
+  version: 5.106.1
+  resolution: "@tanstack/eslint-plugin-query@npm:5.106.1"
+  dependencies:
+    "@typescript-eslint/utils": "npm:^8.71.0"
+  peerDependencies:
+    eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
+    typescript: ^5.6.0 || ^6.0.0 || ^7.0.0
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 10c0/d0b657fc42080baf75c956649de8c25677f036d7cfa5e31adaf38b17fc1c0126a00c8af39867ec54fe009758880b3256689de0db9f8be910a4f5301dd786c56c
+  languageName: node
+  linkType: hard
+
+"@tanstack/query-core@npm:5.106.1":
+  version: 5.106.1
+  resolution: "@tanstack/query-core@npm:5.106.1"
+  checksum: 10c0/514065f943faacdaae39659fc936956906f51677a4385342508ff39c2846c6df8d6acba8ce6167ac3c86bda75a64b714f739f9ada82634e93524f6d6b70ad9f6
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-query@npm:^5.106.1":
+  version: 5.106.1
+  resolution: "@tanstack/react-query@npm:5.106.1"
+  dependencies:
+    "@tanstack/query-core": "npm:5.106.1"
+  peerDependencies:
+    "@types/react": ^18 || ^19
+    react: ^18 || ^19
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/508752957de016b2e8acabc2f1253716d732ba327a1e8897e187d5ea4ec0d250cee1fdaf1ec00251e1cce86cea27284c2240c5f1ab34d183a5e0a0d5b33a0715
+  languageName: node
+  linkType: hard
+
 "@tybys/wasm-util@npm:^0.10.3":
   version: 0.10.4
   resolution: "@tybys/wasm-util@npm:0.10.4"
@@ -1436,7 +1474,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/utils@npm:8.72.1":
+"@typescript-eslint/utils@npm:8.72.1, @typescript-eslint/utils@npm:^8.71.0":
   version: 8.72.1
   resolution: "@typescript-eslint/utils@npm:8.72.1"
   dependencies:
@@ -2052,6 +2090,7 @@ __metadata:
   resolution: "cdm-optimiser@workspace:."
   dependencies:
     "@eslint/js": "npm:^10.0.1"
+    "@tanstack/eslint-plugin-query": "npm:^5.106.1"
     eslint: "npm:^10.14.0"
     eslint-plugin-check-file: "npm:^3.3.2"
     eslint-plugin-react-hooks: "npm:^7.1.1"
