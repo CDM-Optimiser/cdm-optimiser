@@ -1,8 +1,7 @@
 /// <reference types="vitest/config" />
-import path from 'path';
 import {defineConfig, loadEnv, type Plugin} from 'vite';
 import {playwright} from '@vitest/browser-playwright';
-import react from '@vitejs/plugin-react-swc';
+import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
 /** Tests that run in jsdom instead of a browser (see `test` below). */
@@ -51,19 +50,15 @@ function contentSecurityPolicy(supabaseUrl: string | undefined): Plugin {
 
 // https://vite.dev/config/
 export default defineConfig(({mode}) => ({
+  // Relative asset URLs, so the same build works on Netlify and from
+  // file:// inside Electron.
   base: './',
-  build: {
-    outDir: 'dist',
-    assetsDir: 'assets',
-    sourcemap: false,
-    rollupOptions: {
-      input: path.resolve(__dirname, 'index.html'),
-    },
-  },
   plugins: [
     react(),
     tailwindcss(),
-    contentSecurityPolicy(loadEnv(mode, __dirname, 'VITE_').VITE_SUPABASE_URL),
+    contentSecurityPolicy(
+      loadEnv(mode, import.meta.dirname, 'VITE_').VITE_SUPABASE_URL
+    ),
   ],
   // Fixed port: `yarn dev:desktop` waits for this URL before starting Electron.
   server: {
