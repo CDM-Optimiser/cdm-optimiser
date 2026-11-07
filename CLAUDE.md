@@ -46,12 +46,16 @@ yarn dist:desktop            # Windows installer in apps/desktop/release
 
 ## Architecture rules
 
-- **HashRouter and Vite `base: './'` are required.** The same build loads from
-  `file://` inside Electron. Don't switch to `BrowserRouter` or absolute asset
-  paths.
+- **Routes are real paths** (`BrowserRouter`, Vite `base: '/'`), so every
+  server must answer unknown paths with `index.html`: Netlify does it with
+  the redirect in `netlify.toml`, the desktop app in its `app://` protocol
+  handler. Old `/#/…` links are turned into paths on start-up
+  (`lib/redirect-legacy-hash-route.ts`).
 - **Desktop loads the web build.** `yarn build:renderer` (desktop workspace)
-  writes the web build to `apps/desktop/renderer/`, which the main process
-  loads. In development it loads `VITE_DEV_SERVER_URL` instead. `tsc -b`
+  writes the web build to `apps/desktop/renderer/`. The main process serves it
+  on `app://cdm-optimiser/`, never from `file://`; in development it loads
+  `VITE_DEV_SERVER_URL` instead. That scheme and host are the page's origin,
+  which holds the Supabase session: changing them signs users out. `tsc -b`
   compiles `apps/desktop/src` to `apps/desktop/dist`.
 - **One process boundary.** The renderer reaches Electron only through
   `window.darkMode`, exposed by the preload. The contract (channels, payloads,

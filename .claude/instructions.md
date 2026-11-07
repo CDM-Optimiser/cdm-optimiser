@@ -88,8 +88,8 @@ lint rule or delete a test to get a green run. Report what fails instead.
   application logic.
 - Relative imports in TypeScript use explicit file extensions
   (`'./header-component.tsx'`), as `allowImportingTsExtensions` requires.
-  `apps/desktop` is the exception: it is compiled with `tsc` and only imports
-  packages.
+  `apps/desktop` is the exception: it is compiled with `tsc` (`NodeNext`), so
+  its relative imports name the compiled file (`'./resolve-renderer-file.js'`).
 
 ### File names
 
@@ -138,6 +138,9 @@ other modules. Import every value from the file that defines it.
   browser mode with Playwright Chromium and `vitest-browser-react`; prefer
   `await expect.element(locator)` for assertions that wait for the DOM.
   Pure-logic tests named `*.unit.test.ts` run in jsdom instead (web app only).
+  `apps/desktop` tests (`*.test.ts`) use Node's built-in `node:test` and run
+  on the compiled files; `electron-builder.yml` leaves them out of the
+  package.
 - **Browser tests load the real styles.** A setup file
   (`packages/ui/test/setup.ts`, `apps/web/src/test/`) loads Tailwind and the
   app's CSS, so the Vitest UI shows components as users see them, and
@@ -173,11 +176,15 @@ other modules. Import every value from the file that defines it.
 - The window only shows the app: `will-navigate` blocks other URLs and
   `setWindowOpenHandler` sends `https:` links to the system browser. Don't
   load remote content into the window.
+- The renderer is served on `app://cdm-optimiser/` by `protocol.handle` in
+  `main.ts`, not loaded from `file://` (Electron's security checklist, item
+  18). The handler only serves files inside `renderer/`
+  (`resolve-renderer-file.ts`, with tests). Don't use `loadFile`.
 - DevTools open only in development or with the `--devtools` flag. Don't make
   them open in packaged builds.
 - Packaged builds have Electron fuses set in `electron-builder.yml` (no
   run-as-node, no `NODE_OPTIONS` or `--inspect`, asar-only with integrity
-  checks). Don't turn them off.
+  checks, no extra `file://` privileges). Don't turn them off.
 
 ## Patient data and privacy
 
