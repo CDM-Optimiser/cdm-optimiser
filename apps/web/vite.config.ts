@@ -50,9 +50,10 @@ function contentSecurityPolicy(supabaseUrl: string | undefined): Plugin {
 
 // https://vite.dev/config/
 export default defineConfig(({mode}) => ({
-  // Relative asset URLs, so the same build works on Netlify and from
-  // file:// inside Electron.
-  base: './',
+  // Absolute asset URLs, so pages at any path (`/pending-patients`) load
+  // `/assets/…`. Netlify and the desktop app's app:// protocol both serve
+  // the build from the root and answer unknown paths with index.html.
+  base: '/',
   plugins: [
     react(),
     tailwindcss(),
