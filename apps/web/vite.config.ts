@@ -17,6 +17,11 @@ export default defineConfig({
     },
   },
   plugins: [react(), tailwindcss()],
+  // Fixed port: `yarn dev:desktop` waits for this URL before starting Electron.
+  server: {
+    port: 5173,
+    strictPort: true,
+  },
   test: {
     projects: [
       {

@@ -5,6 +5,17 @@ import {fileURLToPath} from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// Set by `yarn dev:desktop` so the window loads the Vite dev server (HMR).
+// Ignored in packaged builds, which always load the bundled renderer.
+const devServerUrl = app.isPackaged
+  ? undefined
+  : process.env.VITE_DEV_SERVER_URL;
+
+// DevTools open automatically in development. Packaged builds only open them
+// when launched with `--devtools`, for debugging an installed app.
+const shouldOpenDevTools =
+  Boolean(devServerUrl) || process.argv.includes('--devtools');
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 1200,
@@ -12,16 +23,22 @@ function createWindow() {
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
-      preload: join(__dirname, 'preload.js'),
+      preload: join(__dirname, 'preload.cjs'),
     },
   });
 
   win.removeMenu();
 
-  win.webContents.openDevTools();
+  if (shouldOpenDevTools) {
+    win.webContents.openDevTools();
+  }
 
-  const indexPath = join(app.getAppPath(), 'frontend/dist/index.html');
-  win.loadFile(join(indexPath));
+  if (devServerUrl) {
+    win.loadURL(devServerUrl);
+  } else {
+    // `renderer/` holds the web build, copied in by `yarn build:renderer`.
+    win.loadFile(join(app.getAppPath(), 'renderer', 'index.html'));
+  }
 }
 
 ipcMain.handle('dark-mode:get-source', () => {

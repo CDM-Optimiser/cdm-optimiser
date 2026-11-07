@@ -1,0 +1,21 @@
+{
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "permissions": {
+    "allow": [
+      "Bash(*)",
+      "WebFetch(domain:*)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:support.claude.com)",
+      "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:json.schemastore.org)",
+      "WebSearch"
+    ],
+    "deny": ["Bash(npm:*)", "Bash(npx:*)", "Bash(pnpm:*)"]
+  },
+  "spinnerTipsEnabled": false
+}

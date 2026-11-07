@@ -1,0 +1,24 @@
+# Netlify builds from the repository root. In the Netlify UI, the
+# "Base directory" setting must be empty.
+# Node comes from .nvmrc; Yarn comes from the "packageManager" field.
+
+[build]
+  command = "yarn build:web"
+  publish = "apps/web/dist"
+
+[build.environment]
+  # The web build doesn't need the Electron binary that the desktop
+  # workspace would otherwise download during install.
+  ELECTRON_SKIP_BINARY_DOWNLOAD = "1"
+
+# Single-page app fallback.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Vite fingerprints everything in /assets, so it can be cached forever.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
