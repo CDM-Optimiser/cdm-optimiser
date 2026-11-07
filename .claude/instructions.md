@@ -42,14 +42,31 @@ lint rule or delete a test to get a green run. Report what fails instead.
 
 ## Where code goes
 
-- `apps/web/src`: everything the user sees.
-  - `pages/`: one component per route.
-  - `features/<area>/`: components grouped by feature; `features/layout/`
-    holds the header and logout button.
-  - `api/`: Supabase data hooks and providers.
-  - `utils/`: hooks, helper functions and types.
+- `apps/web/src`: everything the user sees. Code is grouped by feature, not
+  by kind of file.
+  - `app/`: the app shell (`App.tsx` with the routes).
+  - `pages/`: one component per route. Pages compose features; they hold no
+    data access of their own.
+  - `features/<area>/`: everything for one area of the app, together.
+    - `auth/`: auth context, provider, `useAuth` and the logout button.
+    - `layout/`: the header.
+    - `theme/`: the desktop theme menu.
+    - `patients/`: split into `model/` (the `Patient` type, `PatientStatus`,
+      `StatusFilter`, column config), `api/` (Supabase calls and the hooks
+      around them), `list/`, `pagination/` and `card/`.
+  - `lib/`: app-wide modules with no React (the Supabase client,
+    `getErrorMessage`).
+  - `hooks/`: generic hooks used by several features (`useDebounce`).
+    Feature hooks live in their feature folder.
+  - Don't add a `utils/` folder: put each helper next to the feature that
+    uses it, or in `lib/` if several features do.
   - Components are named `<name>.component.tsx`, with their test in
-    `<name>.component.test.tsx` next to them; hooks are `use<Name>.tsx`.
+    `<name>.component.test.tsx` next to them. Hooks are `use<Name>.ts`
+    (`.tsx` only if they contain JSX). Other modules are camelCase `.ts`.
+  - One component per file. Don't wrap a single `useState` in a custom
+    hook; write a hook when it holds real logic.
+  - Types for patient status come from `features/patients/model/patient.ts`.
+    Don't redeclare the `'accepted' | 'refused' | 'pending'` union.
 - `packages/ui/src`: generic, presentational building blocks (alert,
   dropdown, footer, modal, svg). They take everything through props and must
   not import Supabase, the router or anything from `apps/`. Export new

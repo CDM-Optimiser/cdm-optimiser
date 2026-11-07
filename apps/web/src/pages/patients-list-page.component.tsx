@@ -1,22 +1,21 @@
 import {useEffect, useId, useState} from 'react';
 import {AlertComponent} from '@cdm-optimiser/ui';
-import {FiltersComponent} from '../features/patients-list/filters.component.tsx';
-import {LegendComponent} from '../features/patients-list/legend.component.tsx';
-import {PaginationComponent} from '../features/patients-list/pagination.component.tsx';
-import {PatientsListComponent} from '../features/patients-list/patients-list.component.tsx';
-import {SearchPatientComponent} from '../features/patients-list/search-patient.component.tsx';
-import {useDebounce} from '../utils/hooks/useDebounce.tsx';
-import {useInputChange} from '../utils/hooks/useInputChange.tsx';
-import {useResultsPerPage} from '../utils/hooks/useResultsPerPage.tsx';
-import {filterPatients} from '../utils/functions/filterPatients.ts';
-import {usePatientsContext} from '../utils/hooks/usePatientsContext.tsx';
+import {usePatientsContext} from '../features/patients/api/usePatientsContext.ts';
+import {filterPatients} from '../features/patients/list/filterPatients.ts';
+import {PatientsTableComponent} from '../features/patients/list/patients-table.component.tsx';
+import {SearchPatientComponent} from '../features/patients/list/search-patient.component.tsx';
+import {StatusFilterComponent} from '../features/patients/list/status-filter.component.tsx';
+import {StatusLegendComponent} from '../features/patients/list/status-legend.component.tsx';
+import type {StatusFilter} from '../features/patients/model/patient.ts';
+import {PaginationComponent} from '../features/patients/pagination/pagination.component.tsx';
+import {useDebounce} from '../hooks/useDebounce.ts';
 
 export function PatientsListPageComponent() {
   const inputSearchID = useId();
-  const [acceptedFilter, setAcceptedFilter] = useState<
-    'all' | 'accepted' | 'refused' | 'pending'
-  >('all');
+  const [acceptedFilter, setAcceptedFilter] = useState<StatusFilter>('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [resultsPerPage, setResultsPerPage] = useState(10);
+  const [searchText, setSearchText] = useState('');
 
   const {
     patients,
@@ -30,8 +29,6 @@ export function PatientsListPageComponent() {
     loadPatients,
   } = usePatientsContext();
 
-  const {resultsPerPage, handleResultsPerPage} = useResultsPerPage();
-  const {searchText, handleInputChange} = useInputChange();
   const debouncedSearchText = useDebounce(searchText, 500);
 
   useEffect(() => {
@@ -55,7 +52,7 @@ export function PatientsListPageComponent() {
   const handlePageChange = (page: number) => setCurrentPage(page);
 
   const handleResultsPerPageChange = (newResultsPerPage: number) => {
-    handleResultsPerPage(newResultsPerPage);
+    setResultsPerPage(newResultsPerPage);
 
     const newTotalPages = Math.ceil(
       filteredPatients.length / newResultsPerPage
@@ -66,14 +63,10 @@ export function PatientsListPageComponent() {
     }
   };
 
-  const handleFilterChange = (
-    filter: 'all' | 'accepted' | 'refused' | 'pending'
-  ) => {
+  const handleFilterChange = (filter: StatusFilter) => {
     setAcceptedFilter(filter);
     setCurrentPage(1);
   };
-
-  const handleTextChange = (text: string) => handleInputChange(text);
 
   return (
     <>
@@ -91,14 +84,14 @@ export function PatientsListPageComponent() {
           inputSearchID={inputSearchID}
           placeholder="Type to find a patient by its name, D.O.B or GMS number"
           value={searchText}
-          onTextChange={handleTextChange}
+          onTextChange={setSearchText}
         />
         <div className="flex flex-wrap items-center justify-center gap-4 xl:justify-between">
-          <FiltersComponent
+          <StatusFilterComponent
             filterSelected={acceptedFilter}
             onFilterChange={handleFilterChange}
           />
-          <LegendComponent
+          <StatusLegendComponent
             totalPatients={totalPatients}
             acceptedPatientsText={`Accepted (${acceptedPatients})`}
             refusedPatientsText={`Refused (${refusedPatients})`}
@@ -127,7 +120,7 @@ export function PatientsListPageComponent() {
                   onPageChange={handlePageChange}
                   onResultsPerPageChange={handleResultsPerPageChange}
                 />
-                <PatientsListComponent
+                <PatientsTableComponent
                   patients={paginatedPatients}
                   onUpdatePatient={setPatients}
                 />
@@ -136,7 +129,7 @@ export function PatientsListPageComponent() {
                   totalPages={totalPages}
                   resultsPerPage={resultsPerPage}
                   onPageChange={handlePageChange}
-                  onResultsPerPageChange={handleResultsPerPage}
+                  onResultsPerPageChange={setResultsPerPage}
                 />
               </>
             )}

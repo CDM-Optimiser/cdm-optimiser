@@ -1,7 +1,7 @@
 import {NavLink} from 'react-router';
-import {useAuth} from '../../utils/hooks/useAuth.tsx';
-import {LogoutButton} from './logout-button.component.tsx';
-import {DarkModeComponent} from '../dark-mode/dark-mode.component.tsx';
+import {useAuth} from '../auth/useAuth.ts';
+import {LogoutButton} from '../auth/logout-button.component.tsx';
+import {ThemeMenuComponent} from '../theme/theme-menu.component.tsx';
 
 interface HeaderProps {
   title: string;
@@ -41,7 +41,7 @@ export function HeaderComponent({title}: HeaderProps) {
           </>
         )}
         <LogoutButton />
-        <DarkModeComponent />
+        <ThemeMenuComponent />
       </nav>
     </header>
   );

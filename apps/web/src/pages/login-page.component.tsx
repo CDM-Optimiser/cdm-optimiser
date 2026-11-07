@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {useNavigate} from 'react-router';
-import {useAuth} from '../utils/hooks/useAuth.tsx';
-import {getErrorMessage} from '../utils/functions/getErrorMessage.ts';
+import {useAuth} from '../features/auth/useAuth.ts';
+import {getErrorMessage} from '../lib/getErrorMessage.ts';
 import {AlertComponent} from '@cdm-optimiser/ui';
 
 export function LoginPageComponent() {
