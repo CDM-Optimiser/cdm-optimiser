@@ -219,9 +219,10 @@ The app processes health data of real patients (GDPR special-category data).
 - Never log, print or commit patient records, including in debugging output,
   test fixtures, snapshots, screenshots or issue/PR text.
 - Use only synthetic, obviously fake data in tests and examples.
-- The Supabase anon key is public by design; row-level security in Supabase
-  is the security boundary. Never put a service-role key in client code or in
-  `VITE_*` variables.
+- The Supabase publishable key (`sb_publishable_…`) is public by design; the
+  database functions and row-level security are the security boundary. Never
+  put a secret key (`sb_secret_…`) or a legacy service-role key in client code
+  or in `VITE_*` variables. The build refuses a secret key.
 - Don't add analytics, error reporting or other third-party services without
   an explicit decision from the maintainers.
 
