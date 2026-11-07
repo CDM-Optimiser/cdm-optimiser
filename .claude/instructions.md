@@ -96,14 +96,31 @@ The app processes health data of real patients (GDPR special-category data).
 - Don't add analytics, error reporting or other third-party services without
   an explicit decision from the maintainers.
 
-## UI work
+## UI work and colours
 
-- Inside existing screens, follow the established patterns: Tailwind utility
-  classes, the sky palette, `rounded-xl` cards with `shadow-md`, a `dark:`
-  variant for every colour, and accessible labels (`sr-only` text, `aria-*`)
-  and visible focus states.
-- Use the `frontend-design` skill only for new surfaces where a fresh visual
-  direction is wanted, not to restyle existing screens.
+- Colours come from the CDM Optimiser colour system. The full reference, with
+  the class recipes for each element, is the "CDM Optimiser colour system"
+  section of `.claude/skills/frontend-design/SKILL.md`. In short:
+  - Tailwind's default palette with no custom theme. Use Tailwind colour
+    classes only: no hex codes, arbitrary values or inline colours.
+  - `sky` is the primary colour: actions, links, focus, selection, hover.
+    `gray` and `white` are for the page, surfaces, text and borders.
+  - Green (emerald in dark mode) means a patient accepted and red (rose in
+    dark mode) means they refused. Never use green or red decoratively.
+    Pending patients have no colour.
+  - Messages use `AlertComponent` from `@cdm-optimiser/ui`: info is sky,
+    success green, warning yellow, error red.
+  - Every colour needs a `dark:` variant. Dark mode follows the operating
+    system, or the theme menu in the desktop app.
+- Some existing colour pairs fail WCAG contrast (white on `sky-500` buttons,
+  `sky-500` links, `gray-400` and green icons). They're listed under "Known
+  gaps" in the colour system and belong to the bug-fix plan: don't fix them
+  one component at a time.
+- Other established patterns: `rounded-xl` cards with `shadow-md`, accessible
+  labels (`sr-only` text, `aria-*`) and visible focus states.
+- Use the `frontend-design` skill for new surfaces where a fresh visual
+  direction is wanted, not to restyle existing screens. It follows the same
+  colour system.
 - Copy is in English (Ireland/UK spelling: "optimiser", "enrol").
 
 ## Git and pull requests
