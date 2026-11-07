@@ -4,6 +4,8 @@ import {
   BrowserWindow,
   ipcMain,
   nativeTheme,
+  net,
+  protocol,
   type IpcMainInvokeEvent,
 } from 'electron/main';
 import {join} from 'node:path';
@@ -13,6 +15,7 @@ import type {
   DesktopIpcChannels,
   ThemeValue,
 } from '@cdm-optimiser/desktop-bridge';
+import {resolveRendererFile} from './resolve-renderer-file.js';
 
 // Set by `yarn dev:desktop` so the window loads the Vite dev server (HMR).
 // Ignored in packaged builds, which always load the bundled renderer.
@@ -26,7 +29,23 @@ const shouldOpenDevTools =
   Boolean(devServerUrl) || process.argv.includes('--devtools');
 
 // `renderer/` holds the web build, copied in by `yarn build:renderer`.
-const rendererIndex = join(app.getAppPath(), 'renderer', 'index.html');
+const rendererRoot = join(app.getAppPath(), 'renderer');
+
+// Packaged builds serve the renderer from app://cdm-optimiser/ rather than
+// file://, so the web app's routes work as real paths (BrowserRouter), as
+// on Netlify, and the page gets no file-system privileges. Changing the
+// scheme or host changes the page's origin, which holds the Supabase session
+// in localStorage: users would have to sign in again.
+const APP_SCHEME = 'app';
+const APP_HOST = 'cdm-optimiser';
+const APP_URL = `${APP_SCHEME}://${APP_HOST}/`;
+
+// Must run before the app is ready. `standard` gives the scheme normal URL
+// rules and an origin (for localStorage and relative URLs); `secure` makes
+// it a secure context, like https.
+protocol.registerSchemesAsPrivileged([
+  {scheme: APP_SCHEME, privileges: {standard: true, secure: true}},
+]);
 
 const THEME_VALUES: readonly ThemeValue[] = ['system', 'light', 'dark'];
 
@@ -52,10 +71,23 @@ function isAppUrl(url: string): boolean {
     return target.origin === new URL(devServerUrl).origin;
   }
 
-  return (
-    target.protocol === 'file:' &&
-    target.pathname === pathToFileURL(rendererIndex).pathname
-  );
+  // Node's URL gives custom schemes a "null" origin, so compare the parts.
+  return target.protocol === `${APP_SCHEME}:` && target.host === APP_HOST;
+}
+
+/** Serves the bundled renderer on app://cdm-optimiser/. */
+function registerAppProtocol() {
+  protocol.handle(APP_SCHEME, (request) => {
+    const url = new URL(request.url);
+    const file =
+      url.host === APP_HOST
+        ? resolveRendererFile(rendererRoot, url.pathname)
+        : null;
+
+    if (!file) return new Response('Not found', {status: 404});
+
+    return net.fetch(pathToFileURL(file).toString());
+  });
 }
 
 /** Opens `https:` links in the system browser; anything else is dropped. */
@@ -112,11 +144,7 @@ function createWindow() {
     win.webContents.openDevTools();
   }
 
-  if (devServerUrl) {
-    win.loadURL(devServerUrl);
-  } else {
-    win.loadFile(rendererIndex);
-  }
+  void win.loadURL(devServerUrl ?? APP_URL);
 }
 
 handle('dark-mode:get-source', () => {
@@ -147,6 +175,7 @@ handle('dark-mode:toggle', () => {
 });
 
 app.whenReady().then(() => {
+  registerAppProtocol();
   createWindow();
 
   app.on('activate', () => {

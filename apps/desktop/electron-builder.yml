@@ -12,6 +12,7 @@ directories:
 files:
   - dist/**
   - '!dist/.tsbuildinfo'
+  - '!dist/**/*.test.js'
   - renderer/**
   - package.json
 win:
@@ -27,3 +28,6 @@ electronFuses:
   # Only the signed-off app.asar is loaded, and its integrity is checked.
   onlyLoadAppFromAsar: true
   enableEmbeddedAsarIntegrityValidation: true
+  # The renderer is served from app://, not file://, so pages loaded from
+  # file:// don't need privileges beyond a normal browser's.
+  grantFileProtocolExtraPrivileges: false
