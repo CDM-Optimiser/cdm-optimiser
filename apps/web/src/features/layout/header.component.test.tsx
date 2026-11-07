@@ -13,13 +13,13 @@ const mocks = vi.hoisted(() => {
   };
 });
 
-vi.mock('../../utils/hooks/useAuth.tsx', () => {
+vi.mock('../auth/useAuth.ts', () => {
   return {
     useAuth: mocks.useAuth,
   };
 });
 
-vi.mock('./logout-button.component.tsx', () => ({
+vi.mock('../auth/logout-button.component.tsx', () => ({
   LogoutButton: mocks.LogoutButton,
 }));
 

@@ -1,6 +1,6 @@
 import {useMemo, useState} from 'react';
-import {usePatientsContext} from '../utils/hooks/usePatientsContext.tsx';
-import {PatientCardComponent} from '../features/patient-card/patient-card.component.tsx';
+import {usePatientsContext} from '../features/patients/api/usePatientsContext.ts';
+import {PatientCardComponent} from '../features/patients/card/patient-card.component.tsx';
 import {AlertComponent} from '@cdm-optimiser/ui';
 
 export function PendingPatientsPageComponent() {
