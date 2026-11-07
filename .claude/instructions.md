@@ -44,7 +44,7 @@ lint rule or delete a test to get a green run. Report what fails instead.
 
 - `apps/web/src`: everything the user sees. Code is grouped by feature, not
   by kind of file.
-  - `app/`: the app shell: `app.tsx` with the routes, and
+  - `app/`: the app shell: `app.tsx` with the routes, `query-client.ts`, and
     `protected-layout.tsx`, which waits for the session, sends signed-out
     users to the login page and frames every signed-in page (header,
     `<main>`, footer). Pages render inside that `<main>`, so they don't add
@@ -58,8 +58,8 @@ lint rule or delete a test to get a green run. Report what fails instead.
     - `layout/`: the header.
     - `theme/`: the desktop theme menu.
     - `patients/`: split into `model/` (the `Patient` type, `PatientStatus`,
-      `StatusFilter`, column config), `api/` (Supabase calls and the hooks
-      around them), `list/`, `pagination/` and `card/`.
+      `StatusFilter`, column config), `api/` (see "Patient data" below),
+      `list/`, `pagination/` and `card/`.
   - `lib/`: app-wide modules with no React (the Supabase client,
     `getErrorMessage`).
   - `hooks/`: generic hooks used by several features (`useDebounce`).
@@ -70,6 +70,32 @@ lint rule or delete a test to get a green run. Report what fails instead.
     hook; write a hook when it holds real logic.
   - Types for patient status come from `features/patients/model/patient.ts`.
     Don't redeclare the `'accepted' | 'refused' | 'pending'` union.
+  - `test/`: shared test helpers: `render-with-providers.tsx` (a fresh
+    QueryClient and a MemoryRouter) and `fixtures/` (synthetic patients).
+
+### Patient data
+
+Server state lives in TanStack Query; UI state (search box, filter, page)
+stays in `useState` in the page.
+
+- `features/patients/api/patients-api.ts` is the only module that calls
+  Supabase for patients. It calls three database functions,
+  `list_patients`, `get_patient_counts` and `update_patient_status`, which
+  check the caller's practice. Tables are not readable directly.
+- `toPatient` maps the database row (0/1 flags) to `Patient` (booleans and
+  one `status`). The rest of the app never sees `accepted`/`refused`.
+- Components use the hooks next to it (`usePatientsPage`,
+  `usePatientCounts`, `useUpdatePatientStatus`), never `supabase` itself.
+- Query keys come from `patient-keys.ts`. After a change, invalidate
+  `patientKeys.all`, which refreshes every list and the counts.
+- The list is paginated on the server: one page per request. Don't fetch
+  every patient to filter in the browser.
+- RPCs go as POST, so a search (possibly a patient's name) stays out of
+  URLs and logs. Don't switch them to `{get: true}`.
+- Nothing is persisted: no query persistence and no `localStorage` for
+  patient data. `AuthProvider` clears the cache on sign-out.
+- There is no realtime. Data refetches after the user's own changes and when
+  the window regains focus (data is stale after 30 s).
 - `packages/ui/src`: generic, presentational building blocks. They take
   everything through props and must not import Supabase, the router or
   anything from `apps/`. Apps import each one from its own file through the
