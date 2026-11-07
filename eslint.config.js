@@ -1,6 +1,7 @@
 import js from '@eslint/js';
 import checkFile from 'eslint-plugin-check-file';
 import globals from 'globals';
+import pluginQuery from '@tanstack/eslint-plugin-query';
 import reactHooks from 'eslint-plugin-react-hooks';
 import {reactRefresh} from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
@@ -86,21 +87,11 @@ export default defineConfig([
       tseslint.configs.recommended,
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite(),
+      pluginQuery.configs['flat/recommended'],
     ],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
-    },
-    rules: {
-      // TODO(bug-fix plan): newer eslint-plugin-react-hooks flags
-      // `loadPatients()` in an effect
-      // (apps/web/src/features/patients/api/patients-provider.tsx), the
-      // duplicate-fetch issue. Restore to 'error' once that is fixed.
-      'react-hooks/set-state-in-effect': 'warn',
-      // TODO(bug-fix plan): ESLint 10 flags the rethrow without `cause` in
-      // apps/web/src/features/patients/api/use-update-patient.ts. Restore to
-      // 'error' once fixed.
-      'preserve-caught-error': 'warn',
     },
   },
 ]);

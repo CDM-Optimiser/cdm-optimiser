@@ -1,4 +1,4 @@
-import {useState, type Dispatch, type SetStateAction} from 'react';
+import {useState} from 'react';
 import {ModalComponent} from '@cdm-optimiser/ui/components/modal-component.tsx';
 import {SVGComponent} from '@cdm-optimiser/ui/components/svg-component.tsx';
 import {PatientCardComponent} from '../card/patient-card-component.tsx';
@@ -11,13 +11,9 @@ import {
 
 interface PatientsTableProps {
   patients: Patient[];
-  onUpdatePatient: Dispatch<SetStateAction<Patient[]>>;
 }
 
-export function PatientsTableComponent({
-  patients,
-  onUpdatePatient,
-}: PatientsTableProps) {
+export function PatientsTableComponent({patients}: PatientsTableProps) {
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
 
   return (
@@ -39,11 +35,12 @@ export function PatientsTableComponent({
         </thead>
         <tbody className="bg-white dark:bg-white/5">
           {patients.map((patient) => {
-            const rowBackground = patient.accepted
-              ? 'bg-green-100 dark:bg-emerald-300 dark:text-gray-900'
-              : patient.refused
-                ? 'bg-red-100 dark:bg-rose-300 dark:text-gray-900'
-                : '';
+            const rowBackground =
+              patient.status === 'accepted'
+                ? 'bg-green-100 dark:bg-emerald-300 dark:text-gray-900'
+                : patient.status === 'refused'
+                  ? 'bg-red-100 dark:bg-rose-300 dark:text-gray-900'
+                  : '';
 
             return (
               <tr
@@ -55,8 +52,7 @@ export function PatientsTableComponent({
                   .filter((key) => !excludedColumns.includes(key))
                   .map((key) => {
                     const typedKey = key as keyof Patient;
-                    let value: string | number | boolean =
-                      patient[typedKey] ?? '';
+                    let value = patient[typedKey] ?? '';
 
                     if (booleanColumns.includes(key)) {
                       return (
@@ -89,8 +85,8 @@ export function PatientsTableComponent({
                       );
                     }
 
-                    if (key === 'potential_income')
-                      value = `€ ${patient[typedKey]}`;
+                    if (key === 'potential_income' && value !== '')
+                      value = `€ ${value}`;
 
                     return (
                       <td
@@ -111,13 +107,7 @@ export function PatientsTableComponent({
         isOpen={selectedPatient !== null}
         onClose={() => setSelectedPatient(null)}
       >
-        {selectedPatient && (
-          <PatientCardComponent
-            patient={selectedPatient}
-            onUpdatePatient={onUpdatePatient}
-            onPendingPatientUpdated={() => {}}
-          />
-        )}
+        {selectedPatient && <PatientCardComponent patient={selectedPatient} />}
       </ModalComponent>
     </div>
   );

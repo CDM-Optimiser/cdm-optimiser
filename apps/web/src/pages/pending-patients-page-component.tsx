@@ -1,58 +1,64 @@
-import {useMemo, useState} from 'react';
-import {usePatientsContext} from '../features/patients/api/use-patients-context.ts';
-import {PatientCardComponent} from '../features/patients/card/patient-card-component.tsx';
+import {useState} from 'react';
 import {AlertComponent} from '@cdm-optimiser/ui/components/alert-component.tsx';
+import {ButtonComponent} from '@cdm-optimiser/ui/components/button-component.tsx';
+import {CardComponent} from '@cdm-optimiser/ui/components/card-component.tsx';
+import {usePatientsPage} from '../features/patients/api/use-patients-page.ts';
+import {PatientCardComponent} from '../features/patients/card/patient-card-component.tsx';
+import type {Patient} from '../features/patients/model/patient.ts';
+import {getErrorMessage} from '../lib/get-error-message.ts';
 
+/**
+ * Goes through pending patients one at a time. Each is page `index + 1` of
+ * the pending list with one patient per page, so a saved patient leaves the
+ * list and the next one takes its place at the same position.
+ */
 export function PendingPatientsPageComponent() {
-  const [lastUpdateSuccess, setLastUpdateSuccess] = useState<string | null>(
-    null
-  );
-  const {patients, setPatients} = usePatientsContext();
+  const [index, setIndex] = useState(0);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
 
-  const pendingPatients = useMemo(
-    () => patients.filter((patient) => !patient.accepted && !patient.refused),
-    [patients]
-  );
+  const pending = usePatientsPage({
+    search: '',
+    status: 'pending',
+    page: index + 1,
+    pageSize: 1,
+  });
 
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const total = pending.data?.total ?? 0;
+  const patient = pending.data?.patients[0];
 
-  if (currentIndex >= pendingPatients.length && pendingPatients.length > 0) {
-    setCurrentIndex(pendingPatients.length - 1);
-  } else if (pendingPatients.length === 0 && currentIndex !== 0) {
-    setCurrentIndex(0);
+  // Saving the last patient in the list moves back one. Adjusting state
+  // while rendering is React's pattern for this.
+  if (
+    pending.data &&
+    !pending.isPlaceholderData &&
+    total > 0 &&
+    index >= total
+  ) {
+    setIndex(total - 1);
   }
 
-  const safeIndex = Math.min(
-    currentIndex,
-    Math.max(0, pendingPatients.length - 1)
-  );
-
-  const currentPatient = pendingPatients[safeIndex];
-
-  const handlePrev = () =>
-    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : prev));
-
-  const handleNext = () =>
-    setCurrentIndex((prev) =>
-      prev < pendingPatients.length - 1 ? prev + 1 : prev
-    );
-
-  const handlePatientUpdated = (patientName: string) => {
-    setLastUpdateSuccess(patientName);
-  };
+  const handleUpdated = (updated: Patient) => setLastUpdated(updated.name);
 
   return (
     <>
-      {lastUpdateSuccess && (
+      {lastUpdated && (
         <AlertComponent
           type="success"
           title="Update successful!"
-          text={`${lastUpdateSuccess} has been updated successfully.`}
+          text={`${lastUpdated} has been updated successfully.`}
           autoDismissMs={3000}
-          onDismiss={() => setLastUpdateSuccess(null)}
+          onDismiss={() => setLastUpdated(null)}
         />
       )}
-      {!pendingPatients || pendingPatients.length === 0 ? (
+      {pending.isError ? (
+        <AlertComponent
+          type="error"
+          title="Error getting patients"
+          text={getErrorMessage(pending.error)}
+        />
+      ) : pending.isPending ? (
+        <AlertComponent title="Loading patients" text="Loading patients…" />
+      ) : total === 0 || !patient ? (
         <AlertComponent
           type="info"
           title="No pending patients"
@@ -60,37 +66,33 @@ export function PendingPatientsPageComponent() {
         />
       ) : (
         <>
-          <div className="flex items-center justify-between rounded-xl bg-white p-4 shadow-md dark:bg-white/5 dark:ring dark:ring-gray-600">
+          <CardComponent className="flex items-center justify-between">
             <span className="font-medium text-gray-900 dark:text-gray-200">
-              Pending patient: {currentIndex + 1} of {pendingPatients.length}{' '}
-              patient/s
+              Pending patient: {index + 1} of {total}
             </span>
             <div className="flex gap-2">
-              <button
-                onClick={handlePrev}
-                disabled={currentIndex === 0}
-                className="rounded-md border-b-4 border-b-sky-700 bg-sky-500 px-4 py-2 text-white transition hover:not-disabled:border-b-0 hover:not-disabled:bg-sky-700 disabled:cursor-not-allowed disabled:border-b-gray-500 disabled:bg-gray-200 disabled:text-gray-600"
+              <ButtonComponent
+                onClick={() => setIndex(index - 1)}
+                disabled={index === 0}
               >
                 Previous patient
-              </button>
-              <button
-                onClick={handleNext}
-                disabled={currentIndex === pendingPatients.length - 1}
-                className="rounded-md border-b-4 border-b-sky-700 bg-sky-500 px-4 py-2 text-white transition hover:not-disabled:border-b-0 hover:not-disabled:bg-sky-700 disabled:cursor-not-allowed disabled:border-b-gray-500 disabled:bg-gray-200 disabled:text-gray-600"
+              </ButtonComponent>
+              <ButtonComponent
+                onClick={() => setIndex(index + 1)}
+                disabled={index >= total - 1}
               >
                 Next patient
-              </button>
+              </ButtonComponent>
             </div>
-          </div>
-          <section className="rounded-xl bg-white p-4 shadow-md dark:bg-white/5 dark:ring dark:ring-gray-600">
+          </CardComponent>
+          <CardComponent as="section">
             <PatientCardComponent
-              key={currentPatient.id}
-              patient={currentPatient}
-              onUpdatePatient={setPatients}
-              onPendingPatientUpdated={handlePatientUpdated}
+              key={patient.id}
+              patient={patient}
+              onUpdated={handleUpdated}
               showAlert={false}
             />
-          </section>
+          </CardComponent>
         </>
       )}
     </>

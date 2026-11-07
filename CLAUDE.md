@@ -66,9 +66,13 @@ yarn dist:desktop            # Windows installer in apps/desktop/release
 - **`packages/ui` stays presentational:** no Supabase, router or app state.
   The web app's `index.css` has an `@source` line so Tailwind scans it; keep it
   if the package moves.
+- **Patient data goes through database functions.** The app calls
+  `list_patients`, `get_patient_counts` and `update_patient_status` (one
+  module, `features/patients/api/patients-api.ts`), through TanStack Query.
+  They check the caller's practice; the tables aren't readable directly.
 - **Content Security Policy:** production builds get a CSP `<meta>` tag from
   a plugin in `apps/web/vite.config.ts`, allowing only the app itself and the
-  Supabase origin. A new external origin (API, font, image host) must be
+  Supabase origin over HTTPS (no realtime WebSocket). A new external origin (API, font, image host) must be
   added there, or the browser and Electron will block it.
 - **Configuration** comes from `VITE_SUPABASE_URL` and
   `VITE_SUPABASE_ANON_KEY` in `apps/web/.env.local` (copy `.env.example`).
