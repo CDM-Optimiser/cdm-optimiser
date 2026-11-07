@@ -1,1 +1,14 @@
-frontend
+# Dependencies and package manager
+.yarn
+yarn.lock
+
+# Build output
+**/dist
+apps/desktop/release
+apps/desktop/renderer
+
+# Generated test output
+**/__snapshots__
+**/coverage
+**/playwright-report
+**/test-results

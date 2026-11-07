@@ -3,43 +3,47 @@
   "version": "1.0.0",
   "description": "CDM Optimiser",
   "author": "CDM Optimiser Developers",
-  "license": "MIT",
-  "main": "main.js",
-  "type": "module",
+  "license": "UNLICENSED",
   "private": true,
+  "type": "module",
+  "packageManager": "yarn@4.18.1",
+  "engines": {
+    "node": ">=24.15"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "build:frontend": "cd frontend && npm run build",
-    "dev": "concurrently \"cd frontend && npm run dev\" \"electron .\"",
-    "dist": "npm run build:frontend && electron-builder",
+    "build:web": "yarn workspace @cdm-optimiser/web build",
+    "dev:desktop": "yarn workspace @cdm-optimiser/desktop dev",
+    "dev:web": "yarn workspace @cdm-optimiser/web dev",
+    "dist:desktop": "yarn workspace @cdm-optimiser/desktop dist",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "linc": "node scripts/lint-changed.mjs",
     "lint": "eslint .",
-    "pack": "electron-builder --dir",
-    "postinstall": "cd frontend && npm install",
-    "prettier": "npx prettier . --write",
-    "start": "npm run build:frontend && electron ."
+    "prettier": "node scripts/prettier-changed.mjs",
+    "test": "yarn workspaces foreach --all --exclude cdm-optimiser run test",
+    "test:e2e": "yarn workspace @cdm-optimiser/web test:e2e",
+    "typecheck": "tsc -b"
+  },
+  "dependenciesMeta": {
+    "electron": {
+      "built": true
+    }
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
-    "concurrently": "^9.2.1",
-    "electron": "^39.2.4",
-    "electron-builder": "^26.0.12",
     "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
     "node-fetch": "^3.3.2",
     "prettier": "3.7.4",
-    "prettier-plugin-tailwindcss": "^0.7.1"
-  },
-  "build": {
-    "appId": "com.cdm-optimiser.cdm-optimiser",
-    "productName": "CDM Optimiser",
-    "files": [
-      "main.js",
-      "preload.js",
-      "package.json",
-      "frontend/dist/**"
-    ],
-    "directories": {
-      "buildResources": "build"
-    }
+    "prettier-plugin-tailwindcss": "^0.7.1",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.46.4"
   },
   "repository": {
     "type": "git",
