@@ -1,0 +1,5 @@
+/* Test-only stylesheet: browser tests (and the Vitest UI) render the
+   components with the same Tailwind classes the apps use. */
+@import 'tailwindcss';
+
+@source '../src';

@@ -1,171 +1,118 @@
-import {beforeEach, describe, expect, test, vi} from 'vitest';
+import {describe, expect, test, vi} from 'vitest';
 import {render} from 'vitest-browser-react';
+import type {AlertTypes} from '../types/alert.ts';
 import {AlertComponent} from './alert.component.tsx';
 
-const mocks = vi.hoisted(() => {
-  return {
-    useAutoDismiss: vi.fn(),
-  };
-});
+const defaultProps = {
+  title: 'Test Title',
+  text: 'This is the alert message.',
+};
 
-vi.mock('../hooks/useAutoDismiss.tsx', () => {
-  return {
-    useAutoDismiss: mocks.useAutoDismiss,
-  };
-});
-
-describe('Alert component tests', async () => {
-  const defaultProps = {
-    title: 'Test Title',
-    text: 'This is the alert message.',
-    onDismiss: vi.fn(),
-  };
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-
-    mocks.useAutoDismiss.mockReturnValue({progressBar: 100});
-  });
-
-  test('renders correctly with default (info) type', async () => {
+describe('Alert component tests', () => {
+  test('renders the title and text, as an info alert by default', async () => {
     const screen = await render(<AlertComponent {...defaultProps} />);
-
-    const titleElement = screen.getByRole('heading', {
-      name: defaultProps.title,
-    });
-    const textElement = screen.getByText(defaultProps.text);
-
-    expect(titleElement).toBeVisible();
-    expect(textElement).toBeVisible();
-
-    const alertElement = screen.container.querySelector('.shadow-md');
-
-    if (!alertElement)
-      throw new Error('Alert component container element not found.');
-
-    expect(alertElement).toHaveClass('bg-sky-50');
-    expect(alertElement).toHaveClass('border-sky-400');
-
-    expect(mocks.useAutoDismiss).toHaveBeenCalledWith(
-      undefined,
-      defaultProps.onDismiss
-    );
-  });
-
-  test('renders with error type and correct styling', async () => {
-    const screen = await render(
-      <AlertComponent {...defaultProps} type="error" />
-    );
-
-    const alertElement = screen.container.querySelector('.shadow-md');
-    const titleElement = screen.getByRole('heading', {
-      name: defaultProps.title,
-    });
-
-    if (!alertElement)
-      throw new Error('Alert component container element not found.');
-
-    expect(alertElement).toHaveClass('bg-red-50');
-    expect(alertElement).toHaveClass('border-red-400');
-
-    await expect.element(titleElement).toHaveClass('text-red-800');
-  });
-
-  test('displays the progress bar when autoDismissMs is provided', async () => {
-    const autoDismissMs = 3000;
-
-    mocks.useAutoDismiss.mockReturnValue({progressBar: 75});
-
-    const screen = await render(
-      <AlertComponent {...defaultProps} autoDismissMs={autoDismissMs} />
-    );
-
-    expect(mocks.useAutoDismiss).toHaveBeenCalledWith(
-      autoDismissMs,
-      defaultProps.onDismiss
-    );
-
-    const progressBar = screen.getByText('Progress bar');
-
-    await expect.element(progressBar).toBeVisible();
-
-    const progressBarDiv = screen.container.querySelector(
-      '.h-1.rounded-b-xl'
-    ) as HTMLElement;
 
     await expect
-      .element(progressBarDiv)
-      .toHaveAttribute('style', 'width: 75%;');
+      .element(screen.getByRole('heading', {name: defaultProps.title}))
+      .toBeVisible();
+    await expect.element(screen.getByText(defaultProps.text)).toBeVisible();
+    await expect
+      .element(screen.getByRole('status'))
+      .toHaveClass('bg-sky-50', 'border-sky-400');
   });
 
-  test('does NOT display the progress bar when autoDismissMs is NOT provided', async () => {
-    const screen = await render(
-      <AlertComponent {...defaultProps} autoDismissMs={undefined} />
+  test.each<[AlertTypes, 'alert' | 'status', string]>([
+    ['error', 'alert', 'bg-red-50'],
+    ['warning', 'alert', 'bg-yellow-50'],
+    ['info', 'status', 'bg-sky-50'],
+    ['success', 'status', 'bg-green-50'],
+  ])(
+    'a %s alert uses role="%s" and its colours',
+    async (type, role, background) => {
+      const screen = await render(
+        <AlertComponent {...defaultProps} type={type} />
+      );
+
+      await expect.element(screen.getByRole(role)).toHaveClass(background);
+    }
+  );
+
+  test('shows a close button only when onDismiss is given', async () => {
+    const withoutDismiss = await render(<AlertComponent {...defaultProps} />);
+
+    expect(
+      withoutDismiss.getByRole('button', {name: 'Close alert'}).query()
+    ).toBeNull();
+
+    const onDismiss = vi.fn();
+    const withDismiss = await render(
+      <AlertComponent {...defaultProps} onDismiss={onDismiss} />
     );
 
-    expect(screen.container.querySelector('Progress bar')).toBeNull();
+    await withDismiss.getByRole('button', {name: 'Close alert'}).click();
+
+    expect(onDismiss).toHaveBeenCalledOnce();
   });
 
-  test('progress bar is rendered and width matches hook value', async () => {
-    mocks.useAutoDismiss.mockReturnValue({progressBar: 42});
+  test('dismisses itself once autoDismissMs has passed', async () => {
+    const onDismiss = vi.fn();
 
     const screen = await render(
-      <AlertComponent {...defaultProps} autoDismissMs={3000} />
+      <AlertComponent
+        {...defaultProps}
+        type="success"
+        autoDismissMs={100}
+        onDismiss={onDismiss}
+      />
     );
 
-    const progress = screen.container.querySelector('.h-1') as HTMLElement;
+    expect(onDismiss).not.toHaveBeenCalled();
+    await expect.element(screen.getByTestId('alert-progress')).toBeVisible();
+    await expect
+      .element(screen.getByTestId('alert-progress'))
+      .toHaveClass('bg-green-400');
 
-    expect(progress).toBeVisible();
-    expect(progress.style.width).toBe('42%');
+    await expect.poll(() => onDismiss.mock.calls.length).toBe(1);
   });
 
-  test('progress bar width is 0% when hook returns 0', async () => {
-    mocks.useAutoDismiss.mockReturnValue({progressBar: 0});
+  test('has no progress bar and never dismisses without autoDismissMs', async () => {
+    const onDismiss = vi.fn();
 
     const screen = await render(
-      <AlertComponent {...defaultProps} autoDismissMs={3000} />
+      <AlertComponent {...defaultProps} onDismiss={onDismiss} />
     );
 
-    const progress = screen.container.querySelector('.h-1') as HTMLElement;
+    expect(screen.getByTestId('alert-progress').query()).toBeNull();
 
-    expect(progress.style.width).toBe('0%');
+    await new Promise((resolve) => setTimeout(resolve, 150));
+
+    expect(onDismiss).not.toHaveBeenCalled();
   });
 
-  test('renders without onDismiss safely', async () => {
-    mocks.useAutoDismiss.mockReturnValue({progressBar: 100});
+  test('uses the latest onDismiss without restarting the timer', async () => {
+    const first = vi.fn();
+    const second = vi.fn();
 
     const screen = await render(
-      <AlertComponent title="Test" text="No dismiss callback" />
+      <AlertComponent {...defaultProps} autoDismissMs={150} onDismiss={first} />
     );
 
-    expect(screen.getByText('No dismiss callback')).toBeVisible();
-  });
+    await screen.rerender(
+      <AlertComponent
+        {...defaultProps}
+        autoDismissMs={150}
+        onDismiss={second}
+      />
+    );
 
-  test('clicking the dismiss button calls onDismiss', async () => {
-    const mockOnDismiss = vi.fn();
-    const props = {...defaultProps, onDismiss: mockOnDismiss};
-
-    const {getByRole} = await render(<AlertComponent {...props} />);
-
-    const dismissButton = getByRole('button', {name: /close|X/i});
-
-    expect(mockOnDismiss).not.toHaveBeenCalled();
-
-    await dismissButton.click();
-
-    expect(mockOnDismiss).toHaveBeenCalledOnce();
-  });
-
-  test('component contains expected ARIA roles', async () => {
-    const screen = await render(<AlertComponent {...defaultProps} />);
-
-    const alert = screen.getByRole('alert');
-
-    expect(alert).toBeVisible();
+    await expect.poll(() => second.mock.calls.length).toBe(1);
+    expect(first).not.toHaveBeenCalled();
   });
 
   test('matches snapshot', async () => {
-    const screen = await render(<AlertComponent {...defaultProps} />);
+    const screen = await render(
+      <AlertComponent {...defaultProps} onDismiss={() => {}} />
+    );
 
     expect(screen.container.innerHTML).toMatchSnapshot();
   });

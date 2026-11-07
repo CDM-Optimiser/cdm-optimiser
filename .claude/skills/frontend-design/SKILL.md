@@ -41,6 +41,24 @@ The app uses Tailwind CSS v4's default palette with no custom theme: `apps/web/s
 
 Keep these meanings exclusive: green and red only ever mean a patient's outcome or a success or error message, never decoration. Don't introduce other hues (blue, indigo, violet, orange and so on).
 
+### Use the shared components first
+
+`@cdm-optimiser/ui` already applies these recipes. Reach for its components
+before writing classes by hand:
+
+- `ButtonComponent`: primary actions, and `variant="segment"` with
+  `aria-pressed` for a group of filters.
+- `CardComponent`: cards and panels.
+- `TextFieldComponent`: labelled inputs.
+- `SwitchComponent`: on/off controls, `tone="positive"` (green) or
+  `"negative"` (red), for accepted or refused only.
+- `ModalComponent`: dialogs.
+- `AlertComponent`: messages.
+- The icon components, instead of inline `<svg>`.
+
+The tables below remain the reference for anything those components don't
+cover, and for changing the components themselves.
+
 ### Surfaces and text
 
 | Element                 | Light                                           | Dark                                                    |

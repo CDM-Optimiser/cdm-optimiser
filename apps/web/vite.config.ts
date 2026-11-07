@@ -78,10 +78,14 @@ export default defineConfig(({mode}) => ({
         },
       },
       {
+        // Inherit the plugins above (React, Tailwind), so the stylesheets
+        // loaded by the setup file are compiled as in the app.
+        extends: true,
         test: {
           include: ['src/**/*.{test,spec}.{ts,tsx}'],
           exclude: [UNIT_TESTS],
           name: 'browser',
+          setupFiles: ['./src/test/browser-setup.ts'],
           browser: {
             enabled: true,
             provider: playwright(),
