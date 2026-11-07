@@ -67,7 +67,7 @@ export default defineConfig(({mode}) => ({
   },
   // Tests sit next to the code they test, in src/. Files named
   // `*.unit.test.ts(x)` run in jsdom; every other `*.test.ts(x)` file (such
-  // as `header.component.test.tsx`) runs in a real browser.
+  // as `header-component.test.tsx`) runs in a real browser.
   test: {
     projects: [
       {
