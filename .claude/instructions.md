@@ -67,10 +67,17 @@ lint rule or delete a test to get a green run. Report what fails instead.
     hook; write a hook when it holds real logic.
   - Types for patient status come from `features/patients/model/patient.ts`.
     Don't redeclare the `'accepted' | 'refused' | 'pending'` union.
-- `packages/ui/src`: generic, presentational building blocks (alert,
-  dropdown, footer, modal, svg). They take everything through props and must
-  not import Supabase, the router or anything from `apps/`. Export new
-  components from `src/index.ts`; apps import from `@cdm-optimiser/ui`.
+- `packages/ui/src`: generic, presentational building blocks. They take
+  everything through props and must not import Supabase, the router or
+  anything from `apps/`. Export new components from `src/index.ts`; apps
+  import from `@cdm-optimiser/ui`.
+  - `components/`: alert, button (`primary`, `segment`), card, dropdown,
+    footer, modal (a native `<dialog>`), svg, switch and text field.
+  - `icons/`: one component per icon, decorative (`aria-hidden`) by default.
+    Use them instead of pasting `<svg>` markup.
+  - Use these instead of copying class strings: a button is
+    `ButtonComponent`, a panel is `CardComponent`, a labelled input is
+    `TextFieldComponent`, an on/off control is `SwitchComponent`.
 - `packages/desktop-bridge/src/index.d.ts`: the IPC contract. Types only,
   never runtime code: the sandboxed preload can't import modules.
 - `apps/desktop/src`: Electron only (window setup, IPC handlers, preload). No
@@ -91,6 +98,16 @@ lint rule or delete a test to get a green run. Report what fails instead.
   browser mode with Playwright Chromium and `vitest-browser-react`; prefer
   `await expect.element(locator)` for assertions that wait for the DOM.
   Pure-logic tests named `*.unit.test.ts` run in jsdom instead (web app only).
+- **Browser tests load the real styles.** A setup file
+  (`packages/ui/test/setup.ts`, `apps/web/src/test/`) loads Tailwind and the
+  app's CSS, so the Vitest UI shows components as users see them, and
+  visibility checks behave as in the app.
+- **Test behaviour, not implementation.** Query by role and accessible name
+  (`getByRole('button', {name: 'Save'})`), and assert what the user sees or
+  what a callback receives, not which hook was called with which arguments.
+- **Keyboard tests start from an element:** call `.focus()` on it first.
+  Where the first `userEvent.tab()` lands depends on the test runner's
+  iframe, which makes tests flaky.
 - `vi.mock()` paths are relative to the test file and must resolve to the real
   module. A wrong path silently mocks nothing.
 - Test files are never bundled: Vite only builds what `index.html` imports,
@@ -229,10 +246,3 @@ Also add these when they apply, whatever the type:
 - New package versions are installable only once they're 24 hours old. If
   `yarn add` reports a version as "quarantined", use the newest version that
   isn't, and let the next update pick up the latest.
-- Known failing tests, owned by the bug-fix plan (5 of 20; they also fail on
-  the original `main`). Remove this note once they're fixed.
-  - `footer.component.test.tsx` (3 tests): hardcodes the year 2025, but the
-    component reads the real year when the module loads.
-  - `alert.component.test.tsx` (2 tests): expects `useAutoDismiss` to be
-    called with `(undefined, onDismiss)`, but the component calls it with
-    `(0, handleDismiss)`.
