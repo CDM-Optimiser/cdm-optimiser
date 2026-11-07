@@ -6,6 +6,12 @@
   command = "yarn build:web"
   publish = "apps/web/dist"
 
+[build.environment]
+  # Netlify runs `yarn install $YARN_FLAGS`, and its default flags include
+  # `--ignore-optional`, which Yarn 4 rejects ("Unsupported option name").
+  # `--immutable` also fails the build if yarn.lock is out of date.
+  YARN_FLAGS = "--immutable"
+
 # Single-page app fallback.
 [[redirects]]
   from = "/*"
