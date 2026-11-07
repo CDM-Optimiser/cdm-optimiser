@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "@cdm-optimiser/desktop-bridge": "workspace:*",
-    "@types/node": "^24.10.1",
+    "@types/node": "^24.19.2",
     "concurrently": "^9.2.1",
     "cross-env": "^10.1.0",
     "electron": "39.8.10",
