@@ -44,11 +44,17 @@ lint rule or delete a test to get a green run. Report what fails instead.
 
 - `apps/web/src`: everything the user sees. Code is grouped by feature, not
   by kind of file.
-  - `app/`: the app shell (`app.tsx` with the routes).
+  - `app/`: the app shell: `app.tsx` with the routes, and
+    `protected-layout.tsx`, which waits for the session, sends signed-out
+    users to the login page and frames every signed-in page (header,
+    `<main>`, footer). Pages render inside that `<main>`, so they don't add
+    their own.
   - `pages/`: one component per route. Pages compose features; they hold no
     data access of their own.
   - `features/<area>/`: everything for one area of the app, together.
-    - `auth/`: auth context, provider, `useAuth` and the logout button.
+    - `auth/`: auth context, provider, `useAuth`, the login form and the
+      logout button. The session comes only from Supabase's
+      `onAuthStateChange`; `login` and `logout` just call Supabase.
     - `layout/`: the header.
     - `theme/`: the desktop theme menu.
     - `patients/`: split into `model/` (the `Patient` type, `PatientStatus`,
