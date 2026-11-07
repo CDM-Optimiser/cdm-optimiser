@@ -9,6 +9,11 @@
     "moduleResolution": "NodeNext",
     "types": ["node", "electron"],
 
+    // Only files with import/export are modules. This keeps the compiled
+    // preload a plain script with no `exports` boilerplate, which the
+    // sandboxed preload environment doesn't guarantee.
+    "moduleDetection": "legacy",
+
     /* Emits dist/main.js (ESM) and dist/preload.cjs (CommonJS) for Electron. */
     "noEmit": false,
     "allowImportingTsExtensions": false,

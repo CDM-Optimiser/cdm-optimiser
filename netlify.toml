@@ -6,11 +6,6 @@
   command = "yarn build:web"
   publish = "apps/web/dist"
 
-[build.environment]
-  # The web build doesn't need the Electron binary that the desktop
-  # workspace would otherwise download during install.
-  ELECTRON_SKIP_BINARY_DOWNLOAD = "1"
-
 # Single-page app fallback.
 [[redirects]]
   from = "/*"
