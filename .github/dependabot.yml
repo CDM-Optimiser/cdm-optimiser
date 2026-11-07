@@ -1,6 +1,74 @@
 version: 2
 updates:
+  # Yarn workspaces: one root yarn.lock covers every app and package.
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    open-pull-requests-limit: 10
+    # Yarn refuses versions younger than 24 hours (npmMinimalAgeGate), so
+    # don't propose them either.
+    cooldown:
+      default-days: 3
+    commit-message:
+      prefix: 'build'
+      include: 'scope'
+    # A dependency joins the first group it matches.
+    groups:
+      react:
+        patterns:
+          - 'react'
+          - 'react-dom'
+          - 'react-router'
+          - '@types/react'
+          - '@types/react-dom'
+      vite-vitest:
+        patterns:
+          - 'vite'
+          - '@vitejs/*'
+          - 'vitest'
+          - '@vitest/*'
+          - 'vitest-browser-react'
+          - 'jsdom'
+          - 'playwright'
+          - '@playwright/*'
+          - 'tailwindcss'
+          - '@tailwindcss/*'
+      lint-format:
+        patterns:
+          - 'eslint'
+          - '@eslint/*'
+          - 'typescript-eslint'
+          - 'eslint-plugin-*'
+          - 'globals'
+          - 'prettier'
+          - 'prettier-plugin-*'
+      electron:
+        patterns:
+          - 'electron'
+          - 'electron-builder'
+          - 'concurrently'
+          - 'wait-on'
+          - 'cross-env'
+      minor-and-patch:
+        update-types:
+          - 'minor'
+          - 'patch'
+    ignore:
+      # typescript-eslint supports TypeScript below 6.1 only.
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major']
+      # Stays on the Node major that .nvmrc and Electron use.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
       interval: 'weekly'
+    commit-message:
+      prefix: 'ci'
+    groups:
+      github-actions:
+        patterns:
+          - '*'
