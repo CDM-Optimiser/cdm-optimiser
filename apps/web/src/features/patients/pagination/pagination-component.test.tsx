@@ -1,4 +1,5 @@
-import {describe, expect, test, vi} from 'vitest';
+import {afterEach, describe, expect, test, vi} from 'vitest';
+import {page} from 'vitest/browser';
 import {render} from 'vitest-browser-react';
 import {PaginationComponent} from './pagination-component.tsx';
 
@@ -20,6 +21,10 @@ function renderPagination(currentPage: number, totalPages: number) {
 }
 
 describe('PaginationComponent', () => {
+  afterEach(async () => {
+    await page.viewport(1280, 800);
+  });
+
   test('on the first page, Previous is disabled and Next moves on', async () => {
     const {screen, onPageChange} = renderPagination(1, 5);
     const view = await screen;
@@ -55,6 +60,20 @@ describe('PaginationComponent', () => {
     await pages.getByRole('button', {name: 'Page 10', exact: true}).click();
 
     expect(onPageChange).toHaveBeenCalledWith(10);
+  });
+
+  test('on a phone, shows the page between the arrows instead of numbers', async () => {
+    await page.viewport(390, 844);
+    const {screen, onPageChange} = renderPagination(2, 5);
+    const view = await screen;
+    const pages = view.getByRole('navigation', {name: 'Pagination'});
+
+    await expect.element(pages.getByText('Page 2 of 5')).toBeVisible();
+    expect(pages.getByRole('button', {name: /^Page \d/}).query()).toBeNull();
+
+    await pages.getByRole('button', {name: 'Next page'}).click();
+
+    expect(onPageChange).toHaveBeenCalledWith(3);
   });
 
   test('changes the page size', async () => {
