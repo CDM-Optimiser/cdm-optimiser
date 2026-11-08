@@ -21,6 +21,16 @@ nsis:
   # No spaces: the name is used as-is in the GitHub Release and in latest.yml,
   # which the updater reads.
   artifactName: cdm-optimiser-setup-${version}.${ext}
+  # A step-by-step installer instead of the one-click default, so people
+  # choose the folder. It also asks who the app is for:
+  # - "Only for me" (the default): no admin rights, and updates install
+  #   silently.
+  # - "Anyone who uses this computer": for shared PCs; needs admin rights,
+  #   and Windows asks for them again on every update (electron-updater
+  #   runs the installer through elevate.exe).
+  # Silent updates keep the folder and the choice made at install time.
+  oneClick: false
+  allowToChangeInstallationDirectory: true
 
 # Where the updater looks for new versions (electron-updater). The release
 # workflow (.github/workflows/release.yml) uploads the installer, its
