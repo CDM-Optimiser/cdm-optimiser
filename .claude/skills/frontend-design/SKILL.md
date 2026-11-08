@@ -83,9 +83,10 @@ cover, and for changing the components themselves.
 | Page background         | `bg-gray-100`                                    | `dark:bg-gray-900`                                      |
 | Card or panel           | `rounded-xl bg-white shadow-md`                  | `dark:bg-white/5 dark:ring dark:ring-gray-600`          |
 | Modal                   | `bg-white` over a `bg-black/70` backdrop         | `dark:bg-gray-800 dark:ring dark:ring-gray-600`         |
-| Dropdown menu           | `bg-white shadow-md ring-1 ring-gray-200`        | `dark:bg-gray-800 dark:ring-gray-600`                   |
+| Dropdown or menu list   | `bg-white shadow-md ring-1 ring-gray-200`        | `dark:bg-gray-800 dark:ring-gray-600`                   |
 | Text input, select      | `bg-white shadow-md outline-1 outline-gray-500`  | `dark:bg-white/5 dark:text-white dark:outline-gray-500` |
 | Placeholder             | `placeholder:text-gray-500`                      | `dark:placeholder:text-gray-400`                        |
+| Hint under a field      | `text-sm text-gray-600`                          | `dark:text-gray-300`                                    |
 | Strong text on surfaces | `text-gray-900`                                  | `dark:text-white`                                       |
 | Muted icons             | `text-gray-500`                                  | `dark:text-gray-400`                                    |
 | Dividers, table borders | `border-gray-200`; table cells `border-gray-300` | `dark:border-gray-600`                                  |
@@ -112,6 +113,11 @@ cover, and for changing the components themselves.
   disabled button never shows a variant's colour.
 - Pressed buttons drop onto their bottom edge (`active:mt-1
 active:border-b-0`): the face moves, the button's outer size doesn't.
+- A button that opens a list (the theme dropdown, the account menu) is a
+  secondary button ending in a chevron-down icon. The list's entries share
+  one recipe (`popup-classes.ts` in `packages/ui`): hover and focus fill
+  them with `bg-sky-700 text-white`, and the selected option or current
+  page is bold.
 
 ### Patient status
 
@@ -146,7 +152,9 @@ progress bar, and a `-800` shade for the text.
 | Error   | `red`    | `red-600`    |
 
 Alerts keep their pale tints in dark mode: dark text on a light tint stays
-readable, so they have no `dark:` variants.
+readable, so they have no `dark:` variants. For the same reason, a link
+inside an alert uses the light link colours only (`text-sky-700 underline
+hover:text-sky-900`, at least 4.5:1 on every tint).
 
 ## Ground it in the subject
 

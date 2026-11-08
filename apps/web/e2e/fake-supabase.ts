@@ -134,6 +134,11 @@ export async function useFakeSupabase(
         return route.fulfill({status: 204, headers: CORS_HEADERS});
       }
 
+      // A password change: Supabase answers with the user.
+      if (pathname === '/auth/v1/user' && request.method() === 'PUT') {
+        return json(route, USER);
+      }
+
       if (pathname === '/rest/v1/rpc/list_patients') {
         const {p_status, p_limit, p_offset} = request.postDataJSON();
         const matches = PATIENTS.filter(

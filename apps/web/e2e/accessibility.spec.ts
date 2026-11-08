@@ -58,6 +58,42 @@ for (const colorScheme of ['light', 'dark'] as const) {
       expect(refused).toEqual([]);
     });
 
+    test('the account menu', async ({page}) => {
+      const refused = await useFakeSupabase(page);
+
+      await signIn(page);
+      await page.getByRole('button', {name: /^Account:/}).click();
+      await expect(page.getByRole('link', {name: 'Account'})).toBeVisible();
+      await expectNoViolations(page);
+
+      expect(refused).toEqual([]);
+    });
+
+    test('the Account page, and a changed password', async ({page}) => {
+      const refused = await useFakeSupabase(page);
+
+      await signIn(page);
+      await page.getByRole('button', {name: /^Account:/}).click();
+      await page.getByRole('link', {name: 'Account'}).click();
+      await expect(
+        page.getByRole('heading', {level: 1, name: 'Account'})
+      ).toBeVisible();
+      await expectNoViolations(page);
+
+      await page.getByLabel('Current password').fill('not-a-real-password');
+      await page
+        .getByLabel('New password', {exact: true})
+        .fill('a-new-long-test-password');
+      await page
+        .getByLabel('Confirm new password')
+        .fill('a-new-long-test-password');
+      await page.getByRole('button', {name: 'Change password'}).click();
+      await expect(page.getByText('Password changed')).toBeVisible();
+      await expectNoViolations(page);
+
+      expect(refused).toEqual([]);
+    });
+
     test('the menu drawer on a phone', async ({page}) => {
       const refused = await useFakeSupabase(page);
 
@@ -65,6 +101,11 @@ for (const colorScheme of ['light', 'dark'] as const) {
       await signIn(page);
       await page.getByRole('button', {name: 'Open menu'}).click();
       await expect(page.getByRole('dialog', {name: 'Menu'})).toBeVisible();
+      await page
+        .getByRole('dialog')
+        .getByRole('button', {name: /^Account:/})
+        .click();
+      await expect(page.getByRole('link', {name: 'Account'})).toBeVisible();
       await expectNoViolations(page, 'dialog');
 
       expect(refused).toEqual([]);

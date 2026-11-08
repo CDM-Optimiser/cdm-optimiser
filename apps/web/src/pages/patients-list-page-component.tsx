@@ -45,7 +45,8 @@ export function PatientsListPageComponent() {
         value={list.searchText}
         onTextChange={list.changeSearch}
       />
-      <div className="flex flex-wrap items-center justify-center gap-4 xl:justify-between">
+      {/* Side by side on wide screens, stretched to the same height. */}
+      <div className="flex flex-wrap items-stretch justify-center gap-4 xl:justify-between">
         <StatusFilterComponent
           filterSelected={list.status}
           onFilterChange={list.changeStatus}

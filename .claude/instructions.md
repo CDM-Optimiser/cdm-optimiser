@@ -53,10 +53,24 @@ lint rule or delete a test to get a green run. Report what fails instead.
   - `pages/`: one component per route. Pages compose features; they hold no
     data access of their own.
   - `features/<area>/`: everything for one area of the app, together.
-    - `auth/`: auth context, provider, `useAuth`, the login form, the
-      logout button and `CurrentUserComponent` (an avatar and the signed-in
-      email, shown next to Logout). The session comes only from Supabase's
-      `onAuthStateChange`; `login` and `logout` just call Supabase.
+    - `auth/`: auth context, provider, `useAuth`, the login form,
+      `AccountMenuComponent` (the signed-in email as a button opening
+      Account and Logout, in the header bar and the drawer), the logout
+      button and `useLogout`, and the Account page's parts: the
+      change-password form, the weak-password notice and
+      `getPasswordErrorMessage`. The session comes only from Supabase's
+      `onAuthStateChange`; `login`, `logout` and `changePassword` just call
+      Supabase.
+      - **Passwords:** Supabase enforces the rules (runbook A1: at least
+        16 characters, `MIN_PASSWORD_LENGTH` in `password-rules.ts` must
+        match) and checks the current password (runbook P1). The app
+        states the rule, checks the confirmation, and turns Supabase's
+        error codes into plain words. When Supabase flags a password as
+        weak at sign-in, a notice above every page links to Account.
+      - **The demo account** is marked in `app_metadata.demo`
+        (`isDemoAccount`), which users can't edit. Its Account page shows a
+        notice instead of the form, and the database refuses a new
+        password for it whatever the app does (runbook P2).
     - `layout/`: the page frame: the header (`MainNavComponent` with its
       `NavItemComponent` links; below `lg`, a menu button opening a drawer)
       and the footer. They are this app's frame, not reusable building
@@ -123,11 +137,15 @@ stays in `useState` in the page.
   anything from `apps/`. Apps import each one from its own file through the
   package's `exports`
   (`import {ButtonComponent} from '@cdm-optimiser/ui/components/button-component.tsx'`).
-  - `components/`: alert, button (`primary` for the main action and the
-    selected option in a group, `secondary` for the rest), card, dropdown,
+  - `components/`: alert (with an optional link or other content under the
+    text), button (`primary` for the main action and the selected option in
+    a group, `secondary` for the rest), card, dropdown (picks one option),
+    menu button (a list of actions and links, such as the account menu),
     modal (a native `<dialog>` with a `title` row; `placement="end"` makes
-    it a drawer), svg, switch and text field. Only generic parts belong here; an app's page frame stays in the
-    app.
+    it a drawer), svg, switch and text field (with an optional `hint`). The
+    dropdown and the menu button share their list styles
+    (`popup-classes.ts`) and closing behaviour (`useDismissPopup`). Only
+    generic parts belong here; an app's page frame stays in the app.
   - `icons/`: one component per icon, decorative (`aria-hidden`) by default.
     Use them instead of pasting `<svg>` markup.
   - Use these instead of copying class strings: a button is
@@ -269,8 +287,8 @@ The app processes health data of real patients (GDPR special-category data).
   `test` for testers. Its practice must only ever hold synthetic patients,
   and no real staff may join it: real patients go into their own practice.
   The maintainers check this with the runbook's demo-account check after
-  every import. Don't use the demo account in tests; the e2e tests use a
-  fake Supabase.
+  every import. Nobody can change its password (runbook P2). Don't use the
+  demo account in tests; the e2e tests use a fake Supabase.
 - The Supabase publishable key (`sb_publishable_…`) is public by design; the
   database functions and row-level security are the security boundary. Never
   put a secret key (`sb_secret_…`) or a legacy service-role key in client code
@@ -304,8 +322,8 @@ The app processes health data of real patients (GDPR special-category data).
 - **Colour is never the only signal:** a patient's status is also written
   and drawn, and the current page is bold as well as darker.
 - **Small screens:** no page may scroll sideways at any width. Below `lg`
-  (1024px, so tablets in portrait too) the header's links and account move
-  into a menu drawer; below `md` (768px) the filters move into a drawer and
+  (1024px, so tablets in portrait too) the header's links and account menu
+  move into a menu drawer; below `md` (768px) the filters move into a drawer and
   the pagination shows "Page X of Y" between its arrows. Make a drawer with
   `ModalComponent placement="end"` and close it with `useCloseOnWideScreen`
   when the wide layout returns. An element with `sr-only` text inside a

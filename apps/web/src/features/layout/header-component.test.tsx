@@ -11,6 +11,8 @@ vi.mock('../auth/use-auth.ts', () => ({
   }),
 }));
 
+const ACCOUNT_MENU = 'Account: test.user@example.com';
+
 function renderHeaderAt(path: string) {
   return render(
     <MemoryRouter initialEntries={[path]}>
@@ -48,13 +50,15 @@ describe('HeaderComponent', () => {
         .not.toHaveAttribute('aria-current');
     });
 
-    test('shows who is signed in, and Logout, with no menu button', async () => {
+    test('shows the account menu, with no menu button', async () => {
       await page.viewport(1280, 800);
       const screen = await renderHeaderAt('/');
 
+      await screen.getByRole('button', {name: ACCOUNT_MENU}).click();
+
       await expect
-        .element(screen.getByText('Signed in as test.user@example.com'))
-        .toBeVisible();
+        .element(screen.getByRole('link', {name: 'Account'}))
+        .toHaveAttribute('href', '/account');
       await expect
         .element(screen.getByRole('button', {name: 'Logout'}))
         .toBeVisible();
@@ -110,7 +114,7 @@ describe('HeaderComponent', () => {
       ).toBeNull();
     });
 
-    test('the menu opens a drawer with the links, the user and Logout', async () => {
+    test('the menu opens a drawer with the links and the account menu', async () => {
       await page.viewport(390, 844);
       const screen = await renderHeaderAt('/');
 
@@ -122,8 +126,11 @@ describe('HeaderComponent', () => {
       await expect
         .element(drawer.getByRole('link', {name: 'Patients List'}))
         .toHaveAttribute('aria-current', 'page');
+
+      await drawer.getByRole('button', {name: ACCOUNT_MENU}).click();
+
       await expect
-        .element(drawer.getByText('Signed in as test.user@example.com'))
+        .element(drawer.getByRole('link', {name: 'Account'}))
         .toBeVisible();
       await expect
         .element(drawer.getByRole('button', {name: 'Logout'}))
@@ -139,6 +146,20 @@ describe('HeaderComponent', () => {
         .getByRole('dialog', {name: 'Menu'})
         .getByRole('link', {name: 'Pending Patients'})
         .click();
+
+      await expect.element(screen.getByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    test('choosing Account closes the drawer', async () => {
+      await page.viewport(390, 844);
+      const screen = await renderHeaderAt('/');
+
+      await screen.getByRole('button', {name: 'Open menu'}).click();
+
+      const drawer = screen.getByRole('dialog', {name: 'Menu'});
+
+      await drawer.getByRole('button', {name: ACCOUNT_MENU}).click();
+      await drawer.getByRole('link', {name: 'Account'}).click();
 
       await expect.element(screen.getByRole('dialog')).not.toBeInTheDocument();
     });

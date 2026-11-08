@@ -1,23 +1,12 @@
 import {ButtonComponent} from '@cdm-optimiser/ui/components/button-component.tsx';
-import {getErrorMessage} from '../../lib/get-error-message.ts';
-import {useAuth} from './use-auth.ts';
+import {useLogout} from './use-logout.ts';
 
-/**
- * Signs the user out. The protected layout then sends them to the login
- * page, because the session is gone.
- */
+/** Signs the user out (the Account page has one). */
 export function LogoutButton({className}: {className?: string}) {
-  const {logout} = useAuth();
-
-  const handleLogout = () => {
-    logout().catch((error: unknown) => {
-      // The user stays signed in and can try again.
-      console.warn('Logout failed:', getErrorMessage(error));
-    });
-  };
+  const logout = useLogout();
 
   return (
-    <ButtonComponent className={className} onClick={handleLogout}>
+    <ButtonComponent className={className} onClick={logout}>
       Logout
     </ButtonComponent>
   );
