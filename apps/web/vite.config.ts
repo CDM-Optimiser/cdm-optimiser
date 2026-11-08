@@ -1,4 +1,5 @@
 /// <reference types="vitest/config" />
+import {readFileSync} from 'node:fs';
 import {defineConfig, loadEnv, type Plugin} from 'vite';
 import {playwright} from '@vitest/browser-playwright';
 import react from '@vitejs/plugin-react';
@@ -70,11 +71,18 @@ function supabaseConfigCheck(env: Record<string, string>): Plugin {
   };
 }
 
+/** The app's version: the root package.json (see scripts/bump-version.mjs). */
+const APP_VERSION: string = JSON.parse(
+  readFileSync(new URL('../../package.json', import.meta.url), 'utf8')
+).version;
+
 // https://vite.dev/config/
 export default defineConfig(({mode}) => {
   const env = loadEnv(mode, import.meta.dirname, 'VITE_');
 
   return {
+    // Shown in the footer, on the website and in the desktop app alike.
+    define: {__APP_VERSION__: JSON.stringify(APP_VERSION)},
     // Absolute asset URLs, so pages at any path (`/pending-patients`) load
     // `/assets/…`. Netlify and the desktop app's app:// protocol both serve
     // the build from the root and answer unknown paths with index.html.

@@ -2,6 +2,7 @@ import {Navigate, Outlet, useLocation} from 'react-router';
 import {useAuth} from '../features/auth/use-auth.ts';
 import {FooterComponent} from '../features/layout/footer-component.tsx';
 import {HeaderComponent} from '../features/layout/header-component.tsx';
+import {APP_VERSION} from '../lib/app-version.ts';
 
 /**
  * The frame of every signed-in page. Waits for the stored session, sends
@@ -24,7 +25,7 @@ export function ProtectedLayout() {
       <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-6">
         <Outlet />
       </main>
-      <FooterComponent brand="CDM Optimiser" />
+      <FooterComponent brand="CDM Optimiser" version={APP_VERSION} />
     </>
   );
 }
