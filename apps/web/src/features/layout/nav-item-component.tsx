@@ -4,6 +4,7 @@ import {NavLink} from 'react-router';
 interface NavItemProps {
   to: string;
   children: ReactNode;
+  onClick?: () => void;
 }
 
 /**
@@ -11,10 +12,11 @@ interface NavItemProps {
  * `aria-current="page"`, which also makes it bold, so the current page
  * doesn't rely on colour alone.
  */
-export function NavItemComponent({to, children}: NavItemProps) {
+export function NavItemComponent({to, children, onClick}: NavItemProps) {
   return (
     <NavLink
       to={to}
+      onClick={onClick}
       className="text-xl text-sky-700 underline transition duration-200 ease-in-out hover:text-sky-900 aria-[current=page]:font-semibold dark:text-sky-300 dark:hover:text-sky-200"
     >
       {children}

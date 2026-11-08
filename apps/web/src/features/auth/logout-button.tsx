@@ -6,7 +6,7 @@ import {useAuth} from './use-auth.ts';
  * Signs the user out. The protected layout then sends them to the login
  * page, because the session is gone.
  */
-export function LogoutButton() {
+export function LogoutButton({className}: {className?: string}) {
   const {logout} = useAuth();
 
   const handleLogout = () => {
@@ -16,5 +16,9 @@ export function LogoutButton() {
     });
   };
 
-  return <ButtonComponent onClick={handleLogout}>Logout</ButtonComponent>;
+  return (
+    <ButtonComponent className={className} onClick={handleLogout}>
+      Logout
+    </ButtonComponent>
+  );
 }

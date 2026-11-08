@@ -10,7 +10,10 @@ interface PatientsTableProps {
 
 export function PatientsTableComponent({patients, onOpen}: PatientsTableProps) {
   return (
-    <div className="overflow-hidden overflow-x-auto rounded-xl shadow-md dark:ring-1 dark:ring-gray-600">
+    // `relative` keeps the cells' screen-reader text (absolutely positioned
+    // by `sr-only`) inside this scroll box; without it, that text escapes
+    // and widens the whole page on narrow screens.
+    <div className="relative overflow-x-auto rounded-xl shadow-md dark:ring-1 dark:ring-gray-600">
       <table className="w-full min-w-full table-auto">
         <thead className="bg-sky-200 dark:bg-sky-950">
           <tr>

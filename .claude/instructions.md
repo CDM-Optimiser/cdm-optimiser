@@ -52,25 +52,29 @@ lint rule or delete a test to get a green run. Report what fails instead.
   - `pages/`: one component per route. Pages compose features; they hold no
     data access of their own.
   - `features/<area>/`: everything for one area of the app, together.
-    - `auth/`: auth context, provider, `useAuth`, the login form and the
-      logout button. The session comes only from Supabase's
+    - `auth/`: auth context, provider, `useAuth`, the login form, the
+      logout button and `CurrentUserComponent` (an avatar and the signed-in
+      email, shown next to Logout). The session comes only from Supabase's
       `onAuthStateChange`; `login` and `logout` just call Supabase.
-    - `layout/`: the page frame: the header (with `NavItemComponent` for its
-      links) and the footer. They are this app's frame, not reusable
-      building blocks, so they live here rather than in `packages/ui`: the
-      header needs the router, sign-in and the desktop theme, which
-      `packages/ui` may not use.
+    - `layout/`: the page frame: the header (`MainNavComponent` with its
+      `NavItemComponent` links; below `lg`, a menu button opening a drawer)
+      and the footer. They are this app's frame, not reusable building
+      blocks, so they live here rather than in `packages/ui`: the header
+      needs the router, sign-in and the desktop theme, which `packages/ui`
+      may not use.
     - `theme/`: the desktop theme menu. `useDesktopTheme` talks to
       `window.darkMode`; the menu only renders the dropdown.
     - `patients/`, split into:
       - `model/`: the `Patient` type, `PatientStatus` and `StatusFilter`
-        (`patient.ts`), the CDM conditions (`patient-conditions.ts`) and the
-        table's columns (`patient-columns.ts`). Columns, conditions, filters
-        and legend items are config arrays: add an entry, not markup.
+        (`patient.ts`), the CDM conditions (`patient-conditions.ts`), the
+        table's columns (`patient-columns.ts`) and the list's filters
+        (`status-filters.ts`). Columns, conditions, filters and legend
+        items are config arrays: add an entry, not markup.
       - `api/`: see "Patient data" below.
       - `list/`: `usePatientsList` (the list page's state and query), the
         table (`patients-table` › `patient-row` › `patient-cell`), search,
-        status filter and legend.
+        status filter (a card on wide screens, a drawer below `md`, both
+        built from `StatusFilterButtonsComponent`) and legend.
       - `pagination/`: the pagination bar, page-size select and
         `getVisiblePages`.
       - `card/`: `PatientCardComponent`, made of the details, the conditions
@@ -79,8 +83,8 @@ lint rule or delete a test to get a green run. Report what fails instead.
       - `pending/`: the navigator of the pending patients page.
   - `lib/`: app-wide modules with no React (the Supabase client,
     `getErrorMessage`).
-  - `hooks/`: generic hooks used by several features (`useDebounce`).
-    Feature hooks live in their feature folder.
+  - `hooks/`: generic hooks used by several features (`useDebounce`,
+    `useCloseOnWideScreen`). Feature hooks live in their feature folder.
   - Don't add a `utils/` folder: put each helper next to the feature that
     uses it, or in `lib/` if several features do.
   - One component per file. Don't wrap a single `useState` in a custom
@@ -120,8 +124,8 @@ stays in `useState` in the page.
   (`import {ButtonComponent} from '@cdm-optimiser/ui/components/button-component.tsx'`).
   - `components/`: alert, button (`primary` for the main action and the
     selected option in a group, `secondary` for the rest), card, dropdown,
-    modal (a native `<dialog>` with a `title` row), svg, switch and text
-    field. Only generic parts belong here; an app's page frame stays in the
+    modal (a native `<dialog>` with a `title` row; `placement="end"` makes
+    it a drawer), svg, switch and text field. Only generic parts belong here; an app's page frame stays in the
     app.
   - `icons/`: one component per icon, decorative (`aria-hidden`) by default.
     Use them instead of pasting `<svg>` markup.
@@ -198,6 +202,12 @@ other modules. Import every value from the file that defines it.
   Vitest browser mode, and compares the element's whole text (whitespace
   collapsed). To check part of an element, find the part
   (`getByRole('alert').getByText('…')`) and assert on that.
+- **Browser tests run desktop-sized (1280×800) with reduced motion,** so
+  drawers appear at once. A small-screen test sets its own size with
+  `page.viewport(390, 844)` (from `vitest/browser`) and resets it in
+  `afterEach`. Role queries skip hidden elements, so check that a hidden
+  control is gone with `getByRole(…).query()` returning `null`, not with
+  `not.toBeVisible()`.
 - **Keyboard tests start from an element:** call `.focus()` on it first.
   Where the first `userEvent.tab()` lands depends on the test runner's
   iframe, which makes tests flaky.
@@ -215,6 +225,9 @@ other modules. Import every value from the file that defines it.
   - `accessibility.spec.ts` signs in and checks every page with axe
     (WCAG 2.2 AA) in light and dark mode. Add a check when you add a page
     or a dialog.
+  - `layout.spec.ts` checks that no page scrolls sideways at phone, iPad
+    mini, tablet and desktop sizes, and that pressing a button doesn't
+    move the layout.
   - Signed-in tests use `fake-supabase.ts`: it answers Supabase's auth and
     database calls with synthetic patients and refuses every other request
     to another origin, so nothing leaves the machine. Each test expects the
@@ -283,6 +296,16 @@ The app processes health data of real patients (GDPR special-category data).
   dividers, accent lines), not only the one in front of you.
 - **Colour is never the only signal:** a patient's status is also written
   and drawn, and the current page is bold as well as darker.
+- **Small screens:** no page may scroll sideways at any width. Below `lg`
+  (1024px, so tablets in portrait too) the header's links and account move
+  into a menu drawer; below `md` (768px) the filters move into a drawer and
+  the pagination shows "Page X of Y" between its arrows. Make a drawer with
+  `ModalComponent placement="end"` and close it with `useCloseOnWideScreen`
+  when the wide layout returns. An element with `sr-only` text inside a
+  scroll box needs a positioned ancestor in that box (`relative`), or it
+  escapes and widens the page.
+- **Buttons keep their size when pressed** (the face moves onto its bottom
+  edge). Space them with the parent's `gap`, not vertical margins.
 - **Focus:** one ring for every control, set in `apps/web/src/index.css`.
   Don't add per-component focus colours (text fields repeat the same ring,
   see the colour system).

@@ -58,6 +58,30 @@ for (const colorScheme of ['light', 'dark'] as const) {
       expect(refused).toEqual([]);
     });
 
+    test('the menu drawer on a phone', async ({page}) => {
+      const refused = await useFakeSupabase(page);
+
+      await page.setViewportSize({width: 390, height: 844});
+      await signIn(page);
+      await page.getByRole('button', {name: 'Open menu'}).click();
+      await expect(page.getByRole('dialog', {name: 'Menu'})).toBeVisible();
+      await expectNoViolations(page, 'dialog');
+
+      expect(refused).toEqual([]);
+    });
+
+    test('the filters drawer on a phone', async ({page}) => {
+      const refused = await useFakeSupabase(page);
+
+      await page.setViewportSize({width: 390, height: 844});
+      await signIn(page);
+      await page.getByRole('button', {name: 'Filters: All'}).click();
+      await expect(page.getByRole('dialog', {name: 'Filters'})).toBeVisible();
+      await expectNoViolations(page, 'dialog');
+
+      expect(refused).toEqual([]);
+    });
+
     test('the pending patients page', async ({page}) => {
       const refused = await useFakeSupabase(page);
 

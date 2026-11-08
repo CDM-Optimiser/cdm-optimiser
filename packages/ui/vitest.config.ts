@@ -14,7 +14,9 @@ export default defineConfig({
     setupFiles: ['./test/setup.ts'],
     browser: {
       enabled: true,
-      provider: playwright(),
+      // Reduced motion: drawers appear at once instead of sliding in, so
+      // clicks never land on something still moving.
+      provider: playwright({contextOptions: {reducedMotion: 'reduce'}}),
       instances: [{browser: 'chromium'}],
     },
   },

@@ -1,12 +1,13 @@
+import {useState} from 'react';
 import {Link} from 'react-router';
+import {ButtonComponent} from '@cdm-optimiser/ui/components/button-component.tsx';
+import {ModalComponent} from '@cdm-optimiser/ui/components/modal-component.tsx';
+import {MenuIcon} from '@cdm-optimiser/ui/icons/menu-icon.tsx';
+import {CurrentUserComponent} from '../auth/current-user-component.tsx';
 import {LogoutButton} from '../auth/logout-button.tsx';
+import {useCloseOnWideScreen} from '../../hooks/use-close-on-wide-screen.ts';
 import {ThemeMenuComponent} from '../theme/theme-menu-component.tsx';
-import {NavItemComponent} from './nav-item-component.tsx';
-
-const NAV_ITEMS: readonly {to: string; label: string}[] = [
-  {to: '/', label: 'Patients List'},
-  {to: '/pending-patients', label: 'Pending Patients'},
-];
+import {MainNavComponent} from './main-nav-component.tsx';
 
 interface HeaderProps {
   /** The app's name, linking to the patients list. */
@@ -17,28 +18,57 @@ interface HeaderProps {
  * The top of every signed-in page (ProtectedLayout only renders it for a
  * signed-in user). The brand is a link, not a heading: each page has its own
  * `h1`.
+ *
+ * On wide screens the navigation, the theme menu and the account (the
+ * signed-in user next to Logout) sit in the bar. On small screens a menu
+ * button opens them in a drawer, the account last.
  */
 export function HeaderComponent({title}: HeaderProps) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const closeMenu = () => setIsMenuOpen(false);
+
+  // `lg`, not `md`: the bar needs about 1000px to fit on one line, so
+  // tablets in portrait (an iPad mini is 744–768px wide) get the menu too.
+  useCloseOnWideScreen(isMenuOpen, closeMenu, 'lg');
+
   return (
     <header className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4 border-b-2 border-sky-700 px-6 py-4">
       <Link to="/" className="text-3xl">
         {title}
       </Link>
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-        <nav aria-label="Main">
-          <ul className="flex flex-wrap items-center gap-x-6 gap-y-2">
-            {NAV_ITEMS.map(({to, label}) => (
-              <li key={to}>
-                <NavItemComponent to={to}>{label}</NavItemComponent>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <div className="flex items-center gap-4">
+
+      <div className="hidden flex-wrap items-center gap-x-8 gap-y-3 lg:flex">
+        <MainNavComponent />
+        <ThemeMenuComponent />
+        <div className="flex items-center gap-3">
+          <CurrentUserComponent />
           <LogoutButton />
-          <ThemeMenuComponent />
         </div>
       </div>
+
+      <ButtonComponent
+        variant="secondary"
+        className="px-3 lg:hidden"
+        aria-haspopup="dialog"
+        onClick={() => setIsMenuOpen(true)}
+      >
+        <MenuIcon />
+        <span className="sr-only">Open menu</span>
+      </ButtonComponent>
+
+      <ModalComponent
+        isOpen={isMenuOpen}
+        placement="end"
+        title="Menu"
+        onClose={closeMenu}
+      >
+        <MainNavComponent orientation="vertical" onNavigate={closeMenu} />
+        <ThemeMenuComponent />
+        <div className="flex flex-col gap-3 border-t border-gray-200 pt-6 dark:border-gray-600">
+          <CurrentUserComponent />
+          <LogoutButton className="w-full" />
+        </div>
+      </ModalComponent>
     </header>
   );
 }

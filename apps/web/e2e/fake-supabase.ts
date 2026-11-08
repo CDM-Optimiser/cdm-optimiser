@@ -7,7 +7,7 @@ import type {Page, Route} from '@playwright/test';
 
 type Status = 'accepted' | 'refused' | 'pending';
 
-const PATIENT_COUNT = 30;
+const PATIENT_COUNT = 300;
 
 /** Patient `id`'s status: a mix of all three, so every row colour shows. */
 function statusOf(id: number): Status {

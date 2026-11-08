@@ -27,6 +27,25 @@ function ModalHarness({onClose}: {onClose?: () => void}) {
 }
 
 describe('Modal component tests', () => {
+  test('placement="end" opens a full-height drawer on the right', async () => {
+    const screen = await render(
+      <ModalComponent isOpen placement="end" title="Menu">
+        <a href="/">Patients List</a>
+      </ModalComponent>
+    );
+
+    const drawer = screen.getByRole('dialog', {name: 'Menu'});
+
+    await expect.element(drawer).toBeVisible();
+    // Let the slide-in finish before measuring.
+    await expect
+      .poll(() => Math.round(drawer.element().getBoundingClientRect().right))
+      .toBe(window.innerWidth);
+    expect(drawer.element().getBoundingClientRect().height).toBe(
+      window.innerHeight
+    );
+  });
+
   test('is closed and renders no content until isOpen is true', async () => {
     const screen = await render(<ModalHarness />);
 

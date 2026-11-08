@@ -121,8 +121,13 @@ export default defineConfig(({mode}) => {
             setupFiles: ['./src/test/browser-setup.ts'],
             browser: {
               enabled: true,
-              provider: playwright(),
+              // Reduced motion: drawers appear at once instead of sliding
+              // in, so clicks never land on something still moving.
+              provider: playwright({contextOptions: {reducedMotion: 'reduce'}}),
               instances: [{browser: 'chromium'}],
+              // Desktop-sized, as in clinics. Tests for small screens set
+              // their own size with `page.viewport()`.
+              viewport: {width: 1280, height: 800},
             },
           },
         },
