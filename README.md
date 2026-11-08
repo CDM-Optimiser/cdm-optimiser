@@ -50,6 +50,9 @@ demo account:
   "TEST0001"). The demo account's practice never holds real patient data.
 - You can accept and refuse patients. Other testers share the same data, so
   it may change while you look.
+- The demo account's password can't be changed, so it keeps working for
+  everyone. Your own account can change its password under **Account**
+  (your email at the top right).
 - The desktop app, from the
   [latest release](https://github.com/CDM-Optimiser/cdm-optimiser/releases/latest),
   accepts the same account. Its installer lets you choose the folder, and
@@ -76,13 +79,13 @@ demo account:
 
 The repository is a Yarn workspaces monorepo:
 
-| Path                      | What it is                                                                 |
-| ------------------------- | -------------------------------------------------------------------------- |
-| `apps/web`                | The React app. Deployed to Netlify as the website.                         |
-| `apps/desktop`            | The Electron app. Packages the web app's build into a Windows installer.   |
-| `packages/ui`             | Shared presentational components (alerts, modal, dropdown, footer, icons). |
-| `packages/desktop-bridge` | Type definitions for the calls between the Electron app and the web app.   |
-| `scripts/`                | Repository scripts (formatting and linting of changed files).              |
+| Path                      | What it is                                                               |
+| ------------------------- | ------------------------------------------------------------------------ |
+| `apps/web`                | The React app. Deployed to Netlify as the website.                       |
+| `apps/desktop`            | The Electron app. Packages the web app's build into a Windows installer. |
+| `packages/ui`             | Shared presentational components (alerts, modal, menus, icons).          |
+| `packages/desktop-bridge` | Type definitions for the calls between the Electron app and the web app. |
+| `scripts/`                | Repository scripts (formatting and linting of changed files).            |
 
 ### Prerequisites
 
