@@ -400,6 +400,10 @@ Also add these when they apply, whatever the type:
 - **Pull requests that touch the desktop app** also build the Windows
   installer (`installer-check.yml`), so a broken release shows up before it
   merges.
+- **The installer asks** who the app is for and where to install it
+  (`nsis` in `electron-builder.yml`). "Only for me", the default, needs no
+  admin rights and updates silently; "Anyone who uses this computer" needs
+  admin rights, and Windows asks for them on every update.
 - The installer is not code-signed yet: Windows SmartScreen shows "Unknown
   publisher" on the first install.
 

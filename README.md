@@ -52,7 +52,10 @@ demo account:
   it may change while you look.
 - The desktop app, from the
   [latest release](https://github.com/CDM-Optimiser/cdm-optimiser/releases/latest),
-  accepts the same account.
+  accepts the same account. Its installer lets you choose the folder, and
+  whether it's for you only (no admin rights needed, updates install
+  silently) or for everyone on the PC (Windows asks for admin rights at
+  install and on each update).
 - If the demo sign-in stops working, please
   [open an issue](https://github.com/CDM-Optimiser/cdm-optimiser/issues).
 
