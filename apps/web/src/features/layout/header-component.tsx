@@ -1,48 +1,44 @@
-import {NavLink} from 'react-router';
-import {useAuth} from '../auth/use-auth.ts';
+import {Link} from 'react-router';
 import {LogoutButton} from '../auth/logout-button.tsx';
 import {ThemeMenuComponent} from '../theme/theme-menu-component.tsx';
+import {NavItemComponent} from './nav-item-component.tsx';
+
+const NAV_ITEMS: readonly {to: string; label: string}[] = [
+  {to: '/', label: 'Patients List'},
+  {to: '/pending-patients', label: 'Pending Patients'},
+];
 
 interface HeaderProps {
+  /** The app's name, linking to the patients list. */
   title: string;
 }
 
+/**
+ * The top of every signed-in page (ProtectedLayout only renders it for a
+ * signed-in user). The brand is a link, not a heading: each page has its own
+ * `h1`.
+ */
 export function HeaderComponent({title}: HeaderProps) {
-  const {user} = useAuth();
-
-  if (!user) return null;
-
   return (
-    <header className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4 border-b-2 border-sky-400 p-4">
-      <h1 className="text-3xl">{title}</h1>
-      <nav className="flex items-center justify-between gap-6">
-        {user && (
-          <>
-            <NavLink
-              to="/"
-              className={({isActive}) =>
-                isActive
-                  ? 'text-underline text-xl text-sky-700 underline transition duration-200 ease-in-out'
-                  : 'text-underline text-xl text-sky-500 underline transition duration-200 ease-in-out hover:text-sky-700'
-              }
-            >
-              Patients List
-            </NavLink>
-            <NavLink
-              to="/pending-patients"
-              className={({isActive}) =>
-                isActive
-                  ? 'text-underline text-xl text-sky-700 underline transition duration-200 ease-in-out'
-                  : 'text-underline text-xl text-sky-500 underline transition duration-200 ease-in-out hover:text-sky-700'
-              }
-            >
-              Pending Patients
-            </NavLink>
-          </>
-        )}
-        <LogoutButton />
-        <ThemeMenuComponent />
-      </nav>
+    <header className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4 border-b-2 border-sky-400 px-6 py-4">
+      <Link to="/" className="text-3xl">
+        {title}
+      </Link>
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+        <nav aria-label="Main">
+          <ul className="flex flex-wrap items-center gap-x-6 gap-y-2">
+            {NAV_ITEMS.map(({to, label}) => (
+              <li key={to}>
+                <NavItemComponent to={to}>{label}</NavItemComponent>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <div className="flex items-center gap-4">
+          <LogoutButton />
+          <ThemeMenuComponent />
+        </div>
+      </div>
     </header>
   );
 }
