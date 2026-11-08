@@ -1,5 +1,6 @@
 // `yarn linc`: lints only the files changed against the main branch.
-// Exits with code 1 on lint errors, like `yarn lint` does in CI.
+// Exits with code 1 on any lint error or warning, like `yarn lint` does in
+// CI (`--max-warnings 0`).
 
 import {ESLint} from 'eslint';
 import {getChangedFiles} from './changed-files.mjs';
@@ -20,14 +21,14 @@ if (files.length === 0) {
 
   if (output) console.log(output);
 
-  const errorCount = results.reduce(
-    (total, result) => total + result.errorCount,
+  const problemCount = results.reduce(
+    (total, result) => total + result.errorCount + result.warningCount,
     0
   );
 
-  if (errorCount > 0) {
+  if (problemCount > 0) {
     process.exitCode = 1;
   } else {
-    console.log(`Linted ${files.length} changed file(s): no errors.`);
+    console.log(`Linted ${files.length} changed file(s): no problems.`);
   }
 }
