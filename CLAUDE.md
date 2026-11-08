@@ -13,14 +13,14 @@ data**: follow the privacy rules in `.claude/instructions.md`.
 
 ## Repository map
 
-| Path                      | Package                         | Contents                                                                                                                                              |
-| ------------------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `apps/web`                | `@cdm-optimiser/web`            | React 19 + Vite + Tailwind 4 SPA. Entry `src/main.tsx`, routes `src/app/app.tsx`, Supabase client `src/lib/supabase.ts`.                              |
-| `apps/desktop`            | `@cdm-optimiser/desktop`        | Electron main process `src/main.ts`, preload `src/preload.cts`, packaging config `electron-builder.yml`.                                              |
-| `packages/ui`             | `@cdm-optimiser/ui`             | Presentational components (alert, button, card, dropdown, modal, switch, text field), icons and the auto-dismiss hook. Consumed as TypeScript source. |
-| `packages/desktop-bridge` | `@cdm-optimiser/desktop-bridge` | Types-only IPC contract shared by the Electron main process, the preload and the web app (`src/index.d.ts`).                                          |
-| `scripts/`                | (root)                          | Changed-files helpers behind `yarn prettier` and `yarn linc`.                                                                                         |
-| `.github/`                | (root)                          | `ci.yml` (checks on every PR), `release-desktop.yml` (Windows installer on `v*` tags).                                                                |
+| Path                      | Package                         | Contents                                                                                                                                                  |
+| ------------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/web`                | `@cdm-optimiser/web`            | React 19 + Vite + Tailwind 4 SPA. Entry `src/main.tsx`, routes `src/app/app.tsx`, Supabase client `src/lib/supabase.ts`.                                  |
+| `apps/desktop`            | `@cdm-optimiser/desktop`        | Electron main process `src/main.ts`, updater `src/updater.ts`, preload `src/preload.cts`, packaging and update config `electron-builder.yml`.             |
+| `packages/ui`             | `@cdm-optimiser/ui`             | Presentational components (alert, button, card, dropdown, modal, switch, text field), icons and the auto-dismiss hook. Consumed as TypeScript source.     |
+| `packages/desktop-bridge` | `@cdm-optimiser/desktop-bridge` | Types-only IPC contract shared by the Electron main process, the preload and the web app (`src/index.d.ts`).                                              |
+| `scripts/`                | (root)                          | Changed-files helpers behind `yarn prettier` and `yarn linc`; `yarn bump` and `yarn check:versions`.                                                      |
+| `.github/`                | (root)                          | `ci.yml` (checks on every PR), `installer-check.yml` (Windows installer on desktop PRs), `release.yml` (a GitHub Release for each new version on `main`). |
 
 ## Commands
 
@@ -42,6 +42,7 @@ yarn lint                    # ESLint, whole repo   (yarn linc: changed files on
 yarn format                  # Prettier, whole repo (yarn prettier: changed files only)
 
 yarn dist:desktop            # Windows installer in apps/desktop/release
+yarn bump <x.y.z>            # set the app version; merging it publishes a release
 ```
 
 ## Architecture rules
@@ -58,11 +59,16 @@ yarn dist:desktop            # Windows installer in apps/desktop/release
   which holds the Supabase session: changing them signs users out. `tsc -b`
   compiles `apps/desktop/src` to `apps/desktop/dist`.
 - **One process boundary.** The renderer reaches Electron only through
-  `window.darkMode`, exposed by the preload. The contract (channels, payloads,
+  `window.darkMode` and `window.appUpdates`, exposed by the preload. The contract (channels, payloads,
   `Window` typing) lives in `packages/desktop-bridge`; change it first, then
   `main.ts` and `preload.cts`, and the compiler flags any mismatch.
 - **The web app must also work in a plain browser,** where `window.darkMode`
-  doesn't exist. It is typed as optional, so the compiler asks for the check.
+  and `window.appUpdates` don't exist. They are typed as optional, so the
+  compiler asks for the check.
+- **Releases and updates:** one version (root `package.json`, `yarn bump`).
+  Merging a version bump publishes a GitHub Release, and installed desktop
+  apps update from it (electron-updater in the main process). See "Deploys
+  and releases" in `.claude/instructions.md`.
 - **`packages/ui` stays presentational:** no Supabase, router or app state.
   The web app's `index.css` has an `@source` line so Tailwind scans it; keep it
   if the package moves.

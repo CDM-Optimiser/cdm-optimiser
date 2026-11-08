@@ -331,11 +331,30 @@ Also add these when they apply, whatever the type:
 - **Web:** Netlify builds every push to `main` (and PR previews) from
   `netlify.toml`. The Netlify UI's "Base directory" must stay empty; the
   Supabase variables are set in the Netlify UI.
-- **Desktop:** releases are tag-based.
-  1. `yarn workspace @cdm-optimiser/desktop version <x.y.z>`
-  2. Commit, then `git tag v<x.y.z>` and push the tag.
-  3. `release-desktop.yml` builds the Windows installer and attaches it to a
-     draft GitHub Release for a maintainer to publish.
+- **One version** for the whole app: the root `package.json`, copied into
+  `apps/web` and `apps/desktop`. The footer shows it (`__APP_VERSION__`,
+  defined in `apps/web/vite.config.ts`). CI fails if the copies disagree
+  (`yarn check:versions`).
+- **Desktop releases come from merging a version bump:**
+  1. On a branch, run `yarn bump <x.y.z>` (never edit the versions by hand,
+     and don't name a script `version`: Yarn has that command). Commit as
+     `chore(release): <x.y.z>`, label `chore`.
+  2. Merge it. `release.yml` sees that `v<x.y.z>` doesn't exist yet, builds
+     the Windows installer and publishes the GitHub Release with the
+     installer, its `.blockmap` and `latest.yml`. Ordinary merges keep the
+     version, so they release nothing. A version with a suffix
+     (`1.2.0-rc.1`) becomes a pre-release, which installed apps ignore.
+  3. If a release fails, fix it and run `Release` again from the Actions tab.
+- **Installed apps update themselves** (`apps/desktop/src/updater.ts`, with
+  electron-updater): they check GitHub on start and every 4 hours, download
+  a newer release in the background, verify its SHA-512, then show "Restart
+  now" (`features/updates/`). Otherwise it installs on the next quit. Only
+  the packaged Windows app updates.
+- **Pull requests that touch the desktop app** also build the Windows
+  installer (`installer-check.yml`), so a broken release shows up before it
+  merges.
+- The installer is not code-signed yet: Windows SmartScreen shows "Unknown
+  publisher" on the first install.
 
 ## Known pitfalls
 

@@ -97,17 +97,19 @@ with `yarn workspace @cdm-optimiser/web playwright install-deps chromium`.
 
 - **Web:** Netlify builds and deploys every push to `main` using
   `netlify.toml`. The Supabase variables are configured in the Netlify UI.
-- **Desktop:** push a version tag to build the Windows installer:
+- **Version:** one version for the whole app, shown in the footer on the
+  website and in the desktop app.
+- **Desktop releases:** open a pull request that bumps the version, and merge
+  it:
 
   ```sh
-  yarn workspace @cdm-optimiser/desktop version 1.2.3
-  git commit -am "chore: release desktop v1.2.3"
-  git tag v1.2.3
-  git push origin main v1.2.3
+  yarn bump 1.2.0   # sets the version in every package.json
   ```
 
-  The `Release desktop app` workflow attaches the installer to a draft GitHub
-  Release, ready to review and publish.
+  The `Release` workflow then builds the Windows installer and publishes
+  GitHub Release `v1.2.0`. Installed desktop apps download it in the
+  background and offer to restart into it (or install it the next time they
+  close).
 
 &nbsp;
 
