@@ -56,7 +56,8 @@ lint rule or delete a test to get a green run. Report what fails instead.
       logout button. The session comes only from Supabase's
       `onAuthStateChange`; `login` and `logout` just call Supabase.
     - `layout/`: the header.
-    - `theme/`: the desktop theme menu.
+    - `theme/`: the desktop theme menu. `useDesktopTheme` talks to
+      `window.darkMode`; the menu only renders the dropdown.
     - `patients/`, split into:
       - `model/`: the `Patient` type, `PatientStatus` and `StatusFilter`
         (`patient.ts`), the CDM conditions (`patient-conditions.ts`) and the
