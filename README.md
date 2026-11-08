@@ -84,7 +84,7 @@ Settings → API Keys).
 | `yarn dev:desktop`  | Runs the desktop app against the dev server                    |
 | `yarn test`         | Runs the component tests (Vitest, in Chromium)                 |
 | `yarn build:web`    | Builds the web app into `apps/web/dist`                        |
-| `yarn test:e2e`     | Runs the end-to-end smoke test against the build               |
+| `yarn test:e2e`     | Runs the end-to-end and accessibility tests against the build  |
 | `yarn typecheck`    | Type-checks every workspace                                    |
 | `yarn lint`         | Lints the repository (`yarn linc` lints changed files only)    |
 | `yarn format`       | Formats the repository (`yarn prettier` formats changed files) |

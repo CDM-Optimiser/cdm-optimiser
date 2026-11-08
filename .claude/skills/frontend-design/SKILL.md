@@ -26,7 +26,7 @@ The app uses Tailwind CSS v4's default palette with no custom theme: `apps/web/s
 
 - `dark:` variants follow the operating system's colour scheme (`prefers-color-scheme`). In the desktop app, the theme menu sets it through Electron, so the same classes cover both apps.
 - `apps/web/src/reset.css` sets `color-scheme: light dark`, so plain body text takes the browser's default colour for each scheme. Only set a text colour where a role below calls for one.
-- Every colour you add needs its `dark:` counterpart. Alerts are the one exception (see Feedback).
+- Check every colour you add in dark mode too. Add a `dark:` counterpart unless the same class reads well on both pages (the primary button, the accent rule, alerts: see Feedback).
 
 ### Roles
 
@@ -41,18 +41,34 @@ The app uses Tailwind CSS v4's default palette with no custom theme: `apps/web/s
 
 Keep these meanings exclusive: green and red only ever mean a patient's outcome or a success or error message, never decoration. Don't introduce other hues (blue, indigo, violet, orange and so on).
 
+### Contrast
+
+Every pair must meet WCAG 2.2 AA in light and dark mode: **4.5:1** for text
+and **3:1** for icons that carry meaning, control boundaries, states and focus
+rings. The recipes below all pass; check a new pair before using it (Tailwind
+4's colours are OKLCH, so compute from its values, not from older hex
+tables). `yarn test:e2e` runs axe on every page in both modes and fails on a
+text-contrast problem; it can't judge icons or states, so those are on you.
+
+Colour is never the only signal: a patient's status is also written and
+drawn (the Status column), and the current page link is bold as well as
+darker.
+
 ### Use the shared components first
 
 `@cdm-optimiser/ui` already applies these recipes. Reach for its components
 before writing classes by hand:
 
-- `ButtonComponent`: primary actions, and `variant="segment"` with
-  `aria-pressed` for a group of filters.
+- `ButtonComponent`: `variant="primary"` for the main action and for the
+  selected option in a group (the active filter, the current page);
+  `variant="secondary"` for every other button. Pass `aria-pressed` or
+  `aria-current` yourself.
 - `CardComponent`: cards and panels.
-- `TextFieldComponent`: labelled inputs.
+- `TextFieldComponent`: labelled inputs, the search box included.
 - `SwitchComponent`: on/off controls, `tone="positive"` (green) or
   `"negative"` (red), for accepted or refused only.
-- `ModalComponent`: dialogs.
+- `ModalComponent`: dialogs. It draws the title and the close button in one
+  row; pass `title`.
 - `AlertComponent`: messages.
 - The icon components, instead of inline `<svg>`.
 
@@ -61,62 +77,73 @@ cover, and for changing the components themselves.
 
 ### Surfaces and text
 
-| Element                 | Light                                           | Dark                                                    |
-| ----------------------- | ----------------------------------------------- | ------------------------------------------------------- |
-| Page background         | `bg-gray-100`                                   | `dark:bg-gray-900`                                      |
-| Card or panel           | `rounded-xl bg-white shadow-md`                 | `dark:bg-white/5 dark:ring dark:ring-gray-600`          |
-| Modal                   | `bg-white` over a `bg-black/70` backdrop        | `dark:bg-gray-800 dark:ring dark:ring-gray-600`         |
-| Dropdown menu           | `bg-white shadow-md`                            | `dark:bg-gray-600`                                      |
-| Text input              | `bg-white shadow-md outline-1 outline-gray-200` | `dark:bg-white/5 dark:text-white dark:outline-gray-600` |
-| Strong text on surfaces | `text-gray-900`                                 | `dark:text-white`                                       |
-| Muted text and icons    | `text-gray-400`                                 | `dark:text-gray-400`                                    |
-| Dividers, table borders | `border-gray-200`, `border-gray-300`            | Same                                                    |
+| Element                 | Light                                            | Dark                                                    |
+| ----------------------- | ------------------------------------------------ | ------------------------------------------------------- |
+| Page background         | `bg-gray-100`                                    | `dark:bg-gray-900`                                      |
+| Card or panel           | `rounded-xl bg-white shadow-md`                  | `dark:bg-white/5 dark:ring dark:ring-gray-600`          |
+| Modal                   | `bg-white` over a `bg-black/70` backdrop         | `dark:bg-gray-800 dark:ring dark:ring-gray-600`         |
+| Dropdown menu           | `bg-white shadow-md ring-1 ring-gray-200`        | `dark:bg-gray-800 dark:ring-gray-600`                   |
+| Text input, select      | `bg-white shadow-md outline-1 outline-gray-500`  | `dark:bg-white/5 dark:text-white dark:outline-gray-500` |
+| Placeholder             | `placeholder:text-gray-500`                      | `dark:placeholder:text-gray-400`                        |
+| Strong text on surfaces | `text-gray-900`                                  | `dark:text-white`                                       |
+| Muted icons             | `text-gray-500`                                  | `dark:text-gray-400`                                    |
+| Dividers, table borders | `border-gray-200`; table cells `border-gray-300` | `dark:border-gray-600`                                  |
 
 ### Primary (sky)
 
-| Element                         | Classes                                                                                                                                                                                           |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Primary button                  | `rounded-md border-b-4 border-b-sky-600 bg-sky-500 text-white`, hover `bg-sky-600 border-sky-800`, `active:border-b-0`; dark `dark:border-b-sky-700`, hover `dark:bg-sky-800 dark:border-sky-900` |
-| Selected option (active filter) | `bg-sky-700 border-sky-900`; dark `dark:bg-sky-700 dark:border-b-sky-900`                                                                                                                         |
-| Disabled button                 | `disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-600 disabled:border-b-gray-500`                                                                                              |
-| Link                            | `text-sky-500 underline hover:text-sky-700`; current page `text-sky-700`                                                                                                                          |
-| Keyboard focus                  | `focus:outline-4 focus:outline-offset-1 focus:outline-sky-500`                                                                                                                                    |
-| Table header                    | `bg-sky-200`; dark `dark:bg-white/5`                                                                                                                                                              |
-| Hover on rows                   | `hover:bg-sky-100`; dark `dark:hover:bg-sky-500`                                                                                                                                                  |
-| Hover on menu items and pages   | `hover:bg-sky-500 hover:text-white`                                                                                                                                                               |
-| Accent rule                     | `border-sky-400` (the line under the header)                                                                                                                                                      |
+| Element                       | Light                                                                                    | Dark                                                                       |
+| ----------------------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Primary button, selected item | `border-b-4 border-sky-700 border-b-sky-900 bg-sky-700 text-white`, hover `bg-sky-800`   | Same                                                                       |
+| Secondary button              | `border-b-4 border-sky-100 border-b-sky-300 bg-sky-100 text-sky-900`, hover `bg-sky-200` | `dark:bg-sky-950 dark:border-b-sky-800 dark:text-sky-100`, hover `sky-900` |
+| Disabled button               | `bg-gray-200 text-gray-600 border-b-gray-400`                                            | `dark:bg-gray-700 dark:text-gray-300 dark:border-b-gray-600`               |
+| Link                          | `text-sky-700 underline hover:text-sky-900`; current page also `font-semibold`           | `dark:text-sky-300 dark:hover:text-sky-200`                                |
+| Keyboard focus                | `outline-4 outline-offset-2 outline-sky-700`, set once for every control                 | `dark:outline-sky-400`                                                     |
+| Table header                  | `bg-sky-200`                                                                             | `dark:bg-sky-950`                                                          |
+| Hover on table rows           | `hover:bg-sky-100`                                                                       | `dark:hover:bg-sky-900`                                                    |
+| Hover on menu items           | `hover:bg-sky-700 hover:text-white`                                                      | Same                                                                       |
+| Accent rule                   | `border-sky-700` (the line under the header)                                             | Same                                                                       |
+
+- The focus ring lives in `apps/web/src/index.css` (`:focus-visible`), so
+  controls don't set their own. Text fields and the select are the
+  exception: their border is an outline utility, which beats the base
+  layer, so they repeat the same ring with `focus-visible:`.
+- Buttons get their colours through `enabled:` and `disabled:`, so a
+  disabled button never shows a variant's colour.
 
 ### Patient status
 
-| Status   | Table row                                                     | Legend swatch                                  | Toggle when on                                    |
-| -------- | ------------------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------- |
-| Accepted | `bg-green-100`; dark `dark:bg-emerald-300 dark:text-gray-900` | `text-green-200`; dark `dark:text-emerald-300` | `has-checked:bg-green-500`, knob `ring-green-500` |
-| Refused  | `bg-red-100`; dark `dark:bg-rose-300 dark:text-gray-900`      | `text-red-200`; dark `dark:text-rose-300`      | `has-checked:bg-red-500`, knob `ring-red-500`     |
-| Pending  | No fill                                                       | Outline icon in the current text colour        | n/a                                               |
+| Status   | Table row and legend swatch                | Switch when on | Status cell   |
+| -------- | ------------------------------------------ | -------------- | ------------- |
+| Accepted | `bg-green-100`; dark `dark:bg-emerald-900` | `bg-green-700` | ✓ "Accepted"  |
+| Refused  | `bg-red-100`; dark `dark:bg-rose-900`      | `bg-red-600`   | ✗ "Refused"   |
+| Pending  | No fill (swatch: outline only)             | n/a            | ··· "Pending" |
 
-- A toggle that is off is `bg-gray-300` with a white knob (`ring-gray-300`); dark `dark:bg-white/5 dark:ring dark:ring-gray-600`.
-- Status rows switch to dark text in dark mode (`dark:text-gray-900`) because the emerald and rose fills are light.
-- Condition flags (asthma, DM, CVD, COPD): present is green (`text-green-500` in the table), absent is `text-gray-400`.
+- Accepted and refused fills are nearly the same lightness, so people who
+  can't tell red from green can't tell them apart: the Status cell's word
+  and shape (the same icons as the switches' knobs) carry the meaning.
+- Dark-mode rows use dark fills, so every row keeps the page's light text.
+- A switch that is off is `bg-gray-500` with a white knob (`ring-gray-500`);
+  dark `dark:bg-white/5 dark:ring dark:ring-gray-500`.
+- Condition flags (asthma, DM, CVD, COPD): present is `text-green-700`
+  (`dark:text-green-400`), absent is `text-gray-500` (`dark:text-gray-400`),
+  each with "Yes" or "No" for screen readers.
 
 ### Feedback
 
-Show messages with `AlertComponent` from `@cdm-optimiser/ui` rather than styling them by hand. Each type uses one hue: `border-l-4` with `bg-<hue>-50`, `border-<hue>-400`, icon `text-<hue>-400` and text `text-<hue>-800`.
+Show messages with `AlertComponent` from `@cdm-optimiser/ui` rather than
+styling them by hand. Each type uses three steps of one hue: a `-50` tint
+for the background, an accent for the left border, icon, close button and
+progress bar, and a `-800` shade for the text.
 
-| Type    | Hue      | Notes                                           |
-| ------- | -------- | ----------------------------------------------- |
-| Info    | `sky`    | Default type                                    |
-| Success | `green`  | The auto-dismiss progress bar is `bg-green-400` |
-| Warning | `yellow` | Text is `text-yellow-700`                       |
-| Error   | `red`    |                                                 |
+| Type    | Hue      | Accent       |
+| ------- | -------- | ------------ |
+| Info    | `sky`    | `sky-700`    |
+| Success | `green`  | `green-700`  |
+| Warning | `yellow` | `yellow-700` |
+| Error   | `red`    | `red-600`    |
 
-Alerts keep their pale tints in dark mode: dark text on a light tint stays readable, so they have no `dark:` variants.
-
-### Known gaps
-
-These are system-wide issues, recorded here so new work doesn't spread them. Fix them in one place through the bug-fix plan, not component by component; until then, new UI uses the recipes above so screens stay consistent.
-
-- **Contrast.** White text on `bg-sky-500` (primary buttons) is 2.71:1 and `text-sky-500` links on white are 2.71:1, below the WCAG AA 4.5:1 for normal text. `sky-700` reaches 5.85:1. Muted `gray-400` icons (2.60:1) and green condition icons (2.22:1) are below the 3:1 minimum for meaningful graphics.
-- **Inconsistencies.** The patient card uses `text-green-400` for present conditions (the table uses `text-green-500`) and `text-gray-40`, a typo for `text-gray-400`. The pending-patient buttons use a darker hover (`bg-sky-700`, no bottom border) than the primary button recipe.
+Alerts keep their pale tints in dark mode: dark text on a light tint stays
+readable, so they have no `dark:` variants.
 
 ## Ground it in the subject
 
