@@ -1,0 +1,65 @@
+name: Installer check
+
+# Builds the Windows installer on pull requests that could change it, and
+# checks the files the release workflow uploads (and installed apps read to
+# update) are there. Publishes nothing.
+on:
+  pull_request:
+    paths:
+      - 'apps/desktop/**'
+      - 'packages/desktop-bridge/**'
+      - 'package.json'
+      - 'yarn.lock'
+      - '.github/workflows/release.yml'
+      - '.github/workflows/installer-check.yml'
+
+concurrency:
+  group: installer-check-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  installer:
+    name: Build the Windows installer
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build the installer
+        run: yarn dist:desktop
+        env:
+          # Placeholders: this build is never published.
+          VITE_SUPABASE_URL: https://example.supabase.co
+          VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci-placeholder
+
+      - name: Check the release files
+        shell: bash
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          cd apps/desktop/release
+          ls -l
+          for file in "cdm-optimiser-setup-${version}.exe" \
+                      "cdm-optimiser-setup-${version}.exe.blockmap" \
+                      latest.yml; do
+            test -f "${file}" || { echo "::error::Missing ${file}"; exit 1; }
+          done
+          grep -q "version: ${version}" latest.yml || { echo "::error::latest.yml is not for ${version}"; exit 1; }
+          grep -q "cdm-optimiser-setup-${version}.exe" latest.yml || { echo "::error::latest.yml names another file"; exit 1; }
+          cat latest.yml
