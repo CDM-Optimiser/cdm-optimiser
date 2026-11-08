@@ -6,6 +6,8 @@
 // ../tsconfig.json).
 
 type DarkModeApi = import('@cdm-optimiser/desktop-bridge').DarkModeApi;
+type AppUpdatesApi = import('@cdm-optimiser/desktop-bridge').AppUpdatesApi;
+type UpdateStatus = import('@cdm-optimiser/desktop-bridge').UpdateStatus;
 type DesktopIpcChannel =
   import('@cdm-optimiser/desktop-bridge').DesktopIpcChannel;
 type DesktopIpcChannels =
@@ -31,3 +33,20 @@ const darkMode: DarkModeApi = {
 };
 
 contextBridge.exposeInMainWorld('darkMode', darkMode);
+
+const appUpdates: AppUpdatesApi = {
+  getStatus: () => invoke('updates:get-status'),
+  install: () => invoke('updates:install'),
+  // Only the status is passed on, never the IPC event itself.
+  onStatus: (listener) => {
+    const handler = (_event: unknown, status: UpdateStatus) => listener(status);
+
+    ipcRenderer.on('updates:status', handler);
+
+    return () => {
+      ipcRenderer.removeListener('updates:status', handler);
+    };
+  },
+};
+
+contextBridge.exposeInMainWorld('appUpdates', appUpdates);
