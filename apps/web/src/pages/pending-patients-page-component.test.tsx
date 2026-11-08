@@ -62,7 +62,7 @@ describe('PendingPatientsPageComponent', () => {
     );
     await expect.element(screen.getByText('Test Patient 0001')).toBeVisible();
 
-    await screen.getByRole('checkbox').first().click();
+    await screen.getByRole('switch', {name: 'Accepted'}).click();
     await screen.getByRole('button', {name: 'Update patient'}).click();
 
     await expect
@@ -90,7 +90,7 @@ describe('PendingPatientsPageComponent', () => {
     await screen.getByRole('button', {name: 'Next patient'}).click();
     await expect.element(screen.getByText('Test Patient 0003')).toBeVisible();
 
-    await screen.getByRole('checkbox').last().click();
+    await screen.getByRole('switch', {name: 'Refused'}).click();
     await screen.getByRole('button', {name: 'Update patient'}).click();
 
     await expect

@@ -57,9 +57,21 @@ lint rule or delete a test to get a green run. Report what fails instead.
       `onAuthStateChange`; `login` and `logout` just call Supabase.
     - `layout/`: the header.
     - `theme/`: the desktop theme menu.
-    - `patients/`: split into `model/` (the `Patient` type, `PatientStatus`,
-      `StatusFilter`, column config), `api/` (see "Patient data" below),
-      `list/`, `pagination/` and `card/`.
+    - `patients/`, split into:
+      - `model/`: the `Patient` type, `PatientStatus` and `StatusFilter`
+        (`patient.ts`), the CDM conditions (`patient-conditions.ts`) and the
+        table's columns (`patient-columns.ts`). Columns, conditions, filters
+        and legend items are config arrays: add an entry, not markup.
+      - `api/`: see "Patient data" below.
+      - `list/`: `usePatientsList` (the list page's state and query), the
+        table (`patients-table` › `patient-row` › `patient-cell`), search,
+        status filter and legend.
+      - `pagination/`: the pagination bar, page-size select and
+        `getVisiblePages`.
+      - `card/`: `PatientCardComponent`, made of the details, the conditions
+        summary and the status form (`usePatientStatusForm`). The card
+        reports a save through `onUpdated`; the page shows the message.
+      - `pending/`: the navigator of the pending patients page.
   - `lib/`: app-wide modules with no React (the Supabase client,
     `getErrorMessage`).
   - `hooks/`: generic hooks used by several features (`useDebounce`).
@@ -174,6 +186,10 @@ other modules. Import every value from the file that defines it.
 - **Test behaviour, not implementation.** Query by role and accessible name
   (`getByRole('button', {name: 'Save'})`), and assert what the user sees or
   what a callback receives, not which hook was called with which arguments.
+- **`toHaveTextContent` takes a string, not a regular expression,** in
+  Vitest browser mode, and compares the element's whole text (whitespace
+  collapsed). To check part of an element, find the part
+  (`getByRole('alert').getByText('…')`) and assert on that.
 - **Keyboard tests start from an element:** call `.focus()` on it first.
   Where the first `userEvent.tab()` lands depends on the test runner's
   iframe, which makes tests flaky.

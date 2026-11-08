@@ -1,73 +1,57 @@
+import type {ComponentType} from 'react';
+import {CardComponent} from '@cdm-optimiser/ui/components/card-component.tsx';
+import type {IconProps} from '@cdm-optimiser/ui/icons/icon-props.ts';
+import {SquareFilledIcon} from '@cdm-optimiser/ui/icons/square-filled-icon.tsx';
+import {SquareIcon} from '@cdm-optimiser/ui/icons/square-icon.tsx';
+import type {PatientCounts} from '../api/patients-api.ts';
+import type {PatientStatus} from '../model/patient.ts';
+
+/** The swatch for each status matches the row colours in the table. */
+const ITEMS: readonly {
+  status: PatientStatus;
+  label: string;
+  Icon: ComponentType<IconProps>;
+  className: string;
+}[] = [
+  {
+    status: 'accepted',
+    label: 'Accepted',
+    Icon: SquareFilledIcon,
+    className:
+      'stroke-black stroke-2 text-green-200 dark:stroke-white dark:text-emerald-300',
+  },
+  {
+    status: 'refused',
+    label: 'Refused',
+    Icon: SquareFilledIcon,
+    className:
+      'stroke-black stroke-2 text-red-200 dark:stroke-white dark:text-rose-300',
+  },
+  {status: 'pending', label: 'Pending', Icon: SquareIcon, className: ''},
+];
+
 interface StatusLegendProps {
-  totalPatients: number;
-  acceptedPatientsText: string;
-  refusedPatientsText: string;
-  pendingPatientsText: string;
+  /** The practice's counts; zeros while they load. */
+  counts: PatientCounts | undefined;
 }
 
-export function StatusLegendComponent({
-  totalPatients,
-  acceptedPatientsText,
-  refusedPatientsText,
-  pendingPatientsText,
-}: StatusLegendProps) {
+export function StatusLegendComponent({counts}: StatusLegendProps) {
   return (
-    <div className="flex w-full flex-col flex-wrap gap-4 rounded-xl bg-white p-4 shadow-md xl:w-auto dark:bg-white/5 dark:ring dark:ring-gray-600">
+    <CardComponent className="flex w-full flex-col flex-wrap gap-4 xl:w-auto">
       <div className="flex justify-center gap-2">
-        Total patients: <span className="font-medium">{totalPatients}</span>
+        Total patients:{' '}
+        <span className="font-medium">{counts?.total ?? 0}</span>
       </div>
-      <div className="flex flex-wrap items-center justify-center gap-6 py-2">
-        <div className="flex flex-wrap items-center gap-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth="2"
-            fill="currentColor"
-            className="stroke-black stroke-2 text-green-200 dark:stroke-white dark:text-emerald-300"
-          >
-            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-            <path d="M19 2h-14a3 3 0 0 0 -3 3v14a3 3 0 0 0 3 3h14a3 3 0 0 0 3 -3v-14a3 3 0 0 0 -3 -3z" />
-          </svg>
-          <span>{acceptedPatientsText}</span>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth="2"
-            fill="currentColor"
-            className="stroke-black stroke-2 text-red-200 dark:stroke-white dark:text-rose-300"
-          >
-            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-            <path d="M19 2h-14a3 3 0 0 0 -3 3v14a3 3 0 0 0 3 3h14a3 3 0 0 0 3 -3v-14a3 3 0 0 0 -3 -3z" />
-          </svg>
-          <span>{refusedPatientsText}</span>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="dark:bg-white/5"
-          >
-            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-            <path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" />
-          </svg>
-          <span>{pendingPatientsText}</span>
-        </div>
-      </div>
-    </div>
+      <ul className="flex flex-wrap items-center justify-center gap-6 py-2">
+        {ITEMS.map(({status, label, Icon, className}) => (
+          <li key={status} className="flex items-center gap-2">
+            <Icon className={className} />
+            <span>
+              {label} ({counts?.[status] ?? 0})
+            </span>
+          </li>
+        ))}
+      </ul>
+    </CardComponent>
   );
 }

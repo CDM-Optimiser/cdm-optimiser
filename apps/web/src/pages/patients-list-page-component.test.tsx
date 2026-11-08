@@ -114,4 +114,32 @@ describe('PatientsListPageComponent', () => {
       expect.any(AbortSignal)
     );
   });
+
+  test('saving a patient closes their details and confirms it', async () => {
+    mocks.fetchPatientsPage.mockResolvedValue(pageOf(3, [1, 2, 3]));
+    mocks.updatePatientStatus.mockResolvedValue(
+      patient(2, {status: 'accepted'})
+    );
+
+    const {screen} = await renderWithProviders(<PatientsListPageComponent />);
+
+    await screen.getByRole('button', {name: 'Test Patient 0002'}).click();
+
+    const dialog = screen.getByRole('dialog', {name: 'Patient Information'});
+    await expect.element(dialog).toBeVisible();
+
+    await dialog.getByRole('switch', {name: 'Accepted'}).click();
+    await dialog.getByRole('button', {name: 'Update patient'}).click();
+
+    await expect
+      .element(
+        screen.getByText('Test Patient 0002 has been updated successfully.')
+      )
+      .toBeVisible();
+    await expect.element(dialog).not.toBeInTheDocument();
+    expect(mocks.updatePatientStatus).toHaveBeenCalledWith(
+      {id: 2, status: 'accepted'},
+      expect.anything()
+    );
+  });
 });

@@ -1,4 +1,7 @@
-import {useId, type ChangeEvent, type MouseEvent} from 'react';
+import {useId} from 'react';
+import {CardComponent} from '@cdm-optimiser/ui/components/card-component.tsx';
+import {ChevronLeftIcon} from '@cdm-optimiser/ui/icons/chevron-left-icon.tsx';
+import {ChevronRightIcon} from '@cdm-optimiser/ui/icons/chevron-right-icon.tsx';
 import {getVisiblePages} from './get-visible-pages.ts';
 import {PageSizeSelectComponent} from './page-size-select-component.tsx';
 
@@ -6,142 +9,79 @@ interface PaginationProps {
   currentPage: number;
   totalPages: number;
   resultsPerPage: number;
-  onPageChange?: (page: number) => void;
-  onResultsPerPageChange?: (results: number) => void;
+  onPageChange: (page: number) => void;
+  onResultsPerPageChange: (results: number) => void;
 }
+
+const PAGE_BUTTON =
+  'relative inline-flex items-center justify-center px-3 py-2 font-medium text-gray-900 ring-1 ring-gray-200 transition duration-200 ease-in-out disabled:cursor-not-allowed dark:bg-white/5 dark:text-white';
+
+const ARROW_BUTTON = `${PAGE_BUTTON} bg-white hover:not-disabled:bg-sky-500 hover:not-disabled:text-white disabled:bg-gray-200 disabled:text-gray-400`;
 
 export function PaginationComponent({
   currentPage,
   totalPages,
   resultsPerPage,
-  onPageChange = () => {},
-  onResultsPerPageChange = () => {},
+  onPageChange,
+  onResultsPerPageChange,
 }: PaginationProps) {
-  const selectResultsPerPageID = useId();
-  const pagesToRender = getVisiblePages(currentPage, totalPages);
-
-  const handlePrevClick = (event: MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-
-    if (currentPage > 1) {
-      onPageChange(currentPage - 1);
-    }
-  };
-
-  const handleNextClick = (event: MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-
-    if (currentPage < totalPages) {
-      onPageChange(currentPage + 1);
-    }
-  };
-
-  const handleChangePage = (event: MouseEvent<HTMLButtonElement>) => {
-    const page = Number(event.currentTarget.dataset.pageNumber);
-
-    if (!isNaN(page) && page !== currentPage) {
-      onPageChange(page);
-    }
-  };
-
-  const handleChangeResultsPerPage = (
-    event: ChangeEvent<HTMLSelectElement>
-  ) => {
-    const results = Number(event?.currentTarget.value);
-    onResultsPerPageChange(results);
-  };
+  const pageSizeSelectId = useId();
 
   return (
-    <div className="flex w-full flex-wrap items-center justify-center gap-4 rounded-xl bg-white px-8 py-4 shadow-md md:flex-nowrap md:justify-between dark:bg-white/5 dark:ring dark:ring-gray-600">
+    <CardComponent className="flex w-full flex-wrap items-center justify-center gap-4 px-8 md:flex-nowrap md:justify-between">
       <span>
         Showing page {currentPage} of {totalPages}
       </span>
       <div className="isolate inline-flex">
         <button
           type="button"
-          data-page-number={currentPage - 1}
-          className="relative inline-flex items-center rounded-s-md bg-white px-3 py-2 font-medium text-gray-900 ring-1 ring-gray-200 transition duration-200 ease-in-out hover:bg-sky-500 hover:ring-sky-200 hover:not-disabled:text-white disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400 dark:bg-white/5 dark:text-white"
-          disabled={currentPage === 1}
-          onClick={handlePrevClick}
+          className={`${ARROW_BUTTON} rounded-s-md`}
+          disabled={currentPage <= 1}
+          onClick={() => onPageChange(currentPage - 1)}
         >
-          <span className="sr-only">Previous patient</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-            <path d="M15 6l-6 6l6 6" />
-          </svg>
+          <span className="sr-only">Previous page</span>
+          <ChevronLeftIcon />
         </button>
-        {pagesToRender.map((page, index) => {
-          if (page === '…') {
-            return (
-              <span
-                key={`ellipsis-${index}`}
-                className="relative inline-flex w-12 items-center justify-center bg-white px-3 py-2 font-medium text-gray-900 ring-1 ring-gray-200 dark:bg-white/5 dark:text-white"
-              >
-                …
-              </span>
-            );
-          }
-
-          const buttonsClassName = `${
-            currentPage === page
-              ? 'bg-sky-200 disabled:bg-sky-500 text-white'
-              : 'bg-white'
-          }`.trim();
-
-          return (
+        {getVisiblePages(currentPage, totalPages).map((item) =>
+          typeof item === 'number' ? (
             <button
-              key={page}
+              key={item}
               type="button"
-              data-page-number={page}
-              className={`relative inline-flex w-12 items-center justify-center ${buttonsClassName} px-3 py-2 font-medium text-gray-900 ring-1 ring-gray-200 transition duration-200 ease-in-out hover:not-disabled:bg-sky-500 hover:not-disabled:text-white disabled:cursor-not-allowed dark:bg-white/5 dark:text-white dark:hover:not-disabled:bg-sky-500 dark:hover:not-disabled:ring-sky-200`}
-              disabled={currentPage === page}
-              onClick={handleChangePage}
+              className={`${PAGE_BUTTON} w-12 ${
+                item === currentPage
+                  ? 'bg-sky-500 text-white dark:bg-sky-500'
+                  : 'bg-white hover:bg-sky-500 hover:text-white dark:hover:bg-sky-500'
+              }`}
+              disabled={item === currentPage}
+              onClick={() => onPageChange(item)}
             >
-              {page}
+              {item}
             </button>
-          );
-        })}
+          ) : (
+            <span key={item} className={`${PAGE_BUTTON} w-12 bg-white`}>
+              …
+            </span>
+          )
+        )}
         <button
           type="button"
-          data-page-number={currentPage + 1}
-          className="relative inline-flex items-center rounded-e-md bg-white px-3 py-2 font-medium text-gray-900 ring-1 ring-gray-200 transition duration-200 ease-in-out hover:bg-sky-500 hover:ring-sky-200 hover:not-disabled:text-white disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400 dark:bg-white/5 dark:text-white"
-          disabled={currentPage === totalPages}
-          onClick={handleNextClick}
+          className={`${ARROW_BUTTON} rounded-e-md`}
+          disabled={currentPage >= totalPages}
+          onClick={() => onPageChange(currentPage + 1)}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-            <path d="M9 6l6 6l-6 6" />
-          </svg>
-          <span className="sr-only">Next patient</span>
+          <ChevronRightIcon />
+          <span className="sr-only">Next page</span>
         </button>
       </div>
       <div className="flex items-center justify-center gap-2">
         <PageSizeSelectComponent
-          selectIDAndName={selectResultsPerPageID}
+          selectIDAndName={pageSizeSelectId}
           resultsPerPage={resultsPerPage}
-          onChange={handleChangeResultsPerPage}
+          onChange={(event) =>
+            onResultsPerPageChange(Number(event.currentTarget.value))
+          }
         />
       </div>
-    </div>
+    </CardComponent>
   );
 }

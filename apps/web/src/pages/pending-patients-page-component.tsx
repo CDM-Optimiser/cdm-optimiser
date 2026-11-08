@@ -1,10 +1,10 @@
 import {useState} from 'react';
 import {AlertComponent} from '@cdm-optimiser/ui/components/alert-component.tsx';
-import {ButtonComponent} from '@cdm-optimiser/ui/components/button-component.tsx';
 import {CardComponent} from '@cdm-optimiser/ui/components/card-component.tsx';
 import {usePatientsPage} from '../features/patients/api/use-patients-page.ts';
 import {PatientCardComponent} from '../features/patients/card/patient-card-component.tsx';
 import type {Patient} from '../features/patients/model/patient.ts';
+import {PendingNavigatorComponent} from '../features/patients/pending/pending-navigator-component.tsx';
 import {getErrorMessage} from '../lib/get-error-message.ts';
 
 /**
@@ -66,31 +66,17 @@ export function PendingPatientsPageComponent() {
         />
       ) : (
         <>
-          <CardComponent className="flex items-center justify-between">
-            <span className="font-medium text-gray-900 dark:text-gray-200">
-              Pending patient: {index + 1} of {total}
-            </span>
-            <div className="flex gap-2">
-              <ButtonComponent
-                onClick={() => setIndex(index - 1)}
-                disabled={index === 0}
-              >
-                Previous patient
-              </ButtonComponent>
-              <ButtonComponent
-                onClick={() => setIndex(index + 1)}
-                disabled={index >= total - 1}
-              >
-                Next patient
-              </ButtonComponent>
-            </div>
-          </CardComponent>
+          <PendingNavigatorComponent
+            index={index}
+            total={total}
+            onPrevious={() => setIndex(index - 1)}
+            onNext={() => setIndex(index + 1)}
+          />
           <CardComponent as="section">
             <PatientCardComponent
               key={patient.id}
               patient={patient}
               onUpdated={handleUpdated}
-              showAlert={false}
             />
           </CardComponent>
         </>
