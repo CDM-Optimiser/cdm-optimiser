@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useId,
   useRef,
   type MouseEvent,
   type ReactNode,
@@ -9,10 +10,10 @@ import {SquareXIcon} from '../icons/square-x-icon.tsx';
 
 interface ModalProps {
   isOpen: boolean;
+  /** The dialog's heading, which also names it for screen readers. */
+  title: string;
   /** Called on the close button, the Escape key and a click on the backdrop. */
   onClose?: () => void;
-  /** The id of the heading inside `children` that names the dialog. */
-  labelledBy?: string;
   children: ReactNode;
 }
 
@@ -23,13 +24,9 @@ interface ModalProps {
  * The parent stays in control: Escape and backdrop clicks call `onClose`,
  * and `isOpen` decides whether the dialog is shown.
  */
-export function ModalComponent({
-  isOpen,
-  onClose,
-  labelledBy,
-  children,
-}: ModalProps) {
+export function ModalComponent({isOpen, title, onClose, children}: ModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -60,26 +57,29 @@ export function ModalComponent({
   return (
     <dialog
       ref={dialogRef}
-      aria-labelledby={labelledBy}
+      aria-labelledby={titleId}
       onCancel={handleCancel}
       onClick={handleClick}
       className="m-auto w-full max-w-2xl rounded-lg bg-white p-0 text-inherit shadow-lg backdrop:bg-black/70 dark:bg-gray-800 dark:ring dark:ring-gray-600"
     >
       {isOpen && (
-        <div className="relative p-6">
-          <button
-            type="button"
-            onClick={onClose}
-            className="absolute top-2 right-2 cursor-pointer text-red-500 transition duration-300 ease-in-out hover:text-white dark:text-white dark:hover:text-red-500"
-          >
-            <span className="sr-only">Close dialog</span>
-            <SquareXIcon
-              width={36}
-              height={36}
-              fill="currentColor"
-              className="fill-white hover:fill-red-500 dark:fill-red-600 dark:hover:fill-white"
-            />
-          </button>
+        <div className="flex flex-col gap-6 p-6">
+          {/* The title and the close button share one row, so they line up
+              whatever the title's length or the dialog's width. */}
+          <header className="flex items-center justify-between gap-4 border-b border-gray-200 pb-4 dark:border-gray-600">
+            <h2 id={titleId} className="text-2xl">
+              {title}
+            </h2>
+            <button
+              type="button"
+              onClick={onClose}
+              className="shrink-0 cursor-pointer rounded-md text-gray-500 transition duration-200 ease-in-out hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+            >
+              <span className="sr-only">Close dialog</span>
+              {/* Neutral: red is kept for refused patients and errors. */}
+              <SquareXIcon width={36} height={36} />
+            </button>
+          </header>
           {children}
         </div>
       )}

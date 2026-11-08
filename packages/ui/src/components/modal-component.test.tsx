@@ -14,13 +14,12 @@ function ModalHarness({onClose}: {onClose?: () => void}) {
       </button>
       <ModalComponent
         isOpen={isOpen}
-        labelledBy="modal-title"
+        title="Patient Information"
         onClose={() => {
           onClose?.();
           setIsOpen(false);
         }}
       >
-        <h2 id="modal-title">Patient Information</h2>
         <button type="button">Inside</button>
       </ModalComponent>
     </>
@@ -45,6 +44,24 @@ describe('Modal component tests', () => {
     await expect.element(dialog).toBeVisible();
     expect((dialog.element() as HTMLDialogElement).open).toBe(true);
     expect(dialog.element().matches(':modal')).toBe(true);
+  });
+
+  test('lines the close button up with the title', async () => {
+    const screen = await render(<ModalHarness />);
+
+    await screen.getByRole('button', {name: 'Open details'}).click();
+
+    const middle = (element: Element) => {
+      const box = element.getBoundingClientRect();
+
+      return box.top + box.height / 2;
+    };
+    const title = screen.getByRole('heading', {name: 'Patient Information'});
+    const close = screen.getByRole('button', {name: 'Close dialog'});
+
+    expect(
+      Math.abs(middle(title.element()) - middle(close.element()))
+    ).toBeLessThanOrEqual(1);
   });
 
   test('Escape closes it and returns focus to the button that opened it', async () => {

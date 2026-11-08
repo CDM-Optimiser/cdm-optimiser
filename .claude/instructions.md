@@ -118,9 +118,11 @@ stays in `useState` in the page.
   anything from `apps/`. Apps import each one from its own file through the
   package's `exports`
   (`import {ButtonComponent} from '@cdm-optimiser/ui/components/button-component.tsx'`).
-  - `components/`: alert, button (`primary`, `segment`), card, dropdown,
-    modal (a native `<dialog>`), svg, switch and text field. Only generic
-    parts belong here; an app's page frame stays in the app.
+  - `components/`: alert, button (`primary` for the main action and the
+    selected option in a group, `secondary` for the rest), card, dropdown,
+    modal (a native `<dialog>` with a `title` row), svg, switch and text
+    field. Only generic parts belong here; an app's page frame stays in the
+    app.
   - `icons/`: one component per icon, decorative (`aria-hidden`) by default.
     Use them instead of pasting `<svg>` markup.
   - Use these instead of copying class strings: a button is
@@ -207,8 +209,16 @@ other modules. Import every value from the file that defines it.
   (e.g. `@cdm-optimiser/ui`) only when the UI change is intended, and review
   the snapshot diff.
 - **End-to-end:** `apps/web/e2e` runs against the production build, so run
-  `yarn build:web` first. Keep it a smoke test that needs no real Supabase
-  project.
+  `yarn build:web` first. It never needs a real Supabase project:
+  - `smoke.spec.ts` boots the build under its Content Security Policy,
+    signed out.
+  - `accessibility.spec.ts` signs in and checks every page with axe
+    (WCAG 2.2 AA) in light and dark mode. Add a check when you add a page
+    or a dialog.
+  - Signed-in tests use `fake-supabase.ts`: it answers Supabase's auth and
+    database calls with synthetic patients and refuses every other request
+    to another origin, so nothing leaves the machine. Each test expects the
+    list of refused requests to be empty.
 - **Local browsers:** Chromium needs system libraries. On Linux or WSL, install
   them once with
   `yarn workspace @cdm-optimiser/web playwright install-deps chromium`
@@ -262,14 +272,22 @@ The app processes health data of real patients (GDPR special-category data).
     Pending patients have no colour.
   - Messages use `AlertComponent` from `@cdm-optimiser/ui`: info is sky,
     success green, warning yellow, error red.
-  - Every colour needs a `dark:` variant. Dark mode follows the operating
-    system, or the theme menu in the desktop app.
-- Some existing colour pairs fail WCAG contrast (white on `sky-500` buttons,
-  `sky-500` links, `gray-400` and green icons). They're listed under "Known
-  gaps" in the colour system and belong to the bug-fix plan: don't fix them
-  one component at a time.
+  - Check every colour in dark mode too, and add a `dark:` variant unless
+    the same class works on both. Dark mode follows the operating system,
+    or the theme menu in the desktop app.
+- **Contrast is WCAG 2.2 AA:** 4.5:1 for text, 3:1 for meaningful icons,
+  control boundaries, states and focus, in both modes. The colour system's
+  recipes all pass; check any new pair before using it.
+- **One style per role, everywhere.** Changing a recipe means changing every
+  component with that role (buttons, toggles, pagination, dropdowns,
+  dividers, accent lines), not only the one in front of you.
+- **Colour is never the only signal:** a patient's status is also written
+  and drawn, and the current page is bold as well as darker.
+- **Focus:** one ring for every control, set in `apps/web/src/index.css`.
+  Don't add per-component focus colours (text fields repeat the same ring,
+  see the colour system).
 - Other established patterns: `rounded-xl` cards with `shadow-md`, accessible
-  labels (`sr-only` text, `aria-*`) and visible focus states.
+  labels (`sr-only` text, `aria-*`).
 - Use the `frontend-design` skill for new surfaces where a fresh visual
   direction is wanted, not to restyle existing screens. It follows the same
   colour system.

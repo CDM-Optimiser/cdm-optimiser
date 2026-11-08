@@ -15,14 +15,16 @@ interface SwitchProps extends Omit<
   tone?: SwitchTone;
 }
 
+// The track and the white knob keep at least 3:1 against each other and the
+// surface around them, on or off, so the switch and its state are visible.
 const TRACK_ON: Record<SwitchTone, string> = {
-  positive: 'has-checked:bg-green-500',
-  negative: 'has-checked:bg-red-500',
+  positive: 'has-checked:bg-green-700 dark:has-checked:bg-green-700',
+  negative: 'has-checked:bg-red-600 dark:has-checked:bg-red-600',
 };
 
 const KNOB_ON: Record<SwitchTone, string> = {
-  positive: 'group-has-checked:ring-green-500',
-  negative: 'group-has-checked:ring-red-500',
+  positive: 'group-has-checked:ring-green-700',
+  negative: 'group-has-checked:ring-red-600',
 };
 
 /**
@@ -46,8 +48,9 @@ export function SwitchComponent({
     >
       <span className="font-medium select-none">{label}</span>
       <span
-        className={`group relative inline-flex h-6 w-12 shrink-0 rounded-xl bg-gray-300 p-0.5 transition duration-200 ease-in-out has-focus-visible:outline-4 has-focus-visible:outline-offset-2 has-focus-visible:outline-sky-500 dark:bg-white/5 dark:ring dark:ring-gray-600 ${TRACK_ON[tone]}`}
+        className={`group relative inline-flex h-6 w-12 shrink-0 rounded-xl bg-gray-500 p-0.5 transition duration-200 ease-in-out dark:bg-white/5 dark:ring dark:ring-gray-500 ${TRACK_ON[tone]}`}
       >
+        {/* Covers the track, so the app's focus ring goes around it. */}
         <input
           type="checkbox"
           role="switch"
@@ -55,7 +58,7 @@ export function SwitchComponent({
           {...props}
         />
         <span
-          className={`pointer-events-none relative inline-flex h-5 w-5 items-center justify-center rounded-xl bg-white ring-1 ring-gray-300 transition duration-200 ease-in-out group-has-checked:translate-x-6 dark:text-gray-900 ${KNOB_ON[tone]}`}
+          className={`pointer-events-none relative inline-flex h-5 w-5 items-center justify-center rounded-xl bg-white ring-1 ring-gray-500 transition duration-200 ease-in-out group-has-checked:translate-x-6 dark:text-gray-900 ${KNOB_ON[tone]}`}
         >
           <DotsIcon
             width={16}

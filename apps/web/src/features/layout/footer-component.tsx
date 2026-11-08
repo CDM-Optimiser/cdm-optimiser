@@ -10,7 +10,7 @@ export function FooterComponent({brand, version}: FooterProps) {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mx-auto my-0 flex w-full max-w-7xl flex-wrap justify-center gap-x-2 border-t border-gray-300 p-4">
+    <footer className="mx-auto my-0 flex w-full max-w-7xl flex-wrap justify-center gap-x-2 border-t border-gray-300 p-4 dark:border-gray-600">
       <span>
         &copy; {year} {brand}
       </span>

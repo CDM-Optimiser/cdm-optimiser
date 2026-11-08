@@ -18,7 +18,7 @@ export function PageSizeSelectComponent({
         id={selectIDAndName}
         name={selectIDAndName}
         value={resultsPerPage}
-        className="rounded-md bg-white px-2 py-1 ring ring-gray-400 dark:bg-white/5"
+        className="rounded-md bg-white px-2 py-1 shadow-md outline-1 outline-gray-500 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-sky-700 dark:bg-gray-800 dark:outline-gray-500 dark:focus-visible:outline-sky-400"
         onChange={onChange}
       >
         <option value="5">5</option>

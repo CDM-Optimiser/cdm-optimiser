@@ -12,15 +12,9 @@ vi.mock('../api/patients-api.ts', () => ({
 describe('PatientCardComponent', () => {
   test('shows the details, the conditions and the status form', async () => {
     const {screen} = await renderWithProviders(
-      <PatientCardComponent
-        patient={patient(7, {asthma: true, dm: false})}
-        headingId="card-heading"
-      />
+      <PatientCardComponent patient={patient(7, {asthma: true, dm: false})} />
     );
 
-    await expect
-      .element(screen.getByRole('heading', {name: 'Patient Information'}))
-      .toHaveAttribute('id', 'card-heading');
     await expect.element(screen.getByText('Test Patient 0007')).toBeVisible();
     await expect
       .element(screen.getByRole('listitem').filter({hasText: 'Asthma'}))

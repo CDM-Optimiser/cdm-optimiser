@@ -15,7 +15,10 @@ interface StatusFilterProps {
   onFilterChange: (filter: StatusFilter) => void;
 }
 
-/** A group of toggle buttons; the selected one is pressed (`aria-pressed`). */
+/**
+ * A group of toggle buttons. The selected one is pressed (`aria-pressed`)
+ * and filled in the primary colour; the others are secondary.
+ */
 export function StatusFilterComponent({
   filterSelected,
   onFilterChange,
@@ -35,7 +38,7 @@ export function StatusFilterComponent({
         {FILTERS.map(({value, label}) => (
           <ButtonComponent
             key={value}
-            variant="segment"
+            variant={filterSelected === value ? 'primary' : 'secondary'}
             aria-pressed={filterSelected === value}
             onClick={() => onFilterChange(value)}
           >

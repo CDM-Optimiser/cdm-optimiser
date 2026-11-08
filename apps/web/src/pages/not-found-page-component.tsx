@@ -7,7 +7,7 @@ export function NotFoundPageComponent() {
       <p className="text-xl">The page you are looking for doesn’t exist.</p>
       <Link
         to="/"
-        className="text-sky-500 underline transition duration-200 ease-in-out hover:text-sky-700"
+        className="text-sky-700 underline transition duration-200 ease-in-out hover:text-sky-900 dark:text-sky-300 dark:hover:text-sky-200"
       >
         Go to the patients list
       </Link>

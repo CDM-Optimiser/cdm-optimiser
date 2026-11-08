@@ -16,9 +16,9 @@ export function UpdateNoticeComponent() {
   return (
     <div
       role="status"
-      className="fixed bottom-4 left-4 z-10 flex max-w-sm gap-3 rounded-xl border-l-4 border-sky-400 bg-sky-50 p-4 text-sky-800 shadow-md"
+      className="fixed bottom-4 left-4 z-10 flex max-w-sm gap-3 rounded-xl border-l-4 border-sky-700 bg-sky-50 p-4 text-sky-800 shadow-md"
     >
-      <InfoCircleFilledIcon className="shrink-0 text-sky-400" />
+      <InfoCircleFilledIcon className="shrink-0 text-sky-700" />
       <div className="flex flex-col gap-3">
         <p>
           <strong className="font-medium">

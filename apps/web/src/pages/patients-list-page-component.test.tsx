@@ -79,7 +79,10 @@ describe('PatientsListPageComponent', () => {
     const {screen} = await renderWithProviders(<PatientsListPageComponent />);
     await expect.element(screen.getByText('Test Patient 0001')).toBeVisible();
 
-    await screen.getByRole('button', {name: '2', exact: true}).last().click();
+    await screen
+      .getByRole('navigation', {name: 'Pagination, bottom'})
+      .getByRole('button', {name: 'Page 2', exact: true})
+      .click();
 
     await vi.waitFor(() =>
       expect(mocks.fetchPatientsPage).toHaveBeenLastCalledWith(
@@ -88,7 +91,10 @@ describe('PatientsListPageComponent', () => {
       )
     );
 
-    await screen.getByRole('button', {name: '3', exact: true}).first().click();
+    await screen
+      .getByRole('navigation', {name: 'Pagination, top'})
+      .getByRole('button', {name: 'Page 3', exact: true})
+      .click();
 
     await vi.waitFor(() =>
       expect(mocks.fetchPatientsPage).toHaveBeenLastCalledWith(
@@ -106,7 +112,10 @@ describe('PatientsListPageComponent', () => {
     const {screen} = await renderWithProviders(<PatientsListPageComponent />);
     await expect.element(screen.getByText('Test Patient 0001')).toBeVisible();
 
-    await screen.getByRole('button', {name: '3', exact: true}).first().click();
+    await screen
+      .getByRole('navigation', {name: 'Pagination, top'})
+      .getByRole('button', {name: 'Page 3', exact: true})
+      .click();
 
     await expect.element(screen.getByText('Test Patient 0002')).toBeVisible();
     expect(mocks.fetchPatientsPage).toHaveBeenLastCalledWith(

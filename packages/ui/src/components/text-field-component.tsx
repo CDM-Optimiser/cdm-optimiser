@@ -9,8 +9,11 @@ interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   icon?: ReactNode;
 }
 
+// The border and the focus ring keep at least 3:1, and the placeholder
+// 4.5:1, in both modes. The border is an outline, so the field sets the
+// focus ring itself, matching the app's ring on every other control.
 const INPUT =
-  'w-full rounded-md bg-white px-3 py-2 shadow-md outline-1 outline-offset-1 outline-gray-200 transition duration-200 ease-in-out focus:outline-4 focus:outline-offset-1 focus:outline-sky-500 dark:bg-white/5 dark:text-white dark:outline-gray-600';
+  'w-full rounded-md bg-white px-3 py-2 shadow-md outline-1 outline-gray-500 transition duration-200 ease-in-out placeholder:text-gray-500 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-sky-700 dark:bg-white/5 dark:text-white dark:outline-gray-500 dark:placeholder:text-gray-400 dark:focus-visible:outline-sky-400';
 
 /** A labelled text input. Pass any `<input>` attribute (type, value, …). */
 export function TextFieldComponent({
@@ -41,7 +44,7 @@ export function TextFieldComponent({
           {...props}
         />
         {icon && (
-          <span className="pointer-events-none col-start-1 row-start-1 ml-3 self-center text-gray-400">
+          <span className="pointer-events-none col-start-1 row-start-1 ml-3 self-center text-gray-500 dark:text-gray-400">
             {icon}
           </span>
         )}

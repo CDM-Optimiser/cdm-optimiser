@@ -1,6 +1,13 @@
 /** Where a patient stands on joining the CDM programme. */
 export type PatientStatus = 'accepted' | 'refused' | 'pending';
 
+/** How each status is written in the table and the legend. */
+export const STATUS_LABELS: Record<PatientStatus, string> = {
+  accepted: 'Accepted',
+  refused: 'Refused',
+  pending: 'Pending',
+};
+
 /** A patient list filter: one status, or every patient. */
 export type StatusFilter = PatientStatus | 'all';
 

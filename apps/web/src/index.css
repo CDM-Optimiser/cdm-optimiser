@@ -2,3 +2,13 @@
 
 /* Tailwind only scans this app by default; include the shared UI package. */
 @source '../../../packages/ui/src';
+
+@layer base {
+  /* One focus ring for every control: buttons, links, switches, selects.
+     sky-700 and sky-400 keep at least 3:1 against the page in each mode.
+     Text fields draw their border with an outline utility, which wins over
+     this layer, so they set the same ring themselves. */
+  :focus-visible {
+    @apply outline-4 outline-offset-2 outline-sky-700 dark:outline-sky-400;
+  }
+}

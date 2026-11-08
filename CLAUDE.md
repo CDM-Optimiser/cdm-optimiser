@@ -36,7 +36,7 @@ yarn dev:desktop             # Electron window on the Vite dev server
 
 yarn test                    # Vitest component tests (browser mode, Chromium)
 yarn build:web               # production build to apps/web/dist
-yarn test:e2e                # Playwright smoke test against the build
+yarn test:e2e                # Playwright smoke and accessibility tests against the build
 yarn typecheck               # tsc -b across the workspaces
 yarn lint                    # ESLint, whole repo   (yarn linc: changed files only)
 yarn format                  # Prettier, whole repo (yarn prettier: changed files only)
