@@ -1,5 +1,8 @@
-import {useEffect, useId, useRef, useState, type ReactNode} from 'react';
+import {useId, useRef, useState, type ReactNode} from 'react';
+import {useDismissPopup} from '../hooks/use-dismiss-popup.ts';
+import {ChevronDownIcon} from '../icons/chevron-down-icon.tsx';
 import {ButtonComponent} from './button-component.tsx';
+import {POPUP_ENTRY, POPUP_ITEM, POPUP_LIST} from './popup-classes.ts';
 
 export interface DropdownItem<T extends string> {
   value: T;
@@ -34,30 +37,7 @@ export function DropdownComponent<T extends string>({
 
   const selectedItem = options.find((option) => option.value === selectedValue);
 
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handlePointerDown = (event: PointerEvent) => {
-      if (!containerRef.current?.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsOpen(false);
-        triggerRef.current?.focus();
-      }
-    };
-
-    document.addEventListener('pointerdown', handlePointerDown);
-    document.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      document.removeEventListener('pointerdown', handlePointerDown);
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isOpen]);
+  useDismissPopup(isOpen, () => setIsOpen(false), containerRef, triggerRef);
 
   const handleSelect = (value: T) => {
     onSelect(value);
@@ -81,25 +61,17 @@ export function DropdownComponent<T extends string>({
       >
         <span>{selectedItem?.icon}</span>
         <span>{selectedItem?.label}</span>
+        <ChevronDownIcon className="ml-auto shrink-0" />
       </ButtonComponent>
 
-      <ul
-        id={listId}
-        hidden={!isOpen}
-        className="absolute top-full left-0 z-10 flex min-w-full flex-col overflow-hidden rounded-md bg-white p-0 shadow-md ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-600"
-      >
+      <ul id={listId} hidden={!isOpen} className={`${POPUP_LIST} left-0`}>
         {options.map((option) => (
-          <li
-            key={option.value}
-            className="not-last:border-b not-last:border-gray-200 dark:not-last:border-gray-600"
-          >
-            {/* The list would clip a focus ring, so focus fills the option
-                instead, like hover. The selected option is bold. */}
+          <li key={option.value} className={POPUP_ENTRY}>
             <button
               type="button"
               aria-pressed={option.value === selectedValue}
               onClick={() => handleSelect(option.value)}
-              className="flex w-full cursor-pointer gap-2 px-4 py-2 text-left transition duration-200 ease-in-out hover:bg-sky-700 hover:text-white focus-visible:bg-sky-700 focus-visible:text-white focus-visible:outline-none aria-pressed:font-semibold"
+              className={POPUP_ITEM}
             >
               <span>{option.icon}</span>
               <span>{option.label}</span>

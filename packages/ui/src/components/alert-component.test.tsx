@@ -37,6 +37,18 @@ describe('Alert component tests', () => {
     }
   );
 
+  test('shows extra content, such as a link, inside the alert', async () => {
+    const screen = await render(
+      <AlertComponent {...defaultProps} type="warning">
+        <a href="#fix">Fix it</a>
+      </AlertComponent>
+    );
+
+    await expect
+      .element(screen.getByRole('alert').getByRole('link', {name: 'Fix it'}))
+      .toBeVisible();
+  });
+
   test('shows a close button only when onDismiss is given', async () => {
     const withoutDismiss = await render(<AlertComponent {...defaultProps} />);
 

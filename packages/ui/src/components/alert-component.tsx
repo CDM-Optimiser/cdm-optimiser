@@ -1,4 +1,4 @@
-import type {ComponentType} from 'react';
+import type {ComponentType, ReactNode} from 'react';
 import {useAutoDismiss} from '../hooks/use-auto-dismiss.ts';
 import {AlertCircleFilledIcon} from '../icons/alert-circle-filled-icon.tsx';
 import {AlertTriangleFilledIcon} from '../icons/alert-triangle-filled-icon.tsx';
@@ -16,6 +16,11 @@ interface AlertProps {
   autoDismissMs?: number | null;
   /** Shows a close button, and is called when the alert is dismissed. */
   onDismiss?: () => void;
+  /**
+   * Shown under the text, such as a link to act on the message. Alerts stay
+   * light in dark mode, so a link here uses the light link colours only.
+   */
+  children?: ReactNode;
 }
 
 // Each type uses three steps of one hue: a pale tint for the background,
@@ -75,6 +80,7 @@ export function AlertComponent({
   text,
   autoDismissMs,
   onDismiss,
+  children,
 }: AlertProps) {
   const delay = autoDismissMs && autoDismissMs > 0 ? autoDismissMs : 0;
   const {progressRef} = useAutoDismiss(delay, onDismiss);
@@ -92,6 +98,7 @@ export function AlertComponent({
           <div className="ml-3">
             <h3 className={`font-medium ${style.text}`}>{title}</h3>
             <p className={`mt-2 ${style.text}`}>{text}</p>
+            {children && <div className="mt-2">{children}</div>}
           </div>
           {onDismiss && (
             <button

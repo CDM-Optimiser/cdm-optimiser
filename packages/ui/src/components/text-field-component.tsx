@@ -7,6 +7,11 @@ interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   hideLabel?: boolean;
   /** A decorative icon shown inside the field, on the left. */
   icon?: ReactNode;
+  /**
+   * Help shown under the field, such as a rule the value must follow.
+   * Screen readers read it with the field.
+   */
+  hint?: string;
 }
 
 // The border and the focus ring keep at least 3:1, and the placeholder
@@ -20,12 +25,14 @@ export function TextFieldComponent({
   label,
   hideLabel = false,
   icon,
+  hint,
   id,
   className,
   ...props
 }: TextFieldProps) {
   const generatedId = useId();
   const inputId = id ?? generatedId;
+  const hintId = `${inputId}-hint`;
 
   return (
     <div
@@ -41,6 +48,7 @@ export function TextFieldComponent({
         <input
           id={inputId}
           className={`col-start-1 row-start-1 ${INPUT} ${icon ? 'pl-10' : ''}`}
+          aria-describedby={hint ? hintId : undefined}
           {...props}
         />
         {icon && (
@@ -49,6 +57,11 @@ export function TextFieldComponent({
           </span>
         )}
       </div>
+      {hint && (
+        <p id={hintId} className="text-sm text-gray-600 dark:text-gray-300">
+          {hint}
+        </p>
+      )}
     </div>
   );
 }
