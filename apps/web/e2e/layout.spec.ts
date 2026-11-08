@@ -25,3 +25,37 @@ test('pressing a button moves its face, not the layout around it', async ({
   expect(headerPressed?.height).toBe(headerBefore?.height);
   expect(buttonPressed!.y).toBeGreaterThan(buttonBefore!.y);
 });
+
+for (const [device, width, height] of [
+  ['a phone', 390, 844],
+  ['an iPad mini in portrait', 768, 1024],
+  ['a tablet in landscape', 1024, 768],
+  ['a desktop', 1440, 900],
+] as const) {
+  test(`no page scrolls sideways on ${device}`, async ({page}) => {
+    await page.setViewportSize({width, height});
+    await useFakeSupabase(page);
+
+    const scrollsSideways = () =>
+      page
+        .locator('html')
+        .evaluate((html) => html.scrollWidth > html.clientWidth);
+
+    await page.goto('/login');
+    expect(await scrollsSideways(), 'login').toBe(false);
+
+    await signIn(page);
+    await expect(page.getByRole('table')).toBeVisible();
+    expect(await scrollsSideways(), 'patients list').toBe(false);
+
+    await page.goto('/pending-patients');
+    await expect(page.getByText('Pending patient: 1 of')).toBeVisible();
+    expect(await scrollsSideways(), 'pending patients').toBe(false);
+
+    await page.goto('/no-such-page');
+    await expect(
+      page.getByRole('heading', {name: 'Page not found'})
+    ).toBeVisible();
+    expect(await scrollsSideways(), 'page not found').toBe(false);
+  });
+}
