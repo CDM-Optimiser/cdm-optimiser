@@ -62,7 +62,7 @@ yarn dist:desktop            # Windows installer in apps/desktop/release
   `Window` typing) lives in `packages/desktop-bridge`; change it first, then
   `main.ts` and `preload.cts`, and the compiler flags any mismatch.
 - **The web app must also work in a plain browser,** where `window.darkMode`
-  doesn't exist.
+  doesn't exist. It is typed as optional, so the compiler asks for the check.
 - **`packages/ui` stays presentational:** no Supabase, router or app state.
   The web app's `index.css` has an `@source` line so Tailwind scans it; keep it
   if the package moves.

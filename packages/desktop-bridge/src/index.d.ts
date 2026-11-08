@@ -13,12 +13,6 @@ export interface DarkModeApi {
   getThemeSource: () => Promise<ThemeValue>;
   set: (mode: ThemeValue) => Promise<boolean>;
   system: () => Promise<void>;
-  toggle: () => Promise<boolean>;
-}
-
-/** Declared for `window.electronAPI`; not exposed by the preload script yet. */
-export interface IElectronAPI {
-  loadPreferences: () => Promise<void>;
 }
 
 /**
@@ -30,14 +24,16 @@ export interface DesktopIpcChannels {
   'dark-mode:get-source': {args: []; result: ThemeValue};
   'dark-mode:set': {args: [mode: ThemeValue]; result: boolean};
   'dark-mode:system': {args: []; result: void};
-  'dark-mode:toggle': {args: []; result: boolean};
 }
 
 export type DesktopIpcChannel = keyof DesktopIpcChannels;
 
 declare global {
   interface Window {
-    darkMode: DarkModeApi;
-    electronAPI: IElectronAPI;
+    /**
+     * Only in the desktop app. A plain browser has no `darkMode`, so check
+     * for it before use.
+     */
+    darkMode?: DarkModeApi;
   }
 }

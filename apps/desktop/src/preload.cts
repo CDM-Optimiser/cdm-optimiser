@@ -28,7 +28,6 @@ const darkMode: DarkModeApi = {
   getThemeSource: () => invoke('dark-mode:get-source'),
   set: (mode) => invoke('dark-mode:set', mode),
   system: () => invoke('dark-mode:system'),
-  toggle: () => invoke('dark-mode:toggle'),
 };
 
 contextBridge.exposeInMainWorld('darkMode', darkMode);
