@@ -34,6 +34,20 @@ test('boots the production build and redirects to the login page', async ({
   expect(errors, 'no script or CSP errors').toEqual([]);
 });
 
+test('the browser refuses HTML injected into the page (Trusted Types)', async ({
+  page,
+}) => {
+  await page.goto('/login');
+
+  // A string as HTML, as an injected script would add it. Under the
+  // Content Security Policy's Trusted Types rule, the browser throws.
+  const result = await page.evaluate(
+    "(() => { try { document.body.insertAdjacentHTML('beforeend', '<img src=x>'); return 'allowed'; } catch (error) { return error.name; } })()"
+  );
+
+  expect(result).toBe('TypeError');
+});
+
 test('sends a signed-out user on any page to the login page', async ({
   page,
 }) => {
