@@ -68,7 +68,8 @@ before writing classes by hand:
 - `SwitchComponent`: on/off controls, `tone="positive"` (green) or
   `"negative"` (red), for accepted or refused only.
 - `ModalComponent`: dialogs. It draws the title and the close button in one
-  row; pass `title`.
+  row; pass `title`. `placement="end"` makes it a drawer, for small-screen
+  menus.
 - `AlertComponent`: messages.
 - The icon components, instead of inline `<svg>`.
 
@@ -109,6 +110,8 @@ cover, and for changing the components themselves.
   layer, so they repeat the same ring with `focus-visible:`.
 - Buttons get their colours through `enabled:` and `disabled:`, so a
   disabled button never shows a variant's colour.
+- Pressed buttons drop onto their bottom edge (`active:mt-1
+active:border-b-0`): the face moves, the button's outer size doesn't.
 
 ### Patient status
 
