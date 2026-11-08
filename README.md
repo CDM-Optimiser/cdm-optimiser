@@ -37,6 +37,27 @@ The **CDM Optimiser Organisation** focuses on building high-quality healthcare s
 
 &nbsp;
 
+## Try the demo
+
+Sign in to the live app at **https://cdm-optimiser.netlify.app** with the
+demo account:
+
+| Email           | Password |
+| --------------- | -------- |
+| `test@test.com` | `test`   |
+
+- Every patient you see is **synthetic** ("Test Patient 0001", GMS
+  "TEST0001"). The demo account's practice never holds real patient data.
+- You can accept and refuse patients. Other testers share the same data, so
+  it may change while you look.
+- The desktop app, from the
+  [latest release](https://github.com/CDM-Optimiser/cdm-optimiser/releases/latest),
+  accepts the same account.
+- If the demo sign-in stops working, please
+  [open an issue](https://github.com/CDM-Optimiser/cdm-optimiser/issues).
+
+&nbsp;
+
 ## Technology Stack
 
 - **React**, **TypeScript**, **Vite** and **Tailwind CSS** for the dashboard
