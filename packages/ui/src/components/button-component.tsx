@@ -13,8 +13,13 @@ interface ButtonProps extends ComponentProps<'button'> {
 
 // Colours are set for `enabled:` and `disabled:` separately, so a disabled
 // button never picks up a variant's colour, in light or dark mode.
+//
+// Pressing it moves the face down onto its 4px bottom edge: the edge goes
+// and a 4px top margin takes its place, so the button's outer size, and
+// the layout around it, stay the same. Space buttons with the parent's
+// `gap`, not with vertical margins, which pressing would override.
 const BASE =
-  'rounded-md border-b-4 px-4 py-2 transition duration-200 ease-in-out enabled:cursor-pointer enabled:active:border-b-0 disabled:cursor-not-allowed disabled:border-gray-200 disabled:border-b-gray-400 disabled:bg-gray-200 disabled:text-gray-600 dark:disabled:border-gray-700 dark:disabled:border-b-gray-600 dark:disabled:bg-gray-700 dark:disabled:text-gray-300';
+  'rounded-md border-b-4 px-4 py-2 transition duration-200 ease-in-out enabled:cursor-pointer enabled:active:mt-1 enabled:active:border-b-0 disabled:cursor-not-allowed disabled:border-gray-200 disabled:border-b-gray-400 disabled:bg-gray-200 disabled:text-gray-600 dark:disabled:border-gray-700 dark:disabled:border-b-gray-600 dark:disabled:bg-gray-700 dark:disabled:text-gray-300';
 
 // White on sky-700 is 5.85:1, sky-900 on sky-100 8.24:1 and sky-100 on
 // sky-950 12.1:1 (WCAG AA needs 4.5:1). The primary button reads well on
