@@ -7,17 +7,18 @@ import {APP_VERSION} from '../lib/app-version.ts';
 
 /**
  * The frame of every signed-in page. Waits for the stored session, sends
- * signed-out users to the login page (remembering where they were going),
- * and renders the header, the page and the footer. A password that
+ * users who haven't finished signing in (password, then the code from
+ * their authenticator app) to the login page, remembering where they were
+ * going, and renders the header, the page and the footer. A password that
  * Supabase flagged as weak at sign-in gets a notice above every page.
  */
 export function ProtectedLayout() {
-  const {session, loading} = useAuth();
+  const {signInStep, loading} = useAuth();
   const location = useLocation();
 
   if (loading) return null;
 
-  if (!session) {
+  if (signInStep !== 'signed-in') {
     return <Navigate to="/login" replace state={{from: location.pathname}} />;
   }
 

@@ -1,5 +1,10 @@
 import {expect, test} from '@playwright/test';
-import {signIn, useFakeSupabase} from './fake-supabase.ts';
+import {
+  enterPassword,
+  FAKE_CODE,
+  signIn,
+  useFakeSupabase,
+} from './fake-supabase.ts';
 
 test('pressing a button moves its face, not the layout around it', async ({
   page,
@@ -44,7 +49,13 @@ for (const [device, width, height] of [
     await page.goto('/login');
     expect(await scrollsSideways(), 'login').toBe(false);
 
-    await signIn(page);
+    await enterPassword(page);
+    const code = page.getByLabel('Code from your authenticator app');
+    await expect(code).toBeVisible();
+    expect(await scrollsSideways(), 'two-step code').toBe(false);
+
+    await code.fill(FAKE_CODE);
+    await page.getByRole('button', {name: 'Continue'}).click();
     await expect(page.getByRole('table')).toBeVisible();
     expect(await scrollsSideways(), 'patients list').toBe(false);
 

@@ -1,5 +1,6 @@
 import {createContext} from 'react';
 import type {Session, User, WeakPassword} from '@supabase/supabase-js';
+import type {SignInStep} from './get-sign-in-step.ts';
 
 export interface AuthContextType {
   session: Session | null;
@@ -7,6 +8,11 @@ export interface AuthContextType {
   user: User | null;
   /** True until the session stored by Supabase has been read on start-up. */
   loading: boolean;
+  /**
+   * How far the user is through signing in: only `signed-in` may see
+   * patients. The others are steps of the login page.
+   */
+  signInStep: SignInStep;
   /** Rejects with Supabase's error when the credentials are wrong. */
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
