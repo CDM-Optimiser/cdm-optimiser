@@ -34,7 +34,7 @@ export function StatusFilterComponent({
 
   return (
     <>
-      <CardComponent className="hidden w-full flex-1 flex-col flex-wrap gap-4 md:flex xl:w-auto">
+      <CardComponent className="hidden w-full flex-1 flex-col flex-wrap justify-center gap-4 md:flex xl:w-auto">
         <span id={labelId} className="text-center xl:text-left">
           Filters:
         </span>

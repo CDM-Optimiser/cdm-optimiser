@@ -34,7 +34,7 @@ interface StatusLegendProps {
 
 export function StatusLegendComponent({counts}: StatusLegendProps) {
   return (
-    <CardComponent className="flex w-full flex-col flex-wrap gap-4 xl:w-auto">
+    <CardComponent className="flex w-full flex-col flex-wrap justify-center gap-4 xl:w-auto">
       <div className="flex justify-center gap-2">
         Total patients:{' '}
         <span className="font-medium">{counts?.total ?? 0}</span>
