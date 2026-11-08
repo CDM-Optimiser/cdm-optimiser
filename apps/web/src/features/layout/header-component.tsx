@@ -3,8 +3,7 @@ import {Link} from 'react-router';
 import {ButtonComponent} from '@cdm-optimiser/ui/components/button-component.tsx';
 import {ModalComponent} from '@cdm-optimiser/ui/components/modal-component.tsx';
 import {MenuIcon} from '@cdm-optimiser/ui/icons/menu-icon.tsx';
-import {CurrentUserComponent} from '../auth/current-user-component.tsx';
-import {LogoutButton} from '../auth/logout-button.tsx';
+import {AccountMenuComponent} from '../auth/account-menu-component.tsx';
 import {useCloseOnWideScreen} from '../../hooks/use-close-on-wide-screen.ts';
 import {ThemeMenuComponent} from '../theme/theme-menu-component.tsx';
 import {MainNavComponent} from './main-nav-component.tsx';
@@ -19,9 +18,9 @@ interface HeaderProps {
  * signed-in user). The brand is a link, not a heading: each page has its own
  * `h1`.
  *
- * On wide screens the navigation, the theme menu and the account (the
- * signed-in user next to Logout) sit in the bar. On small screens a menu
- * button opens them in a drawer, the account last.
+ * On wide screens the navigation, the theme menu and the account menu
+ * (the signed-in email, opening Account and Logout) sit in the bar. On
+ * small screens a menu button opens them in a drawer, the account last.
  */
 export function HeaderComponent({title}: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -40,10 +39,7 @@ export function HeaderComponent({title}: HeaderProps) {
       <div className="hidden flex-wrap items-center gap-x-8 gap-y-3 lg:flex">
         <MainNavComponent />
         <ThemeMenuComponent />
-        <div className="flex items-center gap-3">
-          <CurrentUserComponent />
-          <LogoutButton />
-        </div>
+        <AccountMenuComponent align="end" className="max-w-xs" />
       </div>
 
       <ButtonComponent
@@ -64,9 +60,8 @@ export function HeaderComponent({title}: HeaderProps) {
       >
         <MainNavComponent orientation="vertical" onNavigate={closeMenu} />
         <ThemeMenuComponent />
-        <div className="flex flex-col gap-3 border-t border-gray-200 pt-6 dark:border-gray-600">
-          <CurrentUserComponent />
-          <LogoutButton className="w-full" />
+        <div className="border-t border-gray-200 pt-6 dark:border-gray-600">
+          <AccountMenuComponent className="w-full" onNavigate={closeMenu} />
         </div>
       </ModalComponent>
     </header>

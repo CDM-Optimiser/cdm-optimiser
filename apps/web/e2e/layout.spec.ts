@@ -8,17 +8,17 @@ test('pressing a button moves its face, not the layout around it', async ({
   await signIn(page);
 
   const header = page.getByRole('banner');
-  const logout = page.getByRole('button', {name: 'Logout'});
+  const accountMenu = page.getByRole('button', {name: /^Account:/});
   const headerBefore = await header.boundingBox();
-  const buttonBefore = await logout.boundingBox();
+  const buttonBefore = await accountMenu.boundingBox();
 
-  await logout.hover();
+  await accountMenu.hover();
   await page.mouse.down();
 
   const headerPressed = await header.boundingBox();
-  const buttonPressed = await logout.boundingBox();
+  const buttonPressed = await accountMenu.boundingBox();
 
-  // Leave before letting go, so it isn't a click and nobody is signed out.
+  // Leave before letting go, so it isn't a click and the menu stays shut.
   await page.mouse.move(0, 0);
   await page.mouse.up();
 
@@ -51,6 +51,10 @@ for (const [device, width, height] of [
     await page.goto('/pending-patients');
     await expect(page.getByText('Pending patient: 1 of')).toBeVisible();
     expect(await scrollsSideways(), 'pending patients').toBe(false);
+
+    await page.goto('/account');
+    await expect(page.getByLabel('Current password')).toBeVisible();
+    expect(await scrollsSideways(), 'account').toBe(false);
 
     await page.goto('/no-such-page');
     await expect(
