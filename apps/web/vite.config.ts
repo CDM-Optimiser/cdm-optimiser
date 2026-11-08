@@ -35,6 +35,11 @@ function contentSecurityPolicy(supabaseUrl: string | undefined): Plugin {
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
+    // Trusted Types: the browser refuses HTML or script strings in the
+    // risky DOM APIs (`innerHTML`, `insertAdjacentHTML`, …), the usual way
+    // an injected script gets in. The app never uses them; React doesn't
+    // either, without `dangerouslySetInnerHTML`.
+    "require-trusted-types-for 'script'",
   ].join('; ');
 
   return {

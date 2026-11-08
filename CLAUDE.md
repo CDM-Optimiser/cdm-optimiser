@@ -81,7 +81,9 @@ yarn bump <x.y.z>            # set the app version; merging it publishes a relea
 - **Content Security Policy:** production builds get a CSP `<meta>` tag from
   a plugin in `apps/web/vite.config.ts`, allowing only the app itself and the
   Supabase origin over HTTPS (no realtime WebSocket). A new external origin (API, font, image host) must be
-  added there, or the browser and Electron will block it.
+  added there, or the browser and Electron will block it. It also requires
+  Trusted Types, so the browser refuses HTML strings in `innerHTML` and
+  similar APIs: don't use them or `dangerouslySetInnerHTML`.
 - **Configuration** comes from `VITE_SUPABASE_URL` and
   `VITE_SUPABASE_PUBLISHABLE_KEY` in `apps/web/.env.local` (copy
   `.env.example`). They are bundled into the client, so only a publishable

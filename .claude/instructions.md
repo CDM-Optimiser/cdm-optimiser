@@ -255,7 +255,7 @@ other modules. Import every value from the file that defines it.
 - **End-to-end:** `apps/web/e2e` runs against the production build, so run
   `yarn build:web` first. It never needs a real Supabase project:
   - `smoke.spec.ts` boots the build under its Content Security Policy,
-    signed out.
+    signed out, and checks that Trusted Types refuses injected HTML.
   - `accessibility.spec.ts` signs in and checks every page with axe
     (WCAG 2.2 AA) in light and dark mode. Add a check when you add a page
     or a dialog.
@@ -312,6 +312,15 @@ The app processes health data of real patients (GDPR special-category data).
   or in `VITE_*` variables. The build refuses a secret key.
 - Don't add analytics, error reporting or other third-party services without
   an explicit decision from the maintainers.
+- **The sign-in session lives in `localStorage`** (Supabase's default, the
+  maintainers' choice on 2026-11-08), so users stay signed in until they log
+  out. A script injected into the page could read it, so the defence is
+  keeping scripts out: the Content Security Policy allows only the app's own
+  scripts and requires Trusted Types (a smoke test checks the browser
+  refuses injected HTML). Never use `innerHTML`, `insertAdjacentHTML` or
+  `dangerouslySetInnerHTML`, never load third-party scripts, and don't
+  weaken the policy. `sessionStorage` or memory would be no safer against
+  such a script, and `httpOnly` cookies would need a server of our own.
 
 ## UI work and colours
 
