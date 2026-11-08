@@ -43,6 +43,9 @@ jobs:
       - name: Check formatting
         run: yarn format:check
 
+      - name: Check the app versions match
+        run: yarn check:versions
+
       - name: Lint
         run: yarn lint
 
