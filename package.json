@@ -24,7 +24,7 @@
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "linc": "node scripts/lint-changed.mjs",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings 0",
     "prettier": "node scripts/prettier-changed.mjs",
     "test": "yarn workspaces foreach --all --exclude cdm-optimiser run test",
     "test:e2e": "yarn workspace @cdm-optimiser/web test:e2e",

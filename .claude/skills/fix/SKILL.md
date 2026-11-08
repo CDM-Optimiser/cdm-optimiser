@@ -14,4 +14,4 @@ description: Use when you have lint errors, formatting issues, or before committ
 ## Common Mistakes
 
 - **Running prettier on wrong files** - `yarn prettier` only formats changed files
-- **Ignoring linc errors** - These will fail CI, fix them before committing
+- **Ignoring linc errors or warnings** - Both fail CI, fix them before committing
