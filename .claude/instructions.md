@@ -67,16 +67,31 @@ lint rule or delete a test to get a green run. Report what fails instead.
         states the rule, checks the confirmation, and turns Supabase's
         error codes into plain words. When Supabase flags a password as
         weak at sign-in, a notice above every page links to Account.
+      - **Signing in has steps** (`getSignInStep`, from the session): the
+        password, then a code from an authenticator app, or setting one up
+        if the user has none. Only `signed-in` may see patients:
+        `ProtectedLayout` sends every other step to the login page, which
+        shows the step. See `two-step/` below.
       - **The demo account** is marked in `app_metadata.demo`
-        (`isDemoAccount`), which users can't edit. Its Account page shows a
-        notice instead of the form, and the database refuses a new
-        password for it whatever the app does (runbook P2).
+        (`isDemoAccount`), which users can't edit. It skips the code step,
+        its Account page shows notices instead of the password form and
+        the authenticator apps, and the database refuses a new password
+        for it whatever the app does (runbook P2).
     - `layout/`: the page frame: the header (`MainNavComponent` with its
       `NavItemComponent` links; below `lg`, a menu button opening a drawer)
       and the footer. They are this app's frame, not reusable building
       blocks, so they live here rather than in `packages/ui`: the header
       needs the router, sign-in and the desktop theme, which `packages/ui`
       may not use.
+    - `two-step/`: two-step sign-in (Supabase MFA with TOTP factors).
+      `two-step-api.ts` is the only module that calls `supabase.auth.mfa`.
+      The code step of signing in (`VerifyCodeFormComponent`, which tries
+      the code on each of the user's apps), the setup (`SetUpAppComponent`:
+      name, QR code and key, first code; nothing is created until the user
+      asks for the QR code), and the Account page's list of apps
+      (`AuthenticatorAppsComponent`: add another, remove one but never the
+      last). Never log a QR code, key or code. Runbook M2 makes the
+      database refuse patient data without the second step.
     - `theme/`: the desktop theme menu. `useDesktopTheme` talks to
       `window.darkMode`; the menu only renders the dropdown.
     - `patients/`, split into:
@@ -247,10 +262,12 @@ other modules. Import every value from the file that defines it.
   - `layout.spec.ts` checks that no page scrolls sideways at phone, iPad
     mini, tablet and desktop sizes, and that pressing a button doesn't
     move the layout.
-  - Signed-in tests use `fake-supabase.ts`: it answers Supabase's auth and
-    database calls with synthetic patients and refuses every other request
-    to another origin, so nothing leaves the machine. Each test expects the
-    list of refused requests to be empty.
+  - Signed-in tests use `fake-supabase.ts`: it answers Supabase's auth,
+    two-step and database calls with synthetic patients and refuses every
+    other request to another origin, so nothing leaves the machine. Each
+    test expects the list of refused requests to be empty. `signIn` enters
+    the password and the fake's code (`FAKE_CODE`); `twoStep: 'none'` gives
+    a user who must set up an app first.
 - **Local browsers:** Chromium needs system libraries. On Linux or WSL, install
   them once with
   `yarn workspace @cdm-optimiser/web playwright install-deps chromium`

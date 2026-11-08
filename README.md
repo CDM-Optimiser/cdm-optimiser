@@ -51,8 +51,12 @@ demo account:
 - You can accept and refuse patients. Other testers share the same data, so
   it may change while you look.
 - The demo account's password can't be changed, so it keeps working for
-  everyone. Your own account can change its password under **Account**
-  (your email at the top right).
+  everyone, and it doesn't ask for a code.
+- Your own account signs in with its password and then a code from an
+  authenticator app (Google Authenticator, Microsoft Authenticator or a
+  password manager); the first time, the app helps you set one up. Change
+  your password and manage your apps under **Account** (your email at the
+  top right).
 - The desktop app, from the
   [latest release](https://github.com/CDM-Optimiser/cdm-optimiser/releases/latest),
   accepts the same account. Its installer lets you choose the folder, and

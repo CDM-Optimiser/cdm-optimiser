@@ -3,6 +3,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import type {Session, WeakPassword} from '@supabase/supabase-js';
 import {supabase} from '../../lib/supabase.ts';
 import {AuthContext} from './auth-context.ts';
+import {getSignInStep} from './get-sign-in-step.ts';
 
 async function logout() {
   const {error} = await supabase.auth.signOut();
@@ -72,6 +73,7 @@ export function AuthProvider({children}: {children: ReactNode}) {
       session,
       user: session?.user ?? null,
       loading,
+      signInStep: getSignInStep(session),
       login,
       logout,
       changePassword,

@@ -76,6 +76,8 @@ yarn bump <x.y.z>            # set the app version; merging it publishes a relea
   `list_patients`, `get_patient_counts` and `update_patient_status` (one
   module, `features/patients/api/patients-api.ts`), through TanStack Query.
   They check the caller's practice; the tables aren't readable directly.
+  Once runbook step M2 is applied, they also refuse sessions that haven't
+  done two-step sign-in (the demo account excepted).
 - **Content Security Policy:** production builds get a CSP `<meta>` tag from
   a plugin in `apps/web/vite.config.ts`, allowing only the app itself and the
   Supabase origin over HTTPS (no realtime WebSocket). A new external origin (API, font, image host) must be

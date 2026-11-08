@@ -33,6 +33,7 @@ const auth = (overrides: object) => ({
   session: null,
   user: null,
   loading: false,
+  signInStep: 'password',
   login: vi.fn(),
   logout: vi.fn(),
   ...overrides,
@@ -64,8 +65,26 @@ describe('ProtectedLayout', () => {
       .not.toBeInTheDocument();
   });
 
+  test.each(['verify-code', 'set-up-app'])(
+    'sends a user at the %s step back to the login page',
+    async (signInStep) => {
+      mocks.useAuth.mockReturnValue(
+        auth({session, user: session.user, signInStep})
+      );
+
+      const screen = await renderAt('/pending-patients');
+
+      await expect
+        .element(screen.getByText('Login page, from /pending-patients'))
+        .toBeInTheDocument();
+      expect(screen.getByText('Pending page').query()).toBeNull();
+    }
+  );
+
   test('shows the page inside the header, main area and footer when signed in', async () => {
-    mocks.useAuth.mockReturnValue(auth({session, user: session.user}));
+    mocks.useAuth.mockReturnValue(
+      auth({session, user: session.user, signInStep: 'signed-in'})
+    );
 
     const screen = await renderAt('/pending-patients');
 

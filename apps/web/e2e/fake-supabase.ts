@@ -57,14 +57,45 @@ const USER = {
   created_at: '2026-01-01T00:00:00Z',
 };
 
+/** The code the fake accepts from any authenticator app. */
+export const FAKE_CODE = '123456';
+
+interface FakeFactor {
+  id: string;
+  friendly_name: string;
+  factor_type: 'totp';
+  status: 'verified' | 'unverified';
+  created_at: string;
+  updated_at: string;
+}
+
+function factor(id: string, name: string, status: FakeFactor['status']) {
+  return {
+    id,
+    friendly_name: name,
+    factor_type: 'totp' as const,
+    status,
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-01T00:00:00Z',
+  };
+}
+
+// A made-up QR code. Supabase's client turns it into a data URL, which
+// the Content Security Policy allows for images.
+const FAKE_QR_CODE =
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><rect width="10" height="10" fill="black"/></svg>';
+
 function base64Url(value: object): string {
   return Buffer.from(JSON.stringify(value)).toString('base64url');
 }
 
-/** A session shaped like Supabase's. The token is never verified here. */
-function session() {
+/**
+ * A session shaped like Supabase's, at assurance level `aal` (`aal2` once
+ * a code is verified). The token is never verified here.
+ */
+function session(aal: 'aal1' | 'aal2', factors: FakeFactor[]) {
   const expiresAt = Math.floor(Date.now() / 1000) + 3600;
-  const claims = {sub: USER.id, role: 'authenticated', exp: expiresAt};
+  const claims = {sub: USER.id, role: 'authenticated', exp: expiresAt, aal};
 
   return {
     access_token: `${base64Url({alg: 'ES256', typ: 'JWT'})}.${base64Url(claims)}.fake`,
@@ -72,7 +103,7 @@ function session() {
     token_type: 'bearer',
     expires_in: 3600,
     expires_at: expiresAt,
-    user: USER,
+    user: {...USER, factors},
   };
 }
 
@@ -94,6 +125,11 @@ function json(route: Route, body: unknown, status = 200) {
 interface FakeSupabaseOptions {
   /** Refuse the password, as Supabase does for a wrong one. */
   rejectLogin?: boolean;
+  /**
+   * `app` (the default): the user has an authenticator app, so signing in
+   * asks for its code. `none`: they must set one up first.
+   */
+  twoStep?: 'app' | 'none';
 }
 
 /**
@@ -102,9 +138,14 @@ interface FakeSupabaseOptions {
  */
 export async function useFakeSupabase(
   page: Page,
-  {rejectLogin = false}: FakeSupabaseOptions = {}
+  {rejectLogin = false, twoStep = 'app'}: FakeSupabaseOptions = {}
 ): Promise<string[]> {
   const refused: string[] = [];
+  let factors: FakeFactor[] =
+    twoStep === 'app'
+      ? [factor('fake-app', 'Authenticator app', 'verified')]
+      : [];
+  let aal: 'aal1' | 'aal2' = 'aal1';
 
   await page.route(
     (url) => url.hostname !== 'localhost',
@@ -117,17 +158,94 @@ export async function useFakeSupabase(
       }
 
       if (pathname === '/auth/v1/token') {
-        return rejectLogin
-          ? json(
+        const isPassword =
+          new URL(request.url()).searchParams.get('grant_type') === 'password';
+
+        if (isPassword && rejectLogin) {
+          return json(
+            route,
+            {
+              code: 400,
+              error_code: 'invalid_credentials',
+              msg: 'Invalid login credentials',
+            },
+            400
+          );
+        }
+
+        // A password starts at the first step; a refresh keeps the level.
+        if (isPassword) aal = 'aal1';
+
+        return json(route, session(aal, factors));
+      }
+
+      if (pathname === '/auth/v1/user' && request.method() === 'GET') {
+        return json(route, {...USER, factors});
+      }
+
+      if (pathname === '/auth/v1/factors' && request.method() === 'POST') {
+        const {friendly_name} = request.postDataJSON();
+        const added = factor(
+          `fake-app-${factors.length + 1}`,
+          friendly_name,
+          'unverified'
+        );
+
+        factors = [...factors, added];
+
+        return json(route, {
+          id: added.id,
+          type: 'totp',
+          friendly_name,
+          totp: {
+            qr_code: FAKE_QR_CODE,
+            secret: 'FAKEFAKEFAKEFAKE',
+            uri: 'otpauth://totp/fake',
+          },
+        });
+      }
+
+      const factorPath = pathname.match(
+        /^\/auth\/v1\/factors\/([^/]+)(\/challenge|\/verify)?$/
+      );
+
+      if (factorPath) {
+        const [, factorId, action] = factorPath;
+
+        if (action === '/challenge') {
+          return json(route, {
+            id: 'fake-challenge',
+            type: 'totp',
+            expires_at: Math.floor(Date.now() / 1000) + 300,
+          });
+        }
+
+        if (action === '/verify') {
+          if (request.postDataJSON().code !== FAKE_CODE) {
+            return json(
               route,
               {
-                code: 400,
-                error_code: 'invalid_credentials',
-                msg: 'Invalid login credentials',
+                code: 422,
+                error_code: 'mfa_verification_failed',
+                msg: 'Invalid TOTP code entered',
               },
-              400
-            )
-          : json(route, session());
+              422
+            );
+          }
+
+          factors = factors.map((each) =>
+            each.id === factorId ? {...each, status: 'verified'} : each
+          );
+          aal = 'aal2';
+
+          return json(route, session(aal, factors));
+        }
+
+        if (request.method() === 'DELETE') {
+          factors = factors.filter((each) => each.id !== factorId);
+
+          return json(route, {id: factorId});
+        }
       }
 
       if (pathname === '/auth/v1/logout') {
@@ -178,11 +296,21 @@ export async function useFakeSupabase(
   return refused;
 }
 
-/** Signs in through the login form, against the fake. */
-export async function signIn(page: Page) {
+/** Enters the password, as the first step of signing in. */
+export async function enterPassword(page: Page) {
   await page.goto('/login');
   await page.getByLabel('Email').fill(USER.email);
   await page.getByLabel('Password').fill('not-a-real-password');
   await page.getByRole('button', {name: 'Login'}).click();
+}
+
+/**
+ * Signs in through the login page, against the fake: the password, then
+ * the authenticator app's code.
+ */
+export async function signIn(page: Page) {
+  await enterPassword(page);
+  await page.getByLabel('Code from your authenticator app').fill(FAKE_CODE);
+  await page.getByRole('button', {name: 'Continue'}).click();
   await page.waitForURL((url) => url.pathname === '/');
 }

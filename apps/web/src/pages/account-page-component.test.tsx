@@ -1,10 +1,17 @@
 import {beforeEach, describe, expect, test, vi} from 'vitest';
-import {render} from 'vitest-browser-react';
+import {renderWithProviders} from '../test/render-with-providers.tsx';
 import {AccountPageComponent} from './account-page-component.tsx';
 
-const mocks = vi.hoisted(() => ({useAuth: vi.fn(), logout: vi.fn()}));
+const mocks = vi.hoisted(() => ({
+  useAuth: vi.fn(),
+  logout: vi.fn(),
+  listAuthenticatorApps: vi.fn(),
+}));
 
 vi.mock('../features/auth/use-auth.ts', () => ({useAuth: mocks.useAuth}));
+vi.mock('../features/two-step/two-step-api.ts', () => ({
+  listAuthenticatorApps: mocks.listAuthenticatorApps,
+}));
 
 function renderFor(appMetadata: object) {
   mocks.useAuth.mockReturnValue({
@@ -13,7 +20,11 @@ function renderFor(appMetadata: object) {
     logout: mocks.logout,
   });
 
-  return render(<AccountPageComponent />);
+  mocks.listAuthenticatorApps.mockResolvedValue([]);
+
+  return renderWithProviders(<AccountPageComponent />).then(
+    ({screen}) => screen
+  );
 }
 
 describe('AccountPageComponent', () => {
@@ -46,6 +57,18 @@ describe('AccountPageComponent', () => {
       .click();
 
     expect(mocks.logout).toHaveBeenCalledOnce();
+  });
+
+  test('has the two-step sign-in section', async () => {
+    const screen = await renderFor({provider: 'email'});
+
+    await expect
+      .element(
+        screen
+          .getByRole('region', {name: 'Two-step sign-in'})
+          .getByRole('button', {name: 'Add another app'})
+      )
+      .toBeVisible();
   });
 
   test('has the change-password form', async () => {

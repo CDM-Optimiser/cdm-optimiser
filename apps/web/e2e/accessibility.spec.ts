@@ -1,6 +1,11 @@
 import AxeBuilder from '@axe-core/playwright';
 import {expect, test, type Page} from '@playwright/test';
-import {signIn, useFakeSupabase} from './fake-supabase.ts';
+import {
+  enterPassword,
+  FAKE_CODE,
+  signIn,
+  useFakeSupabase,
+} from './fake-supabase.ts';
 
 // Checks every page against WCAG 2.2 AA with axe (contrast, names, roles,
 // structure), in light and dark mode, signed in against a fake Supabase.
@@ -43,6 +48,49 @@ for (const colorScheme of ['light', 'dark'] as const) {
       expect(refused).toEqual([]);
     });
 
+    test('the two-step code, and a wrong one', async ({page}) => {
+      const refused = await useFakeSupabase(page);
+
+      await enterPassword(page);
+      await expect(
+        page.getByRole('heading', {level: 1, name: 'Two-step sign-in'})
+      ).toBeVisible();
+      await expectNoViolations(page);
+
+      await page.getByLabel('Code from your authenticator app').fill('000000');
+      await page.getByRole('button', {name: 'Continue'}).click();
+      await expect(page.getByRole('alert')).toBeVisible();
+      await expectNoViolations(page);
+
+      expect(refused).toEqual([]);
+    });
+
+    test('setting up an authenticator app at sign-in', async ({page}) => {
+      const refused = await useFakeSupabase(page, {twoStep: 'none'});
+
+      await enterPassword(page);
+      await expect(
+        page.getByRole('heading', {level: 1, name: 'Set up two-step sign-in'})
+      ).toBeVisible();
+      await expectNoViolations(page);
+
+      await page.getByRole('button', {name: 'Show the QR code'}).click();
+      await expect(
+        page.getByRole('img', {
+          name: 'QR code to scan with your authenticator app',
+        })
+      ).toBeVisible();
+      await expectNoViolations(page);
+
+      await page.getByLabel('Code from your authenticator app').fill(FAKE_CODE);
+      await page
+        .getByRole('button', {name: 'Turn on two-step sign-in'})
+        .click();
+      await expect(page.getByRole('table')).toBeVisible();
+
+      expect(refused).toEqual([]);
+    });
+
     test('the patients list, and a patient’s details', async ({page}) => {
       const refused = await useFakeSupabase(page);
 
@@ -77,6 +125,18 @@ for (const colorScheme of ['light', 'dark'] as const) {
       await page.getByRole('link', {name: 'Account'}).click();
       await expect(
         page.getByRole('heading', {level: 1, name: 'Account'})
+      ).toBeVisible();
+      await expect(page.getByText('Added 1 Jan 2026')).toBeVisible();
+      await expectNoViolations(page);
+
+      await page.getByRole('button', {name: 'Add another app'}).click();
+      await page.getByLabel('Name for this app').fill('Second phone');
+      await page.getByRole('button', {name: 'Show the QR code'}).click();
+      await page.getByLabel('Code from your authenticator app').fill(FAKE_CODE);
+      await page.getByRole('button', {name: 'Add app'}).click();
+      // With two apps, each can be removed.
+      await expect(
+        page.getByRole('button', {name: 'Remove Second phone'})
       ).toBeVisible();
       await expectNoViolations(page);
 
