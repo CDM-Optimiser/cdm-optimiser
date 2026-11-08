@@ -53,7 +53,7 @@ const USER = {
   role: 'authenticated',
   email: 'test.user@example.com',
   app_metadata: {provider: 'email'},
-  user_metadata: {},
+  user_metadata: {display_name: 'Test User'},
   created_at: '2026-01-01T00:00:00Z',
 };
 
