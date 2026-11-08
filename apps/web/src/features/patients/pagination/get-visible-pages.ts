@@ -1,13 +1,18 @@
-export const getVisiblePages = (
+/** A page number, or a gap in the page list (drawn as "…"). */
+export type PageItem = number | 'gap-start' | 'gap-end';
+
+/**
+ * The page buttons to show: always the first and last page, a few pages
+ * around the current one, and a gap where pages are left out. Gaps have
+ * their own names, so each one keeps a stable React key.
+ */
+export function getVisiblePages(
   current: number,
   total: number,
   maxButtons = 4
-): (number | string)[] => {
-  const pages: (number | string)[] = [];
-
+): PageItem[] {
   if (total <= maxButtons) {
-    for (let i = 1; i <= total; i++) pages.push(i);
-    return pages;
+    return Array.from({length: total}, (_, i) => i + 1);
   }
 
   const numMiddle = maxButtons - 2;
@@ -24,15 +29,15 @@ export const getVisiblePages = (
     start = end - numMiddle + 1;
   }
 
-  pages.push(1);
+  const pages: PageItem[] = [1];
 
-  if (start > 2) pages.push('…');
+  if (start > 2) pages.push('gap-start');
 
   for (let i = start; i <= end; i++) pages.push(i);
 
-  if (end < total - 1) pages.push('…');
+  if (end < total - 1) pages.push('gap-end');
 
   pages.push(total);
 
   return pages;
-};
+}

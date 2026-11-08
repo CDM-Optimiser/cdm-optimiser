@@ -1,37 +1,26 @@
-export const booleanColumns = ['asthma', 'dm', 'cvd', 'copd'];
-export const excludedColumns = [
-  'gender',
-  'email',
-  'gms',
-  'regdate',
-  'type',
-  'hcp',
-  'expdate',
-  'cdm_condition_count',
-  'potential_income',
-  'accepted',
-  'refused',
-];
+import type {Patient} from './patient.ts';
+import {CONDITIONS, type ConditionKey} from './patient-conditions.ts';
 
-export const headerLabels: Record<string, string> = {
-  name: 'Name',
-  dob: 'D.O.B.',
-  gender: 'Gender',
-  address: 'Address',
-  home_phone: 'Home Phone',
-  mobile_phone: 'Mobile Phone',
-  email: 'Email',
-  gms: 'GMS',
-  regdate: 'Registration Date',
-  type: 'Type',
-  hcp: 'HCP',
-  expdate: 'Expiration Date',
-  asthma: 'Asthma',
-  dm: 'DM',
-  cvd: 'CVD',
-  copd: 'COPD',
-  cdm_condition_count: 'CDM Condition Count',
-  potential_income: 'Potential Income',
-  accepted: 'Accepted',
-  refused: 'Refused',
-};
+type TextKey = keyof Pick<
+  Patient,
+  'name' | 'dob' | 'address' | 'home_phone' | 'mobile_phone'
+>;
+
+/** A column of the patients table. `kind` decides how a cell is drawn. */
+export type PatientColumn =
+  | {kind: 'text'; key: TextKey; label: string}
+  | {kind: 'condition'; key: ConditionKey; label: string};
+
+/** The table's columns, in order. Add a column by adding an entry. */
+export const PATIENT_COLUMNS: readonly PatientColumn[] = [
+  {kind: 'text', key: 'name', label: 'Name'},
+  {kind: 'text', key: 'dob', label: 'D.O.B.'},
+  {kind: 'text', key: 'address', label: 'Address'},
+  {kind: 'text', key: 'home_phone', label: 'Home Phone'},
+  {kind: 'text', key: 'mobile_phone', label: 'Mobile Phone'},
+  ...CONDITIONS.map(({key, label}): PatientColumn => ({
+    kind: 'condition',
+    key,
+    label,
+  })),
+];
