@@ -73,7 +73,8 @@ yarn install
 ```
 
 Then copy `apps/web/.env.example` to `apps/web/.env.local` and fill in the
-Supabase project URL and anon key.
+Supabase project URL and publishable key (`sb_publishable_…`, from Project
+Settings → API Keys).
 
 ### Common commands
 

@@ -75,8 +75,10 @@ yarn dist:desktop            # Windows installer in apps/desktop/release
   Supabase origin over HTTPS (no realtime WebSocket). A new external origin (API, font, image host) must be
   added there, or the browser and Electron will block it.
 - **Configuration** comes from `VITE_SUPABASE_URL` and
-  `VITE_SUPABASE_ANON_KEY` in `apps/web/.env.local` (copy `.env.example`).
-  They are bundled into the client, so only the anon key belongs there.
+  `VITE_SUPABASE_PUBLISHABLE_KEY` in `apps/web/.env.local` (copy
+  `.env.example`). They are bundled into the client, so only a publishable
+  key (`sb_publishable_…`) belongs there. The build fails on a missing value,
+  a legacy anon key or a secret key (`src/lib/check-supabase-config.ts`).
 
 ## Pinned versions
 

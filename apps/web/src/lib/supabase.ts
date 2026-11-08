@@ -1,11 +1,14 @@
 import {createClient} from '@supabase/supabase-js';
+import {checkSupabaseConfig} from './check-supabase-config.ts';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
-if (!supabaseUrl || !supabaseKey) {
+const problems = checkSupabaseConfig(supabaseUrl, supabaseKey);
+
+if (problems.length > 0) {
   throw new Error(
-    'Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY. Copy apps/web/.env.example to apps/web/.env.local and fill them in.'
+    `${problems.join(' ')} Copy apps/web/.env.example to apps/web/.env.local and fill it in.`
   );
 }
 

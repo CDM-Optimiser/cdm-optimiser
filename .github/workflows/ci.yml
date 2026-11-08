@@ -16,7 +16,7 @@ concurrency:
 env:
   # Placeholders: CI builds never talk to Supabase.
   VITE_SUPABASE_URL: https://example.supabase.co
-  VITE_SUPABASE_ANON_KEY: ci-placeholder-anon-key
+  VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci-placeholder
 
 jobs:
   checks:
