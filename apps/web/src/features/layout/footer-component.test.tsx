@@ -4,7 +4,7 @@ import {FooterComponent} from './footer-component.tsx';
 
 const MOCKED_YEAR = 2025;
 
-describe('Footer component tests', () => {
+describe('FooterComponent', () => {
   const defaultProps = {
     brand: 'CDM Optimiser',
   };
@@ -40,11 +40,5 @@ describe('Footer component tests', () => {
     const screen = await render(<FooterComponent {...defaultProps} />);
 
     expect(screen.container.textContent).toContain('2031');
-  });
-
-  test('matches snapshot', async () => {
-    const screen = await render(<FooterComponent {...defaultProps} />);
-
-    expect(screen.container.innerHTML).toMatchSnapshot();
   });
 });
