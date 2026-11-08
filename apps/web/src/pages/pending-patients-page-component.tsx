@@ -41,6 +41,7 @@ export function PendingPatientsPageComponent() {
 
   return (
     <>
+      <h1 className="text-2xl font-semibold">Pending patients</h1>
       {lastUpdated && (
         <AlertComponent
           type="success"

@@ -13,14 +13,14 @@ data**: follow the privacy rules in `.claude/instructions.md`.
 
 ## Repository map
 
-| Path                      | Package                         | Contents                                                                                                                                                      |
-| ------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `apps/web`                | `@cdm-optimiser/web`            | React 19 + Vite + Tailwind 4 SPA. Entry `src/main.tsx`, routes `src/app/app.tsx`, Supabase client `src/lib/supabase.ts`.                                      |
-| `apps/desktop`            | `@cdm-optimiser/desktop`        | Electron main process `src/main.ts`, preload `src/preload.cts`, packaging config `electron-builder.yml`.                                                      |
-| `packages/ui`             | `@cdm-optimiser/ui`             | Presentational components (alert, button, card, dropdown, footer, modal, switch, text field), icons and the auto-dismiss hook. Consumed as TypeScript source. |
-| `packages/desktop-bridge` | `@cdm-optimiser/desktop-bridge` | Types-only IPC contract shared by the Electron main process, the preload and the web app (`src/index.d.ts`).                                                  |
-| `scripts/`                | (root)                          | Changed-files helpers behind `yarn prettier` and `yarn linc`.                                                                                                 |
-| `.github/`                | (root)                          | `ci.yml` (checks on every PR), `release-desktop.yml` (Windows installer on `v*` tags).                                                                        |
+| Path                      | Package                         | Contents                                                                                                                                              |
+| ------------------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/web`                | `@cdm-optimiser/web`            | React 19 + Vite + Tailwind 4 SPA. Entry `src/main.tsx`, routes `src/app/app.tsx`, Supabase client `src/lib/supabase.ts`.                              |
+| `apps/desktop`            | `@cdm-optimiser/desktop`        | Electron main process `src/main.ts`, preload `src/preload.cts`, packaging config `electron-builder.yml`.                                              |
+| `packages/ui`             | `@cdm-optimiser/ui`             | Presentational components (alert, button, card, dropdown, modal, switch, text field), icons and the auto-dismiss hook. Consumed as TypeScript source. |
+| `packages/desktop-bridge` | `@cdm-optimiser/desktop-bridge` | Types-only IPC contract shared by the Electron main process, the preload and the web app (`src/index.d.ts`).                                          |
+| `scripts/`                | (root)                          | Changed-files helpers behind `yarn prettier` and `yarn linc`.                                                                                         |
+| `.github/`                | (root)                          | `ci.yml` (checks on every PR), `release-desktop.yml` (Windows installer on `v*` tags).                                                                |
 
 ## Commands
 

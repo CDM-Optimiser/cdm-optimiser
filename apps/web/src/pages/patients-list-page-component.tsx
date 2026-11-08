@@ -37,6 +37,7 @@ export function PatientsListPageComponent() {
 
   return (
     <>
+      <h1 className="text-2xl font-semibold">Patients</h1>
       <SearchPatientComponent
         inputSearchID={searchId}
         placeholder="Type to find a patient by name, D.O.B. or GMS number"

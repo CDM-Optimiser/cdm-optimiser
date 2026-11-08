@@ -1,88 +1,62 @@
-import {beforeEach, describe, expect, test, vi} from 'vitest';
+import {describe, expect, test, vi} from 'vitest';
 import {render} from 'vitest-browser-react';
 import {MemoryRouter} from 'react-router';
-import type {User} from '@supabase/supabase-js';
 import {HeaderComponent} from './header-component.tsx';
 
-const mocks = vi.hoisted(() => {
-  return {
-    useAuth: vi.fn(),
-    LogoutButton: () => (
-      <div data-testid="logout-button-mock">Logout Placeholder</div>
-    ),
-  };
-});
-
-vi.mock('../auth/use-auth.ts', () => {
-  return {
-    useAuth: mocks.useAuth,
-  };
-});
-
-vi.mock('../auth/logout-button.tsx', () => ({
-  LogoutButton: mocks.LogoutButton,
+vi.mock('../auth/use-auth.ts', () => ({
+  useAuth: () => ({logout: vi.fn()}),
 }));
 
-describe('Header component tests', () => {
-  const mockUser = {id: '1', email: 'test@test.com'} as User;
-  const title = 'CDM Optimiser';
+function renderHeaderAt(path: string) {
+  return render(
+    <MemoryRouter initialEntries={[path]}>
+      <HeaderComponent title="CDM Optimiser" />
+    </MemoryRouter>
+  );
+}
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-
-    mocks.useAuth.mockReturnValue({user: mockUser});
-  });
-
-  test('does not render when the user is NOT authenticated', async () => {
-    mocks.useAuth.mockReturnValue({user: null});
-
-    const screen = await render(
-      <MemoryRouter>
-        <HeaderComponent title={title} />
-      </MemoryRouter>
-    );
-
-    expect(screen.container.firstChild).toBeNull();
+describe('HeaderComponent', () => {
+  test('the brand links to the patients list and is not a heading', async () => {
+    const screen = await renderHeaderAt('/pending-patients');
 
     await expect
-      .element(screen.getByRole('link', {name: 'Patients List'}))
-      .not.toBeInTheDocument();
+      .element(screen.getByRole('link', {name: 'CDM Optimiser'}))
+      .toHaveAttribute('href', '/');
+    expect(screen.getByRole('heading').elements()).toHaveLength(0);
+  });
+
+  test('the main navigation marks the current page', async () => {
+    const screen = await renderHeaderAt('/pending-patients');
+    const nav = screen.getByRole('navigation', {name: 'Main'});
+
     await expect
-      .element(screen.getByRole('link', {name: 'Pending Patients'}))
-      .not.toBeInTheDocument();
+      .element(nav.getByRole('link', {name: 'Pending Patients'}))
+      .toHaveAttribute('aria-current', 'page');
+    await expect
+      .element(nav.getByRole('link', {name: 'Patients List'}))
+      .not.toHaveAttribute('aria-current');
   });
 
-  test('renders the title and navigation when the user IS authenticated', async () => {
-    mocks.useAuth.mockReturnValue({user: mockUser});
+  test('on the patients list, only that link is current', async () => {
+    const screen = await renderHeaderAt('/');
+    const nav = screen.getByRole('navigation', {name: 'Main'});
 
-    const screen = await render(
-      <MemoryRouter>
-        <HeaderComponent title={title} />
-      </MemoryRouter>
-    );
-
-    const logoutMock = screen.getByTestId('logout-button-mock');
-
-    expect(screen.getByRole('heading', {name: title})).toBeInTheDocument();
-    expect(screen.getByRole('banner')).toBeInTheDocument();
-    expect(screen.getByRole('navigation')).toBeInTheDocument();
-
-    expect(
-      screen.getByRole('link', {name: 'Patients List'})
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('link', {name: 'Pending Patients'})
-    ).toBeInTheDocument();
-    expect(logoutMock).toBeInTheDocument();
+    await expect
+      .element(nav.getByRole('link', {name: 'Patients List'}))
+      .toHaveAttribute('aria-current', 'page');
+    await expect
+      .element(nav.getByRole('link', {name: 'Pending Patients'}))
+      .not.toHaveAttribute('aria-current');
   });
 
-  test('matches snapshot', async () => {
-    const screen = await render(
-      <MemoryRouter>
-        <HeaderComponent title={title} />
-      </MemoryRouter>
-    );
+  test('offers logout, and no theme menu outside the desktop app', async () => {
+    const screen = await renderHeaderAt('/');
 
-    expect(screen.container.innerHTML).toMatchSnapshot();
+    await expect
+      .element(screen.getByRole('button', {name: 'Logout'}))
+      .toBeVisible();
+    expect(
+      screen.getByRole('button', {name: /^Theme:/}).elements()
+    ).toHaveLength(0);
   });
 });

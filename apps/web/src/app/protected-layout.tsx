@@ -1,6 +1,6 @@
 import {Navigate, Outlet, useLocation} from 'react-router';
-import {FooterComponent} from '@cdm-optimiser/ui/components/footer-component.tsx';
 import {useAuth} from '../features/auth/use-auth.ts';
+import {FooterComponent} from '../features/layout/footer-component.tsx';
 import {HeaderComponent} from '../features/layout/header-component.tsx';
 
 /**

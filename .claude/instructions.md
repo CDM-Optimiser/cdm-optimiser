@@ -55,7 +55,11 @@ lint rule or delete a test to get a green run. Report what fails instead.
     - `auth/`: auth context, provider, `useAuth`, the login form and the
       logout button. The session comes only from Supabase's
       `onAuthStateChange`; `login` and `logout` just call Supabase.
-    - `layout/`: the header.
+    - `layout/`: the page frame: the header (with `NavItemComponent` for its
+      links) and the footer. They are this app's frame, not reusable
+      building blocks, so they live here rather than in `packages/ui`: the
+      header needs the router, sign-in and the desktop theme, which
+      `packages/ui` may not use.
     - `theme/`: the desktop theme menu. `useDesktopTheme` talks to
       `window.darkMode`; the menu only renders the dropdown.
     - `patients/`, split into:
@@ -115,7 +119,8 @@ stays in `useState` in the page.
   package's `exports`
   (`import {ButtonComponent} from '@cdm-optimiser/ui/components/button-component.tsx'`).
   - `components/`: alert, button (`primary`, `segment`), card, dropdown,
-    footer, modal (a native `<dialog>`), svg, switch and text field.
+    modal (a native `<dialog>`), svg, switch and text field. Only generic
+    parts belong here; an app's page frame stays in the app.
   - `icons/`: one component per icon, decorative (`aria-hidden`) by default.
     Use them instead of pasting `<svg>` markup.
   - Use these instead of copying class strings: a button is
