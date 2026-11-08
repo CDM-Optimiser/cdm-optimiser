@@ -7,10 +7,7 @@ import {HeaderComponent} from './header-component.tsx';
 vi.mock('../auth/use-auth.ts', () => ({
   useAuth: () => ({
     logout: vi.fn(),
-    user: {
-      email: 'test.user@example.com',
-      user_metadata: {display_name: 'Test User'},
-    },
+    user: {email: 'test.user@example.com'},
   }),
 }));
 
@@ -56,7 +53,7 @@ describe('HeaderComponent', () => {
       const screen = await renderHeaderAt('/');
 
       await expect
-        .element(screen.getByText('Signed in as Test User'))
+        .element(screen.getByText('Signed in as test.user@example.com'))
         .toBeVisible();
       await expect
         .element(screen.getByRole('button', {name: 'Logout'}))
@@ -76,6 +73,28 @@ describe('HeaderComponent', () => {
         screen.getByRole('button', {name: /^Theme:/}).elements()
       ).toHaveLength(0);
     });
+  });
+
+  test('an iPad mini in portrait gets the menu button', async () => {
+    await page.viewport(768, 1024);
+    const screen = await renderHeaderAt('/');
+
+    await expect
+      .element(screen.getByRole('button', {name: 'Open menu'}))
+      .toBeVisible();
+    expect(
+      screen.getByRole('link', {name: 'Patients List'}).query()
+    ).toBeNull();
+  });
+
+  test('a tablet in landscape gets the full bar', async () => {
+    await page.viewport(1024, 768);
+    const screen = await renderHeaderAt('/');
+
+    await expect
+      .element(screen.getByRole('link', {name: 'Patients List'}))
+      .toBeVisible();
+    expect(screen.getByRole('button', {name: 'Open menu'}).query()).toBeNull();
   });
 
   describe('on a small screen', () => {
@@ -104,7 +123,7 @@ describe('HeaderComponent', () => {
         .element(drawer.getByRole('link', {name: 'Patients List'}))
         .toHaveAttribute('aria-current', 'page');
       await expect
-        .element(drawer.getByText('Signed in as Test User'))
+        .element(drawer.getByText('Signed in as test.user@example.com'))
         .toBeVisible();
       await expect
         .element(drawer.getByRole('button', {name: 'Logout'}))

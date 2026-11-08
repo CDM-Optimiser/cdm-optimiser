@@ -1,14 +1,12 @@
-import {useId} from 'react';
+import {useId, useState} from 'react';
 import {ButtonComponent} from '@cdm-optimiser/ui/components/button-component.tsx';
 import {CardComponent} from '@cdm-optimiser/ui/components/card-component.tsx';
+import {ModalComponent} from '@cdm-optimiser/ui/components/modal-component.tsx';
+import {FilterIcon} from '@cdm-optimiser/ui/icons/filter-icon.tsx';
+import {useCloseOnWideScreen} from '../../../hooks/use-close-on-wide-screen.ts';
 import type {StatusFilter} from '../model/patient.ts';
-
-const FILTERS: readonly {value: StatusFilter; label: string}[] = [
-  {value: 'all', label: 'All'},
-  {value: 'accepted', label: 'Accepted patients'},
-  {value: 'refused', label: 'Refused patients'},
-  {value: 'pending', label: 'Pending patients'},
-];
+import {STATUS_FILTERS} from '../model/status-filters.ts';
+import {StatusFilterButtonsComponent} from './status-filter-buttons-component.tsx';
 
 interface StatusFilterProps {
   filterSelected: StatusFilter;
@@ -16,36 +14,63 @@ interface StatusFilterProps {
 }
 
 /**
- * A group of toggle buttons. The selected one is pressed (`aria-pressed`)
- * and filled in the primary colour; the others are secondary.
+ * The patient list's filters. On wide screens they sit on a card; on small
+ * screens a "Filters" button, naming the current filter, opens them in a
+ * drawer, which closes once one is chosen.
  */
 export function StatusFilterComponent({
   filterSelected,
   onFilterChange,
 }: StatusFilterProps) {
   const labelId = useId();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const closeDrawer = () => setIsDrawerOpen(false);
+
+  useCloseOnWideScreen(isDrawerOpen, closeDrawer, 'md');
+
+  const selectedLabel = STATUS_FILTERS.find(
+    ({value}) => value === filterSelected
+  )?.label;
 
   return (
-    <CardComponent className="flex w-full flex-1 flex-col flex-wrap gap-4 xl:w-auto">
-      <span id={labelId} className="text-center xl:text-left">
-        Filters:
-      </span>
-      <div
-        role="group"
-        aria-labelledby={labelId}
-        className="flex flex-wrap justify-center gap-2 xl:justify-start"
+    <>
+      <CardComponent className="hidden w-full flex-1 flex-col flex-wrap gap-4 md:flex xl:w-auto">
+        <span id={labelId} className="text-center xl:text-left">
+          Filters:
+        </span>
+        <StatusFilterButtonsComponent
+          aria-labelledby={labelId}
+          selected={filterSelected}
+          onChoose={onFilterChange}
+        />
+      </CardComponent>
+
+      <ButtonComponent
+        variant="secondary"
+        className="flex w-full items-center justify-center gap-2 md:hidden"
+        aria-haspopup="dialog"
+        onClick={() => setIsDrawerOpen(true)}
       >
-        {FILTERS.map(({value, label}) => (
-          <ButtonComponent
-            key={value}
-            variant={filterSelected === value ? 'primary' : 'secondary'}
-            aria-pressed={filterSelected === value}
-            onClick={() => onFilterChange(value)}
-          >
-            {label}
-          </ButtonComponent>
-        ))}
-      </div>
-    </CardComponent>
+        <FilterIcon />
+        Filters: {selectedLabel}
+      </ButtonComponent>
+
+      <ModalComponent
+        isOpen={isDrawerOpen}
+        placement="end"
+        title="Filters"
+        onClose={closeDrawer}
+      >
+        <StatusFilterButtonsComponent
+          orientation="vertical"
+          aria-label="Filter patients by status"
+          selected={filterSelected}
+          onChoose={(filter) => {
+            onFilterChange(filter);
+            closeDrawer();
+          }}
+        />
+      </ModalComponent>
+    </>
   );
 }

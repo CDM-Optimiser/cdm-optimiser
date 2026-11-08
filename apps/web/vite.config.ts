@@ -123,6 +123,9 @@ export default defineConfig(({mode}) => {
               enabled: true,
               provider: playwright(),
               instances: [{browser: 'chromium'}],
+              // Desktop-sized, as in clinics. Tests for small screens set
+              // their own size with `page.viewport()`.
+              viewport: {width: 1280, height: 800},
             },
           },
         },

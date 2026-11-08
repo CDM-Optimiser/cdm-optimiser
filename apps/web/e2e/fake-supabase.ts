@@ -7,7 +7,7 @@ import type {Page, Route} from '@playwright/test';
 
 type Status = 'accepted' | 'refused' | 'pending';
 
-const PATIENT_COUNT = 30;
+const PATIENT_COUNT = 300;
 
 /** Patient `id`'s status: a mix of all three, so every row colour shows. */
 function statusOf(id: number): Status {
@@ -53,7 +53,7 @@ const USER = {
   role: 'authenticated',
   email: 'test.user@example.com',
   app_metadata: {provider: 'email'},
-  user_metadata: {display_name: 'Test User'},
+  user_metadata: {},
   created_at: '2026-01-01T00:00:00Z',
 };
 

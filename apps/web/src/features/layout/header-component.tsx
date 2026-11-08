@@ -1,15 +1,13 @@
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {Link} from 'react-router';
 import {ButtonComponent} from '@cdm-optimiser/ui/components/button-component.tsx';
 import {ModalComponent} from '@cdm-optimiser/ui/components/modal-component.tsx';
 import {MenuIcon} from '@cdm-optimiser/ui/icons/menu-icon.tsx';
 import {CurrentUserComponent} from '../auth/current-user-component.tsx';
 import {LogoutButton} from '../auth/logout-button.tsx';
+import {useCloseOnWideScreen} from '../../hooks/use-close-on-wide-screen.ts';
 import {ThemeMenuComponent} from '../theme/theme-menu-component.tsx';
 import {MainNavComponent} from './main-nav-component.tsx';
-
-/** Tailwind's `md` breakpoint: from here the menu fits in the bar. */
-const WIDE_SCREEN = '(min-width: 48rem)';
 
 interface HeaderProps {
   /** The app's name, linking to the patients list. */
@@ -29,20 +27,9 @@ export function HeaderComponent({title}: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const closeMenu = () => setIsMenuOpen(false);
 
-  // A drawer left open while the window widens would cover a bar that now
-  // shows the same links.
-  useEffect(() => {
-    if (!isMenuOpen) return;
-
-    const wideScreen = window.matchMedia(WIDE_SCREEN);
-    const closeOnWideScreen = () => {
-      if (wideScreen.matches) setIsMenuOpen(false);
-    };
-
-    wideScreen.addEventListener('change', closeOnWideScreen);
-
-    return () => wideScreen.removeEventListener('change', closeOnWideScreen);
-  }, [isMenuOpen]);
+  // `lg`, not `md`: the bar needs about 1000px to fit on one line, so
+  // tablets in portrait (an iPad mini is 744–768px wide) get the menu too.
+  useCloseOnWideScreen(isMenuOpen, closeMenu, 'lg');
 
   return (
     <header className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4 border-b-2 border-sky-700 px-6 py-4">
@@ -50,7 +37,7 @@ export function HeaderComponent({title}: HeaderProps) {
         {title}
       </Link>
 
-      <div className="hidden flex-wrap items-center gap-x-8 gap-y-3 md:flex">
+      <div className="hidden flex-wrap items-center gap-x-8 gap-y-3 lg:flex">
         <MainNavComponent />
         <ThemeMenuComponent />
         <div className="flex items-center gap-3">
@@ -61,7 +48,7 @@ export function HeaderComponent({title}: HeaderProps) {
 
       <ButtonComponent
         variant="secondary"
-        className="px-3 md:hidden"
+        className="px-3 lg:hidden"
         aria-haspopup="dialog"
         onClick={() => setIsMenuOpen(true)}
       >
