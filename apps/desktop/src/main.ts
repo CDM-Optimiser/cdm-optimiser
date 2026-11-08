@@ -165,15 +165,6 @@ handle('dark-mode:system', () => {
   nativeTheme.themeSource = 'system';
 });
 
-handle('dark-mode:toggle', () => {
-  if (nativeTheme.shouldUseDarkColors) {
-    nativeTheme.themeSource = 'light';
-  } else {
-    nativeTheme.themeSource = 'dark';
-  }
-  return nativeTheme.shouldUseDarkColors;
-});
-
 app.whenReady().then(() => {
   registerAppProtocol();
   createWindow();
