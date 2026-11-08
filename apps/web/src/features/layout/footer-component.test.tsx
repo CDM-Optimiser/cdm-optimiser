@@ -1,44 +1,36 @@
-import {afterEach, beforeEach, describe, expect, test, vi} from 'vitest';
+import {afterEach, describe, expect, test, vi} from 'vitest';
 import {render} from 'vitest-browser-react';
 import {FooterComponent} from './footer-component.tsx';
 
-const MOCKED_YEAR = 2025;
-
 describe('FooterComponent', () => {
-  const defaultProps = {
-    brand: 'CDM Optimiser',
-  };
-
-  beforeEach(() => {
-    vi.setSystemTime(new Date(MOCKED_YEAR, 5, 15));
-  });
-
   afterEach(() => {
     vi.useRealTimers();
   });
 
-  test('renders the brand and the current year when copyright is NOT provided', async () => {
-    const screen = await render(<FooterComponent {...defaultProps} />);
+  test('shows the year, the brand and the version', async () => {
+    vi.setSystemTime(new Date(2025, 5, 15));
 
-    expect(screen.container.textContent).toBe(
-      `©${MOCKED_YEAR}${defaultProps.brand}`
+    const screen = await render(
+      <FooterComponent brand="CDM Optimiser" version="1.2.3" />
     );
-  });
 
-  test('renders the brand, the current year and copyright when copyright IS provided', async () => {
-    const props = {...defaultProps, copyright: 'All rights reserved'};
-    const screen = await render(<FooterComponent {...props} />);
+    const footer = screen.getByRole('contentinfo');
 
-    expect(screen.container.textContent).toBe(
-      `©${MOCKED_YEAR}${props.brand} - ${props.copyright}`
-    );
+    await expect
+      .element(footer.getByText('© 2025 CDM Optimiser'))
+      .toBeVisible();
+    await expect.element(footer.getByText('Version 1.2.3')).toBeVisible();
   });
 
   test('reads the year when it renders, not when the module loads', async () => {
     vi.setSystemTime(new Date(2031, 0, 1));
 
-    const screen = await render(<FooterComponent {...defaultProps} />);
+    const screen = await render(
+      <FooterComponent brand="CDM Optimiser" version="1.2.3" />
+    );
 
-    expect(screen.container.textContent).toContain('2031');
+    await expect
+      .element(screen.getByText('© 2031 CDM Optimiser'))
+      .toBeVisible();
   });
 });

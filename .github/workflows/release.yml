@@ -1,0 +1,107 @@
+name: Release
+
+# Publishes a GitHub Release, with the Windows installer, for every new app
+# version that reaches main. The version is the root package.json (set it with
+# `yarn bump <x.y.z>`); ordinary merges keep the same version and release
+# nothing. Installed desktop apps find the new release and update themselves
+# (electron-updater; see apps/desktop/src/updater.ts).
+#
+# Run it by hand from the Actions tab to retry a failed release.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# One release at a time, and never cancel one halfway.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Is this a new version?
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      release: ${{ steps.version.outputs.release }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Check the app versions match
+        run: node scripts/check-versions.mjs
+
+      - name: Look for an existing release
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          if gh release view "v${version}" --repo "${GITHUB_REPOSITORY}" > /dev/null 2>&1; then
+            echo "v${version} is already released: nothing to do."
+            echo "release=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "v${version} is new: building and releasing it."
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  release:
+    name: Build and publish v${{ needs.check.outputs.version }}
+    needs: check
+    if: needs.check.outputs.release == 'true'
+    runs-on: windows-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      # On Windows, Node must come first: setup-node puts its Node first on
+      # the PATH, and Corepack has to add its Yarn 4 shim to that Node, or
+      # the runner's own Yarn 1 runs. setup-node's Yarn cache would call Yarn
+      # before Corepack is ready, so these rare jobs go without it.
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build the installer
+        run: yarn dist:desktop
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+
+      # Created only after a successful build, so a release always has its
+      # installer. Published (not a draft): the updater ignores drafts.
+      # latest.yml and the .blockmap are what installed apps read to update.
+      - name: Publish the GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.check.outputs.version }}
+        run: |
+          prerelease=""
+          if [[ "${VERSION}" == *-* ]]; then prerelease="--prerelease"; fi
+          gh release create "v${VERSION}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --target "${GITHUB_SHA}" \
+            --title "v${VERSION}" \
+            --generate-notes \
+            ${prerelease} \
+            "apps/desktop/release/cdm-optimiser-setup-${VERSION}.exe" \
+            "apps/desktop/release/cdm-optimiser-setup-${VERSION}.exe.blockmap" \
+            apps/desktop/release/latest.yml

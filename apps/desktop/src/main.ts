@@ -13,9 +13,12 @@ import {pathToFileURL} from 'node:url';
 import type {
   DesktopIpcChannel,
   DesktopIpcChannels,
+  DesktopIpcEvent,
+  DesktopIpcEvents,
   ThemeValue,
 } from '@cdm-optimiser/desktop-bridge';
 import {resolveRendererFile} from './resolve-renderer-file.js';
+import {getUpdateStatus, installUpdate, startUpdater} from './updater.js';
 
 // Set by `yarn dev:desktop` so the window loads the Vite dev server (HMR).
 // Ignored in packaged builds, which always load the bundled renderer.
@@ -111,6 +114,16 @@ function handle<Channel extends DesktopIpcChannel>(
   ipcMain.handle(channel, listener);
 }
 
+/** Sends an event from the shared IPC contract to every open window. */
+function broadcast<Event extends DesktopIpcEvent>(
+  event: Event,
+  payload: DesktopIpcEvents[Event]
+) {
+  for (const win of BrowserWindow.getAllWindows()) {
+    win.webContents.send(event, payload);
+  }
+}
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 1200,
@@ -165,9 +178,16 @@ handle('dark-mode:system', () => {
   nativeTheme.themeSource = 'system';
 });
 
+handle('updates:get-status', () => getUpdateStatus());
+
+handle('updates:install', () => {
+  installUpdate();
+});
+
 app.whenReady().then(() => {
   registerAppProtocol();
   createWindow();
+  startUpdater((status) => broadcast('updates:status', status));
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

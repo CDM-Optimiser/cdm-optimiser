@@ -17,6 +17,19 @@ files:
   - package.json
 win:
   target: nsis
+nsis:
+  # No spaces: the name is used as-is in the GitHub Release and in latest.yml,
+  # which the updater reads.
+  artifactName: cdm-optimiser-setup-${version}.${ext}
+
+# Where the updater looks for new versions (electron-updater). The release
+# workflow (.github/workflows/release.yml) uploads the installer, its
+# .blockmap and latest.yml to a GitHub Release; builds themselves never
+# publish (--publish never).
+publish:
+  provider: github
+  owner: CDM-Optimiser
+  repo: cdm-optimiser
 
 # Hardening for the packaged app (https://www.electronjs.org/docs/latest/tutorial/fuses).
 electronFuses:
