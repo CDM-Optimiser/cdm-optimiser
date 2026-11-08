@@ -264,6 +264,12 @@ The app processes health data of real patients (GDPR special-category data).
 - Never log, print or commit patient records, including in debugging output,
   test fixtures, snapshots, screenshots or issue/PR text.
 - Use only synthetic, obviously fake data in tests and examples.
+- **The demo account is public.** The README publishes `test@test.com` /
+  `test` for testers. Its practice must only ever hold synthetic patients,
+  and no real staff may join it: real patients go into their own practice.
+  The maintainers check this with the runbook's demo-account check after
+  every import. Don't use the demo account in tests; the e2e tests use a
+  fake Supabase.
 - The Supabase publishable key (`sb_publishable_…`) is public by design; the
   database functions and row-level security are the security boundary. Never
   put a secret key (`sb_secret_…`) or a legacy service-role key in client code
