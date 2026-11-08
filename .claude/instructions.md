@@ -6,8 +6,9 @@ the overview, the repository map and the commands.
 ## Before you commit
 
 1. Run the `fix` skill: `yarn prettier` formats the changed files, then
-   `yarn linc` lints them. Fix every `linc` error; CI runs `yarn lint` on the
-   whole repo and fails on errors.
+   `yarn linc` lints them. Fix everything `linc` reports, warnings
+   included; CI runs `yarn lint` on the whole repo and fails on any error or
+   warning.
 2. Run `yarn typecheck` and `yarn test`.
 3. If you touched the build, routing or Vite config, also run
    `yarn build:web && yarn test:e2e`.
@@ -326,6 +327,12 @@ The app processes health data of real patients (GDPR special-category data).
 
 - Branch from `main`. Use Conventional Commits: `feat`, `fix`, `refactor`,
   `test`, `docs`, `build`, `ci`, `chore` (Dependabot uses `build(deps):`).
+- **`main` is protected** by a ruleset ("Protect main", Settings → Rules):
+  every change goes through a pull request, which can merge only once
+  "Lint, typecheck, test and build" and "Package desktop app" pass. Force
+  pushes and deleting `main` are blocked, and nobody can bypass it. If a
+  required check is renamed (the job's `name` in `ci.yml`), update the
+  ruleset in the same PR, or every PR waits for a check that never runs.
 - Fill in `.github/PULL_REQUEST_TEMPLATE.md`.
 - Keep formatting-only changes in their own commit.
 - Never commit database material: schema or policy exports, SQL or Edge
