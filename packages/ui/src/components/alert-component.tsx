@@ -18,6 +18,9 @@ interface AlertProps {
   onDismiss?: () => void;
 }
 
+// Each type uses three steps of one hue: a pale tint for the background,
+// an accent for the border, icon, close button and progress bar (at least
+// 3:1 on the tint), and a dark shade for the text (at least 4.5:1).
 interface AlertStyle {
   container: string;
   accent: string;
@@ -33,34 +36,34 @@ interface AlertStyle {
 
 const STYLES: Record<AlertTypes, AlertStyle> = {
   error: {
-    container: 'bg-red-50 border-red-400',
-    accent: 'text-red-400',
+    container: 'bg-red-50 border-red-600',
+    accent: 'text-red-600',
     text: 'text-red-800',
-    bar: 'bg-red-400',
+    bar: 'bg-red-600',
     icon: AlertCircleFilledIcon,
     role: 'alert',
   },
   warning: {
-    container: 'bg-yellow-50 border-yellow-400',
-    accent: 'text-yellow-400',
-    text: 'text-yellow-700',
-    bar: 'bg-yellow-400',
+    container: 'bg-yellow-50 border-yellow-700',
+    accent: 'text-yellow-700',
+    text: 'text-yellow-800',
+    bar: 'bg-yellow-700',
     icon: AlertTriangleFilledIcon,
     role: 'alert',
   },
   info: {
-    container: 'bg-sky-50 border-sky-400',
-    accent: 'text-sky-400',
+    container: 'bg-sky-50 border-sky-700',
+    accent: 'text-sky-700',
     text: 'text-sky-800',
-    bar: 'bg-sky-400',
+    bar: 'bg-sky-700',
     icon: InfoCircleFilledIcon,
     role: 'status',
   },
   success: {
-    container: 'bg-green-50 border-green-400',
-    accent: 'text-green-400',
+    container: 'bg-green-50 border-green-700',
+    accent: 'text-green-700',
     text: 'text-green-800',
-    bar: 'bg-green-400',
+    bar: 'bg-green-700',
     icon: CircleCheckFilledIcon,
     role: 'status',
   },

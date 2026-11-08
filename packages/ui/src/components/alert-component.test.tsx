@@ -18,7 +18,7 @@ describe('Alert component tests', () => {
     await expect.element(screen.getByText(defaultProps.text)).toBeVisible();
     await expect
       .element(screen.getByRole('status'))
-      .toHaveClass('bg-sky-50', 'border-sky-400');
+      .toHaveClass('bg-sky-50', 'border-sky-700');
   });
 
   test.each<[AlertTypes, 'alert' | 'status', string]>([
@@ -70,7 +70,7 @@ describe('Alert component tests', () => {
     await expect.element(screen.getByTestId('alert-progress')).toBeVisible();
     await expect
       .element(screen.getByTestId('alert-progress'))
-      .toHaveClass('bg-green-400');
+      .toHaveClass('bg-green-700');
 
     await expect.poll(() => onDismiss.mock.calls.length).toBe(1);
   });

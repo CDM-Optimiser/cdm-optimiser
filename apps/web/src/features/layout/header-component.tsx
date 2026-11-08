@@ -20,7 +20,7 @@ interface HeaderProps {
  */
 export function HeaderComponent({title}: HeaderProps) {
   return (
-    <header className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4 border-b-2 border-sky-400 px-6 py-4">
+    <header className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4 border-b-2 border-sky-700 px-6 py-4">
       <Link to="/" className="text-3xl">
         {title}
       </Link>

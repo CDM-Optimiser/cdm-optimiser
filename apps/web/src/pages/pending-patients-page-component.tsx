@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useId, useState} from 'react';
 import {AlertComponent} from '@cdm-optimiser/ui/components/alert-component.tsx';
 import {CardComponent} from '@cdm-optimiser/ui/components/card-component.tsx';
 import {usePatientsPage} from '../features/patients/api/use-patients-page.ts';
@@ -13,6 +13,7 @@ import {getErrorMessage} from '../lib/get-error-message.ts';
  * list and the next one takes its place at the same position.
  */
 export function PendingPatientsPageComponent() {
+  const titleId = useId();
   const [index, setIndex] = useState(0);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
 
@@ -73,7 +74,18 @@ export function PendingPatientsPageComponent() {
             onPrevious={() => setIndex(index - 1)}
             onNext={() => setIndex(index + 1)}
           />
-          <CardComponent as="section">
+          <CardComponent
+            as="section"
+            aria-labelledby={titleId}
+            className="flex flex-col gap-6"
+          >
+            {/* Styled like the dialog's title on the list page. */}
+            <h2
+              id={titleId}
+              className="border-b border-gray-200 pb-4 text-2xl dark:border-gray-600"
+            >
+              Patient Information
+            </h2>
             <PatientCardComponent
               key={patient.id}
               patient={patient}

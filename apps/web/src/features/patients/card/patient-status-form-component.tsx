@@ -26,7 +26,7 @@ export function PatientStatusFormComponent({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-4 border-t border-gray-200 pt-4"
+      className="flex flex-col gap-4 border-t border-gray-200 pt-4 dark:border-gray-600"
     >
       <div className="flex flex-wrap items-center gap-6">
         <SwitchComponent

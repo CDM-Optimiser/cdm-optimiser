@@ -60,15 +60,24 @@ describe('Switch component tests', () => {
     expect(onChange).toHaveBeenLastCalledWith(true);
   });
 
-  test('the negative tone turns red when on', async () => {
+  test('each tone colours the track when on', async () => {
     const screen = await render(
-      <SwitchComponent label="Refused" tone="negative" defaultChecked />
+      <div>
+        <SwitchComponent label="Off" />
+        <SwitchComponent label="Accepted" tone="positive" defaultChecked />
+        <SwitchComponent label="Refused" tone="negative" defaultChecked />
+      </div>
+    );
+    const trackColour = (name: string) =>
+      getComputedStyle(
+        screen.getByRole('switch', {name}).element().parentElement!
+      ).backgroundColor;
+
+    const colours = new Set(
+      ['Off', 'Accepted', 'Refused'].map((name) => trackColour(name))
     );
 
-    const track = screen
-      .getByRole('switch', {name: 'Refused'})
-      .element().parentElement;
-
-    expect(track?.className).toContain('has-checked:bg-red-500');
+    // Off, green and red: three different colours.
+    expect(colours.size).toBe(3);
   });
 });

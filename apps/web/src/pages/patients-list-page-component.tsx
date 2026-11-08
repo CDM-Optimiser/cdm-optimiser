@@ -14,7 +14,6 @@ import {getErrorMessage} from '../lib/get-error-message.ts';
 
 export function PatientsListPageComponent() {
   const searchId = useId();
-  const cardHeadingId = useId();
   const list = usePatientsList();
   const counts = usePatientCounts();
   const [selected, setSelected] = useState<Patient | null>(null);
@@ -25,8 +24,10 @@ export function PatientsListPageComponent() {
     setLastUpdated(patient.name);
   };
 
-  const pagination = (
+  // The same bar above and below the table, named apart for screen readers.
+  const pagination = (position: 'top' | 'bottom') => (
     <PaginationComponent
+      label={`Pagination, ${position}`}
       currentPage={list.page}
       totalPages={list.totalPages}
       resultsPerPage={list.pageSize}
@@ -67,7 +68,7 @@ export function PatientsListPageComponent() {
         />
       ) : (
         <>
-          {pagination}
+          {pagination('top')}
           <div
             aria-busy={list.query.isPlaceholderData}
             className={`transition-opacity ${list.query.isPlaceholderData ? 'opacity-60' : ''}`}
@@ -77,19 +78,18 @@ export function PatientsListPageComponent() {
               onOpen={setSelected}
             />
           </div>
-          {pagination}
+          {pagination('bottom')}
         </>
       )}
       <ModalComponent
         isOpen={selected !== null}
+        title="Patient Information"
         onClose={() => setSelected(null)}
-        labelledBy={cardHeadingId}
       >
         {selected && (
           <PatientCardComponent
             key={selected.id}
             patient={selected}
-            headingId={cardHeadingId}
             onUpdated={handleUpdated}
           />
         )}

@@ -26,6 +26,24 @@ describe('PatientsTableComponent', () => {
     expect(screen.getByRole('row').elements()).toHaveLength(4);
   });
 
+  test('writes each status in words, not only as a row colour', async () => {
+    const screen = await render(
+      <PatientsTableComponent patients={patients} onOpen={vi.fn()} />
+    );
+
+    await expect
+      .element(screen.getByRole('columnheader', {name: 'Status'}))
+      .toBeVisible();
+    // The Status column comes straight after Name.
+    expect(
+      screen
+        .getByRole('row')
+        .elements()
+        .slice(1)
+        .map((row) => row.querySelectorAll('td')[1]?.textContent)
+    ).toEqual(['Accepted', 'Refused', 'Pending']);
+  });
+
   test('says yes or no for each condition, for screen readers', async () => {
     const screen = await render(
       <PatientsTableComponent patients={patients} onOpen={vi.fn()} />

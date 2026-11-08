@@ -18,7 +18,11 @@ export function PendingNavigatorComponent({
 }: PendingNavigatorProps) {
   return (
     <CardComponent className="flex flex-wrap items-center justify-between gap-4">
-      <span className="font-medium text-gray-900 dark:text-gray-200">
+      {/* Announced when Previous or Next changes it. */}
+      <span
+        aria-live="polite"
+        className="font-medium text-gray-900 dark:text-white"
+      >
         Pending patient: {index + 1} of {total}
       </span>
       <div className="flex gap-2">

@@ -41,14 +41,18 @@ describe('PaginationComponent', () => {
     await expect.element(view.getByText('Showing page 5 of 5')).toBeVisible();
   });
 
-  test('jumps to a page, and the current page is not a link to itself', async () => {
+  test('marks the current page and jumps to another', async () => {
     const {screen, onPageChange} = renderPagination(5, 10);
     const view = await screen;
+    const pages = view.getByRole('navigation', {name: 'Pagination'});
 
     await expect
-      .element(view.getByRole('button', {name: '5', exact: true}))
-      .toBeDisabled();
-    await view.getByRole('button', {name: '10', exact: true}).click();
+      .element(pages.getByRole('button', {name: 'Page 5', exact: true}))
+      .toHaveAttribute('aria-current', 'page');
+    await expect
+      .element(pages.getByRole('button', {name: 'Page 4', exact: true}))
+      .not.toHaveAttribute('aria-current');
+    await pages.getByRole('button', {name: 'Page 10', exact: true}).click();
 
     expect(onPageChange).toHaveBeenCalledWith(10);
   });

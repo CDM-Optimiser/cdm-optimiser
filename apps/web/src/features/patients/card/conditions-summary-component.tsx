@@ -11,9 +11,9 @@ export function ConditionsSummaryComponent({patient}: {patient: Patient}) {
         <li key={key} className="flex items-center gap-2">
           <strong>{label}:</strong>
           {patient[key] ? (
-            <CircleCheckFilledIcon className="text-green-400" />
+            <CircleCheckFilledIcon className="text-green-700 dark:text-green-400" />
           ) : (
-            <DotsIcon className="text-gray-400" />
+            <DotsIcon className="text-gray-500 dark:text-gray-400" />
           )}
           <span className="sr-only">{patient[key] ? 'Yes' : 'No'}</span>
         </li>

@@ -1,6 +1,14 @@
+import type {ComponentType} from 'react';
+import {CheckIcon} from '@cdm-optimiser/ui/icons/check-icon.tsx';
 import {DotsIcon} from '@cdm-optimiser/ui/icons/dots-icon.tsx';
+import type {IconProps} from '@cdm-optimiser/ui/icons/icon-props.ts';
 import {SquareCheckFilledIcon} from '@cdm-optimiser/ui/icons/square-check-filled-icon.tsx';
-import type {Patient} from '../model/patient.ts';
+import {XIcon} from '@cdm-optimiser/ui/icons/x-icon.tsx';
+import {
+  STATUS_LABELS,
+  type Patient,
+  type PatientStatus,
+} from '../model/patient.ts';
 import type {PatientColumn} from '../model/patient-columns.ts';
 
 interface PatientCellProps {
@@ -10,7 +18,19 @@ interface PatientCellProps {
   onOpen: () => void;
 }
 
-const CELL = 'border border-gray-300 px-4 py-2';
+const CELL = 'border border-gray-300 px-4 py-2 dark:border-gray-600';
+
+// A shape for each status, as on the Accepted and Refused switches, so the
+// status doesn't depend on telling green from red.
+const STATUS_ICONS: Record<PatientStatus, ComponentType<IconProps>> = {
+  accepted: CheckIcon,
+  refused: XIcon,
+  pending: DotsIcon,
+};
+
+// At least 3:1 on every row colour: white, accepted, refused and hover.
+const PRESENT = 'inline text-green-700 dark:text-green-400';
+const ABSENT = 'inline text-gray-500 dark:text-gray-400';
 
 export function PatientCellComponent({
   patient,
@@ -23,11 +43,24 @@ export function PatientCellComponent({
     return (
       <td className={`${CELL} text-center`}>
         {hasCondition ? (
-          <SquareCheckFilledIcon className="inline text-green-500" />
+          <SquareCheckFilledIcon className={PRESENT} />
         ) : (
-          <DotsIcon className="inline text-gray-400" />
+          <DotsIcon className={ABSENT} />
         )}
         <span className="sr-only">{hasCondition ? 'Yes' : 'No'}</span>
+      </td>
+    );
+  }
+
+  if (column.kind === 'status') {
+    const StatusIcon = STATUS_ICONS[patient.status];
+
+    return (
+      <td className={CELL}>
+        <span className="flex items-center gap-2">
+          <StatusIcon className="shrink-0" />
+          {STATUS_LABELS[patient.status]}
+        </span>
       </td>
     );
   }

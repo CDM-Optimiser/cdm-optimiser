@@ -1,4 +1,5 @@
 import {useId} from 'react';
+import {ButtonComponent} from '@cdm-optimiser/ui/components/button-component.tsx';
 import {CardComponent} from '@cdm-optimiser/ui/components/card-component.tsx';
 import {ChevronLeftIcon} from '@cdm-optimiser/ui/icons/chevron-left-icon.tsx';
 import {ChevronRightIcon} from '@cdm-optimiser/ui/icons/chevron-right-icon.tsx';
@@ -6,6 +7,8 @@ import {getVisiblePages} from './get-visible-pages.ts';
 import {PageSizeSelectComponent} from './page-size-select-component.tsx';
 
 interface PaginationProps {
+  /** Names the page links for screen readers; unique on the page. */
+  label?: string;
   currentPage: number;
   totalPages: number;
   resultsPerPage: number;
@@ -13,12 +16,15 @@ interface PaginationProps {
   onResultsPerPageChange: (results: number) => void;
 }
 
-const PAGE_BUTTON =
-  'relative inline-flex items-center justify-center px-3 py-2 font-medium text-gray-900 ring-1 ring-gray-200 transition duration-200 ease-in-out disabled:cursor-not-allowed dark:bg-white/5 dark:text-white';
+/** Room for two digits, so the buttons don't change width between pages. */
+const PAGE_BUTTON = 'min-w-12 px-3';
 
-const ARROW_BUTTON = `${PAGE_BUTTON} bg-white hover:not-disabled:bg-sky-500 hover:not-disabled:text-white disabled:bg-gray-200 disabled:text-gray-400`;
-
+/**
+ * The page buttons, as the filters: the current page is filled in the
+ * primary colour and marked with `aria-current`, the others are secondary.
+ */
 export function PaginationComponent({
+  label = 'Pagination',
   currentPage,
   totalPages,
   resultsPerPage,
@@ -32,47 +38,44 @@ export function PaginationComponent({
       <span>
         Showing page {currentPage} of {totalPages}
       </span>
-      <div className="isolate inline-flex">
-        <button
-          type="button"
-          className={`${ARROW_BUTTON} rounded-s-md`}
+      <nav aria-label={label} className="flex flex-wrap items-center gap-1">
+        <ButtonComponent
+          variant="secondary"
+          className="px-3"
           disabled={currentPage <= 1}
           onClick={() => onPageChange(currentPage - 1)}
         >
           <span className="sr-only">Previous page</span>
           <ChevronLeftIcon />
-        </button>
+        </ButtonComponent>
         {getVisiblePages(currentPage, totalPages).map((item) =>
           typeof item === 'number' ? (
-            <button
+            <ButtonComponent
               key={item}
-              type="button"
-              className={`${PAGE_BUTTON} w-12 ${
-                item === currentPage
-                  ? 'bg-sky-500 text-white dark:bg-sky-500'
-                  : 'bg-white hover:bg-sky-500 hover:text-white dark:hover:bg-sky-500'
-              }`}
-              disabled={item === currentPage}
+              variant={item === currentPage ? 'primary' : 'secondary'}
+              aria-current={item === currentPage ? 'page' : undefined}
+              className={PAGE_BUTTON}
               onClick={() => onPageChange(item)}
             >
+              <span className="sr-only">Page </span>
               {item}
-            </button>
+            </ButtonComponent>
           ) : (
-            <span key={item} className={`${PAGE_BUTTON} w-12 bg-white`}>
+            <span key={item} aria-hidden="true" className="px-2">
               …
             </span>
           )
         )}
-        <button
-          type="button"
-          className={`${ARROW_BUTTON} rounded-e-md`}
+        <ButtonComponent
+          variant="secondary"
+          className="px-3"
           disabled={currentPage >= totalPages}
           onClick={() => onPageChange(currentPage + 1)}
         >
           <ChevronRightIcon />
           <span className="sr-only">Next page</span>
-        </button>
-      </div>
+        </ButtonComponent>
+      </nav>
       <div className="flex items-center justify-center gap-2">
         <PageSizeSelectComponent
           selectIDAndName={pageSizeSelectId}

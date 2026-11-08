@@ -47,9 +47,9 @@ describe('Button component tests', () => {
     expect(onClick).toHaveBeenCalledOnce();
   });
 
-  test('a segment button exposes its pressed state', async () => {
+  test('passes aria attributes through, for toggle buttons', async () => {
     const screen = await render(
-      <ButtonComponent variant="segment" aria-pressed>
+      <ButtonComponent variant="primary" aria-pressed>
         All
       </ButtonComponent>
     );
@@ -77,6 +77,40 @@ describe('Button component tests', () => {
 
     await expect
       .element(screen.getByRole('button', {name: 'Wide'}))
-      .toHaveClass('w-full', 'bg-sky-500', 'rounded-md');
+      .toHaveClass('w-full', 'rounded-md');
+  });
+
+  test('a secondary button is tinted, and looks unlike a primary one', async () => {
+    const screen = await render(
+      <div>
+        <ButtonComponent>Primary</ButtonComponent>
+        <ButtonComponent variant="secondary">Secondary</ButtonComponent>
+      </div>
+    );
+    const background = (name: string) =>
+      getComputedStyle(screen.getByRole('button', {name}).element())
+        .backgroundColor;
+
+    // Not transparent and not white: it reads as a button on a white card.
+    expect(background('Secondary')).not.toMatch(
+      /^rgba\(0, 0, 0, 0\)$|^rgb\(255, 255, 255\)$/
+    );
+    expect(background('Secondary')).not.toBe(background('Primary'));
+  });
+
+  test('a disabled button looks disabled, whatever its variant', async () => {
+    const screen = await render(
+      <div>
+        <ButtonComponent disabled>Primary</ButtonComponent>
+        <ButtonComponent variant="secondary" disabled>
+          Secondary
+        </ButtonComponent>
+      </div>
+    );
+    const background = (name: string) =>
+      getComputedStyle(screen.getByRole('button', {name}).element())
+        .backgroundColor;
+
+    expect(background('Primary')).toBe(background('Secondary'));
   });
 });

@@ -4,30 +4,27 @@ import type {IconProps} from '@cdm-optimiser/ui/icons/icon-props.ts';
 import {SquareFilledIcon} from '@cdm-optimiser/ui/icons/square-filled-icon.tsx';
 import {SquareIcon} from '@cdm-optimiser/ui/icons/square-icon.tsx';
 import type {PatientCounts} from '../api/patients-api.ts';
-import type {PatientStatus} from '../model/patient.ts';
+import {STATUS_LABELS, type PatientStatus} from '../model/patient.ts';
 
-/** The swatch for each status matches the row colours in the table. */
+/** Each swatch is the exact row colour of its status in the table. */
 const ITEMS: readonly {
   status: PatientStatus;
-  label: string;
   Icon: ComponentType<IconProps>;
   className: string;
 }[] = [
   {
     status: 'accepted',
-    label: 'Accepted',
     Icon: SquareFilledIcon,
     className:
-      'stroke-black stroke-2 text-green-200 dark:stroke-white dark:text-emerald-300',
+      'stroke-black stroke-2 text-green-100 dark:stroke-white dark:text-emerald-900',
   },
   {
     status: 'refused',
-    label: 'Refused',
     Icon: SquareFilledIcon,
     className:
-      'stroke-black stroke-2 text-red-200 dark:stroke-white dark:text-rose-300',
+      'stroke-black stroke-2 text-red-100 dark:stroke-white dark:text-rose-900',
   },
-  {status: 'pending', label: 'Pending', Icon: SquareIcon, className: ''},
+  {status: 'pending', Icon: SquareIcon, className: ''},
 ];
 
 interface StatusLegendProps {
@@ -43,11 +40,11 @@ export function StatusLegendComponent({counts}: StatusLegendProps) {
         <span className="font-medium">{counts?.total ?? 0}</span>
       </div>
       <ul className="flex flex-wrap items-center justify-center gap-6 py-2">
-        {ITEMS.map(({status, label, Icon, className}) => (
+        {ITEMS.map(({status, Icon, className}) => (
           <li key={status} className="flex items-center gap-2">
             <Icon className={className} />
             <span>
-              {label} ({counts?.[status] ?? 0})
+              {STATUS_LABELS[status]} ({counts?.[status] ?? 0})
             </span>
           </li>
         ))}
