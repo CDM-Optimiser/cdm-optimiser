@@ -64,14 +64,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
-      - name: Enable Corepack
-        run: corepack enable
-
+      # On Windows, Node must come first: setup-node puts its Node first on
+      # the PATH, and Corepack has to add its Yarn 4 shim to that Node, or
+      # the runner's own Yarn 1 runs. setup-node's Yarn cache would call Yarn
+      # before Corepack is ready, so these rare jobs go without it.
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
-          cache: yarn
+
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Install dependencies
         run: yarn install --immutable
