@@ -29,6 +29,9 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+    # A private app: search engines must not list any page or file.
+    # robots.txt doesn't block crawling, so crawlers can read this.
+    X-Robots-Tag = "noindex, nofollow"
 
 # Vite fingerprints everything in /assets, so it can be cached forever.
 [[headers]]
