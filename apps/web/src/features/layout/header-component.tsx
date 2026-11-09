@@ -6,10 +6,11 @@ import {MenuIcon} from '@cdm-optimiser/ui/icons/menu-icon.tsx';
 import {AccountMenuComponent} from '../auth/account-menu-component.tsx';
 import {useCloseOnWideScreen} from '../../hooks/use-close-on-wide-screen.ts';
 import {ThemeMenuComponent} from '../theme/theme-menu-component.tsx';
+import {BrandLogoComponent} from './brand-logo-component.tsx';
 import {MainNavComponent} from './main-nav-component.tsx';
 
 interface HeaderProps {
-  /** The app's name, linking to the patients list. */
+  /** The app's name: the logo's text alternative, linking to the list. */
   title: string;
 }
 
@@ -32,8 +33,8 @@ export function HeaderComponent({title}: HeaderProps) {
 
   return (
     <header className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4 border-b-2 border-sky-700 px-6 py-4">
-      <Link to="/" className="text-3xl">
-        {title}
+      <Link to="/" className="shrink-0">
+        <BrandLogoComponent alt={title} className="h-10" />
       </Link>
 
       <div className="hidden flex-wrap items-center gap-x-8 gap-y-3 lg:flex">

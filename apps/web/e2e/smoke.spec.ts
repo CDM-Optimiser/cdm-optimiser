@@ -48,6 +48,57 @@ test('the browser refuses HTML injected into the page (Trusted Types)', async ({
   expect(result).toBe('TypeError');
 });
 
+test('every icon and link-preview image is linked and served', async ({
+  page,
+  request,
+}) => {
+  await page.goto('/login');
+
+  const head = page.locator('head');
+  const linked = await head
+    .locator(
+      'link[rel="icon"], link[rel="apple-touch-icon"], link[rel="manifest"]'
+    )
+    .evaluateAll((links) => links.map((link) => link.getAttribute('href')));
+
+  expect(linked).toEqual([
+    '/favicon.ico',
+    '/favicon.svg',
+    '/apple-touch-icon.png',
+    '/site.webmanifest',
+  ]);
+
+  // Previews name the live site; check the same file in this build.
+  const preview = await head
+    .locator('meta[property="og:image"]')
+    .getAttribute('content');
+
+  expect(preview).toBe('https://cdm-optimiser.netlify.app/og-image.png');
+  // A private app: search engines must not list it.
+  await expect(head.locator('meta[name="robots"]')).toHaveAttribute(
+    'content',
+    'noindex, nofollow'
+  );
+
+  const manifest = await (await request.get('/site.webmanifest')).json();
+  const files = [
+    ...linked,
+    new URL(preview!).pathname,
+    ...manifest.icons.map((icon: {src: string}) => icon.src),
+    '/logo.svg',
+    '/logo-dark.svg',
+  ];
+
+  for (const file of files) {
+    const response = await request.get(file!);
+
+    expect(response.status(), file!).toBe(200);
+    expect(response.headers()['content-type'], file!).not.toContain(
+      'text/html'
+    );
+  }
+});
+
 test('sends a signed-out user on any page to the login page', async ({
   page,
 }) => {

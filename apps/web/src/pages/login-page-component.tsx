@@ -6,6 +6,7 @@ import {getRedirectPath} from '../features/auth/get-redirect-path.ts';
 import {LoginFormComponent} from '../features/auth/login-form-component.tsx';
 import {useAuth} from '../features/auth/use-auth.ts';
 import {useLogout} from '../features/auth/use-logout.ts';
+import {BrandLogoComponent} from '../features/layout/brand-logo-component.tsx';
 import {FooterComponent} from '../features/layout/footer-component.tsx';
 import {SetUpAppComponent} from '../features/two-step/set-up-app-component.tsx';
 import {VerifyCodeFormComponent} from '../features/two-step/verify-code-form-component.tsx';
@@ -50,6 +51,9 @@ export function LoginPageComponent() {
     <div className="flex min-h-dvh flex-col">
       <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center p-6">
         <CardComponent className="flex flex-col gap-6 p-8">
+          {/* Every step's heading names the app or the step, so the logo
+              itself is decorative here. */}
+          <BrandLogoComponent alt="" className="mx-auto h-12" />
           {signInStep === 'password' && (
             <Step title="Login to CDM Optimiser">
               <LoginFormComponent />

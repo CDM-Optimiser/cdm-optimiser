@@ -77,9 +77,9 @@ lint rule or delete a test to get a green run. Report what fails instead.
         its Account page shows notices instead of the password form and
         the authenticator apps, and the database refuses a new password
         for it whatever the app does (runbook P2).
-    - `layout/`: the page frame: the header (`MainNavComponent` with its
-      `NavItemComponent` links; below `lg`, a menu button opening a drawer)
-      and the footer. They are this app's frame, not reusable building
+    - `layout/`: the page frame: the header (the logo, `BrandLogoComponent`,
+      linking home; `MainNavComponent` with its `NavItemComponent` links;
+      below `lg`, a menu button opening a drawer) and the footer. They are this app's frame, not reusable building
       blocks, so they live here rather than in `packages/ui`: the header
       needs the router, sign-in and the desktop theme, which `packages/ui`
       may not use.
@@ -113,6 +113,15 @@ lint rule or delete a test to get a green run. Report what fails instead.
       - `pending/`: the navigator of the pending patients page.
   - `lib/`: app-wide modules with no React (the Supabase client,
     `getErrorMessage`).
+- `apps/web/public`: files served as they are: the logo (`logo.svg`, and
+  `logo-dark.svg` with a white wordmark), the favicons, the phone and
+  Android icons (`apple-touch-icon.png`, `icon-192/512.png` in
+  `site.webmanifest`) and `og-image.png` (1200×630, for link previews).
+  `index.html` links them, with the Open Graph tags and `noindex`: the app
+  is private, so search engines must not list it (Netlify also sends
+  `X-Robots-Tag`). The smoke test checks each file is linked and served.
+  The desktop app's icon is `apps/desktop/build/icon.png` (1024×1024);
+  electron-builder makes the Windows icon from it.
   - `hooks/`: generic hooks used by several features (`useDebounce`,
     `useCloseOnWideScreen`). Feature hooks live in their feature folder.
   - Don't add a `utils/` folder: put each helper next to the feature that

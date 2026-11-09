@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="apps/web/public/logo-dark.svg" />
+    <img src="apps/web/public/logo.svg" alt="CDM Optimiser" width="320" />
+  </picture>
+</p>
+
 # CDM Optimiser
 
 **CDM Optimiser** is a healthcare analytics startup dedicated to empowering Irish GP practices to enhance their Chronic Disease Management (CDM) performance, maximise programme revenue, and streamline administrative workflows.
