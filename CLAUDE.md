@@ -15,7 +15,7 @@ data**: follow the privacy rules in `.claude/instructions.md`.
 
 | Path                      | Package                         | Contents                                                                                                                                                  |
 | ------------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `apps/web`                | `@cdm-optimiser/web`            | React 19 + Vite + Tailwind 4 SPA. Entry `src/main.tsx`, routes `src/app/app.tsx`, Supabase client `src/lib/supabase.ts`.                                  |
+| `apps/web`                | `@cdm-optimiser/web`            | React 19 + Vite + Tailwind 4 SPA. Entry `src/main.tsx`, routes `src/app/app.tsx`, Supabase client `src/lib/supabase.ts`; logo and icons in `public/`.     |
 | `apps/desktop`            | `@cdm-optimiser/desktop`        | Electron main process `src/main.ts`, updater `src/updater.ts`, preload `src/preload.cts`, packaging and update config `electron-builder.yml`.             |
 | `packages/ui`             | `@cdm-optimiser/ui`             | Presentational components (alert, button, card, dropdown, menu button, modal, switch, text field), icons and their hooks. Consumed as TypeScript source.  |
 | `packages/desktop-bridge` | `@cdm-optimiser/desktop-bridge` | Types-only IPC contract shared by the Electron main process, the preload and the web app (`src/index.d.ts`).                                              |
