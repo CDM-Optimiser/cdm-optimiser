@@ -33,6 +33,13 @@
     # robots.txt doesn't block crawling, so crawlers can read this.
     X-Robots-Tag = "noindex, nofollow"
 
+# Netlify doesn't know the .webmanifest extension and would send it as
+# application/octet-stream. Browsers accept that, but this is its real type.
+[[headers]]
+  for = "/site.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+
 # Vite fingerprints everything in /assets, so it can be cached forever.
 [[headers]]
   for = "/assets/*"
