@@ -21,7 +21,7 @@
     "@types/node": "^24.19.2",
     "concurrently": "^10.0.7",
     "cross-env": "^10.1.0",
-    "electron": "45.3.3",
+    "electron": "45.4.1",
     "electron-builder": "^26.18.1",
     "typescript": "~6.0.3",
     "wait-on": "^9.5.1"
